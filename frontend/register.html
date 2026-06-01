@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Register - Ascenda Groups</title>
   <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
 <nav class="navbar"><div class="nav-container">
@@ -14,27 +16,99 @@
 
 <div class="form-container">
   <h2>Create Account 🚀</h2>
-  <div id="error-msg" style="color:red;text-align:center;display:none;"></div>
-  <div id="success-msg" style="color:green;text-align:center;display:none;"></div>
-  <div class="form-group"><label>Full Name</label><input type="text" id="reg-name" required></div>
-  <div class="form-group"><label>Email</label><input type="email" id="reg-email" required></div>
-  <div class="form-group"><label>Password</label><input type="password" id="reg-password" required minlength="6"></div>
+  <div id="msg" style="text-align:center;display:none;padding:12px;border-radius:8px;margin-bottom:12px;"></div>
+  <div class="form-group"><label>Full Name *</label><input type="text" id="reg-name" required placeholder="John Doe"></div>
+  <div class="form-group"><label>Email *</label><input type="email" id="reg-email" required placeholder="you@example.com"></div>
+  <div class="form-group"><label>Password *</label><input type="password" id="reg-password" required placeholder="Min 6 characters" minlength="6"></div>
   <button id="register-btn" class="btn btn-primary btn-block btn-lg">Create Account</button>
-  <p style="text-align:center;margin-top:16px;">Have account? <a href="login.html">Login</a></p>
+  <p style="text-align:center;margin-top:16px;">Already have account? <a href="login.html">Login</a></p>
 </div>
 
-<script src="supabase.js"></script>
 <script>
-if(!window.supabaseClient) window.supabaseClient = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY, {auth:{persistSession:true,autoRefreshToken:true,storage:localStorage}});
-const sb = window.supabaseClient;
+const SUPABASE_URL = 'https://rfogomnbicceentrhymy.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmb2dvbW5iaWNjZWVudHJoeW15Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyNDQwOTEsImV4cCI6MjA5NTgyMDA5MX0.wke5a7GEdU2oepfKfSD-rthLTEmpk3GqVfFRM_MjZ9c';
+
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
 document.getElementById('register-btn').addEventListener('click', async () => {
-  const name = document.getElementById('reg-name').value, email = document.getElementById('reg-email').value, password = document.getElementById('reg-password').value;
-  const btn = document.getElementById('register-btn'), err = document.getElementById('error-msg'), suc = document.getElementById('success-msg');
-  err.style.display='none'; suc.style.display='none';
-  btn.disabled=true; btn.textContent='Creating...';
-  const {error} = await sb.auth.signUp({email,password,options:{data:{full_name:name}}});
-  if(error){ err.textContent=error.message; err.style.display='block'; btn.disabled=false; btn.textContent='Create Account'; }
-  else { suc.textContent='Account created! Redirecting...'; suc.style.display='block'; setTimeout(()=>window.location.href='dashboard.html',1500); }
+  const name = document.getElementById('reg-name').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  const password = document.getElementById('reg-password').value;
+  const btn = document.getElementById('register-btn');
+  const msg = document.getElementById('msg');
+
+  // Reset
+  msg.style.display = 'none';
+
+  // Validate
+  if (!name || !email || !password) {
+    msg.textContent = 'Please fill all fields';
+    msg.style.display = 'block';
+    msg.style.color = '#ef4444';
+    msg.style.background = 'rgba(239,68,68,0.1)';
+    return;
+  }
+
+  if (password.length < 6) {
+    msg.textContent = 'Password must be at least 6 characters';
+    msg.style.display = 'block';
+    msg.style.color = '#ef4444';
+    msg.style.background = 'rgba(239,68,68,0.1)';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Creating account...';
+
+  try {
+    const { data, error } = await sb.auth.signUp({
+      email: email,
+      password: password,
+      options: {
+        data: { full_name: name }
+      }
+    });
+
+    if (error) {
+      msg.textContent = error.message;
+      msg.style.display = 'block';
+      msg.style.color = '#ef4444';
+      msg.style.background = 'rgba(239,68,68,0.1)';
+      btn.disabled = false;
+      btn.textContent = 'Create Account';
+      return;
+    }
+
+    if (data.user) {
+      // Manually insert profile as backup
+      await sb.from('profiles').upsert({
+        id: data.user.id,
+        role: 'user',
+        full_name: name,
+        email: email,
+        created_at: new Date().toISOString()
+      });
+
+      msg.textContent = '✅ Account created! Redirecting...';
+      msg.style.display = 'block';
+      msg.style.color = '#10b981';
+      msg.style.background = 'rgba(16,185,129,0.1)';
+
+      // Auto-login after signup
+      await sb.auth.signInWithPassword({ email, password });
+
+      setTimeout(() => {
+        window.location.href = 'dashboard.html';
+      }, 1000);
+    }
+  } catch (err) {
+    msg.textContent = 'Something went wrong. Please try again.';
+    msg.style.display = 'block';
+    msg.style.color = '#ef4444';
+    msg.style.background = 'rgba(239,68,68,0.1)';
+    btn.disabled = false;
+    btn.textContent = 'Create Account';
+  }
 });
 </script>
 </body>
