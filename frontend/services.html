@@ -1,11 +1,61 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Services - Ascenda Groups</title><link rel="stylesheet" href="style.css"><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"><style>.services-hero{background:linear-gradient(135deg,#0a0f1c,#111827);padding:60px 20px;text-align:center;}.services-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:24px;max-width:1200px;margin:40px auto;padding:0 20px;}.service-card{background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:28px;cursor:pointer;transition:all 0.3s;}.service-card:hover{border-color:var(--blue);transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,0,0,0.4);}.service-card h3{font-size:1.2rem;margin:8px 0;}.service-card p{color:var(--text-secondary);font-size:0.9rem;}.skeleton-card{height:200px;background:linear-gradient(90deg,var(--bg-card)25%,var(--border)50%,var(--bg-card)75%);background-size:200%100%;animation:shimmer 1.5s infinite;border-radius:16px;}@keyframes shimmer{0%{background-position:200%0;}100%{background-position:-200%0;}}</style></head><body>
-<nav class="navbar"><div class="nav-container"><a href="index.html" class="logo"><img src="https://rfogomnbicceentrhymy.supabase.co/storage/v1/object/public/Ascenda%20pics/logo.png" alt="Ascenda"></a><div class="nav-links"><a href="index.html">Home</a><a href="about.html">About</a><a href="services.html" class="active">Services</a><a href="marketplace.html">Marketplace</a><a href="jobs.html">Jobs</a><a href="news.html">News</a><a href="contact.html">Contact</a><a href="login.html" class="btn btn-outline auth-login-btn">Login</a><a href="register.html" class="btn btn-primary auth-register-btn">Sign Up</a><span class="auth-user-name" style="display:none;color:var(--blue);"></span><a href="#" class="btn btn-outline auth-logout-btn" style="display:none;">Logout</a></div><button class="hamburger" id="hamburger"><span></span><span></span><span></span></button></div></nav>
-<div class="mobile-nav" id="mobileNav"><a href="index.html">Home</a><a href="about.html">About</a><a href="services.html">Services</a><a href="marketplace.html">Marketplace</a><a href="jobs.html">Jobs</a><a href="news.html">News</a><a href="contact.html">Contact</a></div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Services – Ascenda Groups</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <!-- UNIVERSAL NAVBAR -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="logo"><img src="https://rfogomnbicceentrhymy.supabase.co/storage/v1/object/public/Ascenda%20pics/logo.png" alt="Ascenda" style="height:36px;"></a>
+      <div class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="services.html">Services</a>
+        <a href="marketplace.html">Marketplace</a>
+        <a href="jobs.html">Jobs</a>
+        <a href="news.html">News</a>
+        <a href="contact.html">Contact</a>
+        <a href="login.html" class="btn btn-outline nav-login">Login</a>
+        <a href="register.html" class="btn btn-primary nav-register">Sign Up</a>
+        <a href="profile.html" class="btn btn-outline nav-profile" style="display:none;">👤 <span class="nav-username"></span></a>
+        <a href="admin.html" class="btn btn-outline nav-admin" style="display:none;color:#f59e0b;border-color:#f59e0b;">⚡ Admin</a>
+        <a href="#" class="btn btn-outline nav-logout" style="display:none;" onclick="logout()">Logout</a>
+      </div>
+      <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+    </div>
+  </nav>
+  <div class="mobile-nav" id="mobileNav">
+    <a href="index.html">🏠 Home</a>
+    <a href="about.html">📖 About</a>
+    <a href="services.html">🔧 Services</a>
+    <a href="marketplace.html">🏪 Marketplace</a>
+    <a href="jobs.html">💼 Jobs</a>
+    <a href="news.html">📰 News</a>
+    <a href="contact.html">✉️ Contact</a>
+    <a href="login.html" class="mob-login">🔑 Login</a>
+    <a href="register.html" class="mob-register">🚀 Sign Up</a>
+    <a href="profile.html" class="mob-profile" style="display:none;">👤 Profile</a>
+    <a href="admin.html" class="mob-admin" style="display:none;color:#f59e0b;">⚡ Admin</a>
+    <a href="#" class="mob-logout" style="display:none;" onclick="logout()">🚪 Logout</a>
+  </div>
 
-<section class="services-hero"><h1>Our Services</h1><p>Professional solutions for your needs</p></section>
-<div class="services-grid" id="services-list"><div class="skeleton-card"></div><div class="skeleton-card"></div><div class="skeleton-card"></div></div>
+  <!-- SERVICES LIST -->
+  <section class="container" style="padding:40px 20px;">
+    <h2>Our Services</h2>
+    <div id="services-list" class="cards-grid"></div>
+  </section>
 
-<section style="text-align:center;padding:60px 20px;background:var(--bg-secondary);"><h2>Interested?</h2><p style="color:var(--text-muted);">Register to get started</p><a href="register.html" class="btn btn-primary btn-xl">Create Account</a></section>
-<footer class="footer"><div class="footer-content"><p>© 2026 Ascenda Groups. CEO: Eyakem Takele Kebede</p></div></footer>
-<script src="supabase.js"></script><script src="script.js"></script>
-</body></html>
+  <footer class="footer">
+    <p>© <span data-setting="copyright_year">2026</span> Ascenda Groups. CEO: <span data-setting="ceo_name">Eyakem Takele Kebede</span></p>
+    <p><a href="https://t.me/ascendagroups" target="_blank">Telegram</a></p>
+  </footer>
+
+  <script src="supabase.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

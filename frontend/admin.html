@@ -1,14 +1,574 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Admin - Ascenda Groups</title><link rel="stylesheet" href="style.css"><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><style>.card{background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:20px;}table{width:100%;border-collapse:collapse;}th{background:rgba(0,0,0,0.3);padding:10px;text-align:left;font-size:0.75rem;text-transform:uppercase;color:var(--text-muted);}td{padding:10px;border-bottom:1px solid var(--border);}input,select,textarea{width:100%;padding:10px;background:var(--bg-primary);border:1px solid var(--border);color:white;border-radius:8px;margin-bottom:8px;}textarea{resize:vertical;min-height:60px;}.btn-sm{padding:4px 10px;font-size:0.75rem;}</style></head><body>
-<nav class="navbar"><div class="nav-container"><a href="index.html" class="logo"><img src="https://rfogomnbicceentrhymy.supabase.co/storage/v1/object/public/Ascenda%20pics/logo.png" alt="Ascenda"></a><div class="nav-links"><a href="index.html">Home</a><a href="#" class="btn btn-outline" onclick="logout()">Logout</a></div></div></nav>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel – Ascenda Groups</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    /* Additional admin‑specific styles (extend style.css) */
+    .admin-wrapper { display: flex; min-height: 100vh; }
+    .sidebar { width: 260px; background: var(--bg-card); border-right: 1px solid var(--border); padding: 20px; position: fixed; top: 0; left: 0; bottom: 0; overflow-y: auto; z-index: 90; transition: transform 0.3s; }
+    .sidebar nav a { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-radius: 10px; color: var(--text-muted); text-decoration: none; font-size: 0.9rem; margin-bottom: 2px; }
+    .sidebar nav a:hover, .sidebar nav a.active { background: rgba(59,130,246,0.1); color: var(--blue); }
+    .main-content { margin-left: 260px; flex: 1; padding: 30px; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 24px; }
+    .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 12px; }
+    .form-group { display: flex; flex-direction: column; gap: 4px; }
+    .form-group label { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; }
+    input, select, textarea { width: 100%; padding: 10px; background: var(--bg); border: 1px solid var(--border); color: white; border-radius: 8px; }
+    table { width: 100%; border-collapse: collapse; }
+    th { background: rgba(0,0,0,0.3); padding: 10px; text-align: left; font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); }
+    td { padding: 10px; border-bottom: 1px solid var(--border); }
+    .btn-sm { padding: 4px 10px; font-size: 0.75rem; }
+    .toast { position: fixed; top: 20px; right: 20px; padding: 14px 20px; background: var(--bg-card); border: 1px solid #10b981; border-radius: 12px; color: white; z-index: 9999; font-size: 0.9rem; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+    .toast.error { border-color: #ef4444; }
+    .mobile-toggle { display: none; position: fixed; top: 16px; left: 16px; z-index: 100; background: var(--blue); color: white; border: none; width: 40px; height: 40px; border-radius: 10px; font-size: 1.2rem; cursor: pointer; }
+    @media (max-width: 900px) {
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); }
+      .main-content { margin-left: 0; }
+      .mobile-toggle { display: flex; align-items: center; justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Mobile toggle -->
+  <button class="mobile-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
 
-<div style="max-width:1300px;margin:30px auto;padding:0 20px;"><h1>⚡ Admin Panel</h1><p style="color:var(--text-muted);">CEO: Eyakem Takele Kebede</p>
-<div style="display:flex;gap:8px;flex-wrap:wrap;margin:20px 0;">
-<button class="btn btn-primary" onclick="loadAdminTab('users')">👥 Users</button>
-<button class="btn btn-outline" onclick="loadAdminTab('departments')">🏢 Departments</button>
-<button class="btn btn-outline" onclick="loadAdminTab('services')">🔧 Services</button>
-<button class="btn btn-outline" onclick="loadAdminTab('messages')">✉️ Messages</button>
-</div>
-<div id="admin-content"><div class="skeleton" style="height:300px;"></div></div></div>
+  <div class="admin-wrapper">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div style="padding-bottom:20px;border-bottom:1px solid var(--border);margin-bottom:16px;">
+        <img src="https://rfogomnbicceentrhymy.supabase.co/storage/v1/object/public/Ascenda%20pics/logo.png" alt="Ascenda" style="height:32px;">
+      </div>
+      <nav>
+        <a href="#" class="active" data-tab="users" onclick="switchTab(event, 'users')">👥 Users</a>
+        <a href="#" data-tab="departments" onclick="switchTab(event, 'departments')">🏢 Departments</a>
+        <a href="#" data-tab="authority" onclick="switchTab(event, 'authority')">⭐ Authority</a>
+        <a href="#" data-tab="jobs" onclick="switchTab(event, 'jobs')">💼 Jobs</a>
+        <a href="#" data-tab="services" onclick="switchTab(event, 'services')">🔧 Services</a>
+        <a href="#" data-tab="marketplace" onclick="switchTab(event, 'marketplace')">🏪 Marketplace</a>
+        <a href="#" data-tab="news" onclick="switchTab(event, 'news')">📰 News</a>
+        <a href="#" data-tab="announcements" onclick="switchTab(event, 'announcements')">📢 Announcements</a>
+        <a href="#" data-tab="applications" onclick="switchTab(event, 'applications')">📋 Applications</a>
+        <a href="#" data-tab="messages" onclick="switchTab(event, 'messages')">✉️ Messages</a>
+        <a href="#" data-tab="settings" onclick="switchTab(event, 'settings')">⚙️ Settings</a>
+        <a href="index.html" style="margin-top:20px;">🏠 Back to Site</a>
+        <a href="#" onclick="logout()" style="color:var(--red);">🚪 Logout</a>
+      </nav>
+    </aside>
 
-<script src="supabase.js"></script><script src="script.js"></script>
-</body></html>
+    <!-- Main Content -->
+    <main class="main-content">
+      <div id="toast-container" style="position:fixed;top:20px;right:20px;z-index:9999;"></div>
+
+      <!-- USERS TAB -->
+      <div class="tab-content active" id="tab-users">
+        <div class="card">
+          <h3>All Users</h3>
+          <table id="users-table">
+            <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Department</th><th>Actions</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- DEPARTMENTS TAB -->
+      <div class="tab-content" id="tab-departments">
+        <div class="card">
+          <h3>Create Department</h3>
+          <div class="form-grid">
+            <input id="dept-name" placeholder="Department Name">
+            <input id="dept-desc" placeholder="Description">
+          </div>
+          <button class="btn btn-primary" onclick="addDepartment()">Create Department</button>
+        </div>
+        <div class="card">
+          <h3>Existing Departments</h3>
+          <table id="dept-table"><thead><tr><th>Name</th><th>Description</th><th>Actions</th></tr></thead><tbody></tbody></table>
+        </div>
+      </div>
+
+      <!-- AUTHORITY TAB -->
+      <div class="tab-content" id="tab-authority">
+        <div class="card">
+          <h3>Assign Authority</h3>
+          <div class="form-grid">
+            <input id="auth-title" placeholder="Title (e.g., Vice President)">
+            <input id="auth-level" type="number" placeholder="Level (1=Highest)">
+            <select id="auth-user"><option value="">Select User</option></select>
+            <select id="auth-dept"><option value="">Select Department</option></select>
+          </div>
+          <button class="btn btn-primary" onclick="addAuthority()">Assign</button>
+        </div>
+        <div class="card">
+          <h3>Authority Ladder</h3>
+          <table id="auth-table"><thead><tr><th>Title</th><th>Level</th><th>User</th><th>Department</th><th>Actions</th></tr></thead><tbody></tbody></table>
+        </div>
+      </div>
+
+      <!-- JOBS TAB -->
+      <div class="tab-content" id="tab-jobs">
+        <div class="card">
+          <h3>Post New Job</h3>
+          <div class="form-grid">
+            <input id="job-title" placeholder="Job Title">
+            <select id="job-dept"><option value="">Department</option></select>
+            <input id="job-loc" placeholder="Location">
+            <input id="job-type" placeholder="Type (Full-time)">
+            <input id="job-salary" placeholder="Salary">
+          </div>
+          <textarea id="job-desc" placeholder="Description" rows="3"></textarea>
+          <button class="btn btn-primary" onclick="addJob()">Post Job</button>
+        </div>
+        <div class="card">
+          <h3>Posted Jobs</h3>
+          <table id="job-table"><thead><tr><th>Title</th><th>Location</th><th>Department</th><th>Actions</th></tr></thead><tbody></tbody></table>
+        </div>
+      </div>
+
+      <!-- SERVICES TAB -->
+      <div class="tab-content" id="tab-services">
+        <div class="card">
+          <h3>Add Service</h3>
+          <div class="form-grid">
+            <input id="svc-title" placeholder="Service Title">
+            <input id="svc-price" placeholder="Price">
+            <select id="svc-dept"><option value="">Department</option></select>
+          </div>
+          <textarea id="svc-desc" placeholder="Description"></textarea>
+          <button class="btn btn-primary" onclick="addService()">Add Service</button>
+        </div>
+        <div class="card">
+          <h3>Services</h3>
+          <table id="svc-table"><thead><tr><th>Title</th><th>Price</th><th>Department</th><th>Status</th><th>Actions</th></tr></thead><tbody></tbody></table>
+        </div>
+      </div>
+
+      <!-- MARKETPLACE TAB -->
+      <div class="tab-content" id="tab-marketplace">
+        <div class="card">
+          <h3>Add Marketplace Item</h3>
+          <div class="form-grid">
+            <input id="mp-title" placeholder="Title">
+            <select id="mp-cat"><option>house</option><option>car</option><option>value_item</option><option>e_service</option><option>digital_product</option><option>other</option></select>
+            <input id="mp-price" type="number" step="0.01" placeholder="Price">
+            <input id="mp-contact" placeholder="Seller Contact">
+            <input id="mp-image" placeholder="Image/YouTube URL">
+          </div>
+          <textarea id="mp-desc" placeholder="Description"></textarea>
+          <button class="btn btn-primary" onclick="addMarketplaceItem()">Add Item</button>
+        </div>
+        <div class="card">
+          <h3>Items</h3>
+          <table id="mp-table"><thead><tr><th>Preview</th><th>Title</th><th>Category</th><th>Price</th><th>Actions</th></tr></thead><tbody></tbody></table>
+        </div>
+      </div>
+
+      <!-- NEWS TAB -->
+      <div class="tab-content" id="tab-news">
+        <div class="card">
+          <h3>Publish News</h3>
+          <div class="form-grid">
+            <input id="news-title" placeholder="Title">
+            <select id="news-type"><option>article</option><option>youtube</option><option>image</option><option>document</option></select>
+            <input id="news-media" placeholder="Media URL (YouTube/Image)">
+          </div>
+          <textarea id="news-content" placeholder="Content"></textarea>
+          <button class="btn btn-primary" onclick="addNews()">Publish</button>
+        </div>
+        <div class="card">
+          <h3>News</h3>
+          <table id="news-table"><thead><tr><th>Preview</th><th>Title</th><th>Type</th><th>Date</th><th>Actions</th></tr></thead><tbody></tbody></table>
+        </div>
+      </div>
+
+      <!-- ANNOUNCEMENTS TAB -->
+      <div class="tab-content" id="tab-announcements">
+        <div class="card">
+          <h3>Post Announcement</h3>
+          <textarea id="ann-msg" placeholder="Message"></textarea>
+          <select id="ann-type"><option>info</option><option>success</option><option>warning</option><option>urgent</option></select>
+          <button class="btn btn-primary" onclick="addAnnouncement()">Post</button>
+        </div>
+        <div class="card">
+          <h3>Active Announcements</h3>
+          <table id="ann-table"><thead><tr><th>Message</th><th>Type</th><th>Actions</th></tr></thead><tbody></tbody></table>
+        </div>
+      </div>
+
+      <!-- APPLICATIONS TAB -->
+      <div class="tab-content" id="tab-applications">
+        <div class="card">
+          <h3>Applications</h3>
+          <table id="app-table"><thead><tr><th>User</th><th>Type</th><th>Department</th><th>Status</th><th>Actions</th></tr></thead><tbody></tbody></table>
+        </div>
+      </div>
+
+      <!-- MESSAGES TAB -->
+      <div class="tab-content" id="tab-messages">
+        <div class="card">
+          <h3>Contact Messages</h3>
+          <table id="msg-table"><thead><tr><th>From</th><th>Email</th><th>Subject</th><th>Message</th><th>Date</th></tr></thead><tbody></tbody></table>
+        </div>
+      </div>
+
+      <!-- SETTINGS TAB -->
+      <div class="tab-content" id="tab-settings">
+        <div class="card">
+          <h3>Site Settings</h3>
+          <div id="settings-form"></div>
+          <button class="btn btn-primary" onclick="saveSettings()">Save Settings</button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // ========== SUPABASE INIT ==========
+    const SUPABASE_URL = 'https://rfogomnbicceentrhymy.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmb2dvbW5iaWNjZWVudHJoeW15Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyNDQwOTEsImV4cCI6MjA5NTgyMDA5MX0.wke5a7GEdU2oepfKfSD-rthLTEmpk3GqVfFRM_MjZ9c';
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: { persistSession: true, autoRefreshToken: true, storage: localStorage }
+    });
+
+    let currentAdmin = null;
+    let isAdmin = false;
+
+    // Check admin access
+    async function checkAdmin() {
+      const { data: { user } } = await sb.auth.getUser();
+      if (!user) { window.location.href = 'login.html'; return; }
+      currentAdmin = user;
+      const { data: profile } = await sb.from('profiles').select('role,email').eq('id', user.id).single();
+      if (!profile || (profile.role !== 'admin' && profile.role !== 'ceo' && profile.email !== 'takeleeyakem@gmail.com')) {
+        window.location.href = 'index.html';
+        return;
+      }
+      isAdmin = true;
+      // Load initial tab
+      switchTab(null, 'users');
+    }
+    checkAdmin();
+
+    function logout() { sb.auth.signOut(); window.location.href = 'index.html'; }
+
+    // ========== TOAST ==========
+    function showToast(msg, error = false) {
+      const t = document.createElement('div'); t.className = 'toast' + (error ? ' error' : '');
+      t.textContent = (error ? '❌ ' : '✅ ') + msg;
+      document.body.appendChild(t);
+      setTimeout(() => t.remove(), 3000);
+    }
+
+    // ========== TAB SWITCHING ==========
+    function switchTab(event, tabName) {
+      if (event) event.preventDefault();
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.sidebar nav a').forEach(a => a.classList.remove('active'));
+      document.getElementById('tab-' + tabName).classList.add('active');
+      const link = document.querySelector(`.sidebar nav a[data-tab="${tabName}"]`);
+      if (link) link.classList.add('active');
+      if (window.innerWidth < 900) document.getElementById('sidebar').classList.remove('open');
+      loadTabData(tabName);
+    }
+
+    // ========== DATA LOADERS ==========
+    async function loadTabData(tab) {
+      switch (tab) {
+        case 'users': await loadUsers(); break;
+        case 'departments': await loadDepartments(); break;
+        case 'authority': await loadAuthority(); break;
+        case 'jobs': await loadJobs(); break;
+        case 'services': await loadServices(); break;
+        case 'marketplace': await loadMarketplace(); break;
+        case 'news': await loadNews(); break;
+        case 'announcements': await loadAnnouncements(); break;
+        case 'applications': await loadApplications(); break;
+        case 'messages': await loadMessages(); break;
+        case 'settings': await loadSettings(); break;
+      }
+    }
+
+    // ---- USERS ----
+    async function loadUsers() {
+      const { data } = await sb.from('profiles').select('*');
+      const tbody = document.querySelector('#users-table tbody');
+      tbody.innerHTML = data.map(u => `
+        <tr>
+          <td>${u.full_name || ''}</td>
+          <td>${u.email}</td>
+          <td>${u.role}</td>
+          <td>${u.department || '-'}</td>
+          <td>
+            <select onchange="updateUserRole('${u.id}', this.value)" style="padding:4px 8px;background:var(--bg);color:white;border:1px solid var(--border);border-radius:6px;">
+              <option ${u.role === 'user' ? 'selected' : ''}>user</option>
+              <option ${u.role === 'agent' ? 'selected' : ''}>agent</option>
+              <option ${u.role === 'worker' ? 'selected' : ''}>worker</option>
+              <option ${u.role === 'dept_admin' ? 'selected' : ''}>dept_admin</option>
+              <option ${u.role === 'admin' ? 'selected' : ''}>admin</option>
+            </select>
+            <button class="btn btn-danger btn-sm" onclick="deleteUser('${u.id}')">Del</button>
+          </td>
+        </tr>`).join('');
+      // Also fill authority user select
+      const authUserSel = document.getElementById('auth-user');
+      if (authUserSel) authUserSel.innerHTML = '<option value="">Select User</option>' + data.map(u => `<option value="${u.id}">${u.full_name || u.email}</option>`).join('');
+    }
+
+    async function updateUserRole(userId, newRole) {
+      await sb.from('profiles').update({ role: newRole }).eq('id', userId);
+      showToast('Role updated');
+      loadUsers();
+    }
+    async function deleteUser(userId) {
+      if (!confirm('Delete this user permanently?')) return;
+      await sb.from('profiles').delete().eq('id', userId);
+      showToast('User deleted');
+      loadUsers();
+    }
+
+    // ---- DEPARTMENTS ----
+    async function loadDepartments() {
+      const { data } = await sb.from('departments').select('*');
+      document.querySelector('#dept-table tbody').innerHTML = data.map(d => `
+        <tr><td>${d.name}</td><td>${d.description || ''}</td><td><button class="btn btn-danger btn-sm" onclick="deleteItem('departments','${d.id}')">Del</button></td></tr>`).join('');
+      // Update department selects
+      const opts = data.map(d => `<option value="${d.id}">${d.name}</option>`).join('');
+      document.querySelectorAll('#auth-dept, #job-dept, #svc-dept').forEach(sel => {
+        sel.innerHTML = '<option value="">Select Department</option>' + opts;
+      });
+    }
+
+    async function addDepartment() {
+      const name = document.getElementById('dept-name').value.trim();
+      if (!name) return showToast('Name required', true);
+      await sb.from('departments').insert({ name, description: document.getElementById('dept-desc').value });
+      showToast('Department created');
+      loadDepartments();
+    }
+
+    // ---- AUTHORITY ----
+    async function loadAuthority() {
+      const { data } = await sb.from('authority').select('*, profiles(full_name), departments(name)').order('level');
+      document.querySelector('#auth-table tbody').innerHTML = data.map(a => `
+        <tr><td>${a.title}</td><td>${a.level}</td><td>${a.profiles?.full_name || 'Unassigned'}</td><td>${a.departments?.name || '-'}</td><td><button class="btn btn-danger btn-sm" onclick="deleteItem('authority','${a.id}')">Remove</button></td></tr>`).join('');
+    }
+
+    async function addAuthority() {
+      const title = document.getElementById('auth-title').value.trim();
+      const level = parseInt(document.getElementById('auth-level').value);
+      if (!title || !level) return showToast('Title and level required', true);
+      await sb.from('authority').insert({
+        title, level,
+        profile_id: document.getElementById('auth-user').value || null,
+        department_id: document.getElementById('auth-dept').value || null
+      });
+      showToast('Authority assigned');
+      loadAuthority();
+    }
+
+    // ---- JOBS ----
+    async function loadJobs() {
+      const { data } = await sb.from('jobs').select('*, departments(name)');
+      document.querySelector('#job-table tbody').innerHTML = data.map(j => `
+        <tr><td>${j.title}</td><td>${j.location || '-'}</td><td>${j.departments?.name || '-'}</td><td><button class="btn btn-danger btn-sm" onclick="deleteItem('jobs','${j.id}')">Del</button></td></tr>`).join('');
+    }
+
+    async function addJob() {
+      const title = document.getElementById('job-title').value.trim();
+      if (!title) return showToast('Title required', true);
+      await sb.from('jobs').insert({
+        title, description: document.getElementById('job-desc').value,
+        department_id: document.getElementById('job-dept').value || null,
+        location: document.getElementById('job-loc').value,
+        type: document.getElementById('job-type').value,
+        salary: document.getElementById('job-salary').value,
+        posted_by: currentAdmin.id
+      });
+      showToast('Job posted');
+      loadJobs();
+    }
+
+    // ---- SERVICES ----
+    async function loadServices() {
+      const { data } = await sb.from('services').select('*, departments(name)');
+      document.querySelector('#svc-table tbody').innerHTML = data.map(s => `
+        <tr><td>${s.title}</td><td>${s.price || '-'}</td><td>${s.departments?.name || '-'}</td>
+        <td><span class="badge ${s.is_active ? 'badge-approved' : 'badge-rejected'}">${s.is_active ? 'Active' : 'Hidden'}</span></td>
+        <td>
+          <button class="btn btn-sm btn-primary" onclick="toggleService('${s.id}', ${!s.is_active})">${s.is_active ? 'Hide' : 'Show'}</button>
+          <button class="btn btn-sm btn-danger" onclick="deleteItem('services','${s.id}')">Del</button>
+        </td></tr>`).join('');
+    }
+
+    async function addService() {
+      const title = document.getElementById('svc-title').value.trim();
+      if (!title) return showToast('Title required', true);
+      await sb.from('services').insert({
+        title, description: document.getElementById('svc-desc').value,
+        price: document.getElementById('svc-price').value,
+        department_id: document.getElementById('svc-dept').value || null,
+        posted_by: currentAdmin.id
+      });
+      showToast('Service added');
+      loadServices();
+    }
+
+    async function toggleService(id, status) {
+      await sb.from('services').update({ is_active: status }).eq('id', id);
+      showToast(status ? 'Activated' : 'Hidden');
+      loadServices();
+    }
+
+    // ---- MARKETPLACE ----
+    function getYouTubeThumb(url) {
+      if (!url) return null;
+      const match = url.match(/(?:youtu\.be\/|v\/|embed\/|watch\?v=|&v=)([^#&?]{11})/);
+      return match ? `https://img.youtube.com/vi/${match[1]}/hqdefault.jpg` : null;
+    }
+
+    async function loadMarketplace() {
+      const { data } = await sb.from('marketplace_items').select('*');
+      document.querySelector('#mp-table tbody').innerHTML = data.map(i => {
+        const yt = getYouTubeThumb(i.images?.[0]);
+        const thumb = yt || i.images?.[0];
+        return `<tr>
+          <td>${thumb ? `<img src="${thumb}" style="width:60px;height:40px;object-fit:cover;border-radius:6px;">` : '–'}</td>
+          <td>${i.title}</td><td>${i.category}</td><td>$${i.price}</td>
+          <td><button class="btn btn-danger btn-sm" onclick="deleteItem('marketplace_items','${i.id}')">Del</button></td>
+        </tr>`;
+      }).join('');
+    }
+
+    async function addMarketplaceItem() {
+      const title = document.getElementById('mp-title').value.trim();
+      if (!title) return showToast('Title required', true);
+      const images = document.getElementById('mp-image').value ? [document.getElementById('mp-image').value] : [];
+      await sb.from('marketplace_items').insert({
+        title, description: document.getElementById('mp-desc').value,
+        category: document.getElementById('mp-cat').value,
+        price: parseFloat(document.getElementById('mp-price').value) || 0,
+        seller_contact: document.getElementById('mp-contact').value,
+        images, posted_by: currentAdmin.id
+      });
+      showToast('Item added');
+      loadMarketplace();
+    }
+
+    // ---- NEWS ----
+    async function loadNews() {
+      const { data } = await sb.from('news_posts').select('*');
+      document.querySelector('#news-table tbody').innerHTML = data.map(n => {
+        const yt = getYouTubeThumb(n.media_url);
+        const thumb = yt || (n.type === 'image' ? n.media_url : null);
+        return `<tr>
+          <td>${thumb ? `<img src="${thumb}" style="width:60px;height:40px;object-fit:cover;border-radius:6px;">` : (n.type === 'youtube' ? '▶️' : '📄')}</td>
+          <td>${n.title}</td><td>${n.type}</td><td>${new Date(n.created_at).toLocaleDateString()}</td>
+          <td><button class="btn btn-danger btn-sm" onclick="deleteItem('news_posts','${n.id}')">Del</button></td>
+        </tr>`;
+      }).join('');
+    }
+
+    async function addNews() {
+      const title = document.getElementById('news-title').value.trim();
+      if (!title) return showToast('Title required', true);
+      await sb.from('news_posts').insert({
+        title, content: document.getElementById('news-content').value,
+        type: document.getElementById('news-type').value,
+        media_url: document.getElementById('news-media').value,
+        posted_by: currentAdmin.id
+      });
+      showToast('News published');
+      loadNews();
+    }
+
+    // ---- ANNOUNCEMENTS ----
+    async function loadAnnouncements() {
+      const { data } = await sb.from('announcements').select('*');
+      document.querySelector('#ann-table tbody').innerHTML = data.map(a => `
+        <tr><td>${a.message}</td><td>${a.type}</td><td><button class="btn btn-danger btn-sm" onclick="deleteItem('announcements','${a.id}')">Del</button></td></tr>`).join('');
+    }
+
+    async function addAnnouncement() {
+      const msg = document.getElementById('ann-msg').value.trim();
+      if (!msg) return showToast('Message required', true);
+      await sb.from('announcements').insert({ message: msg, type: document.getElementById('ann-type').value, posted_by: currentAdmin.id });
+      showToast('Announcement posted');
+      loadAnnouncements();
+    }
+
+    // ---- APPLICATIONS ----
+    async function loadApplications() {
+      const { data } = await sb.from('applications').select('*, profiles(full_name), departments(name)');
+      document.querySelector('#app-table tbody').innerHTML = data.map(a => `
+        <tr>
+          <td>${a.profiles?.full_name || ''}</td><td>${a.type}</td><td>${a.departments?.name || '-'}</td>
+          <td><span class="badge ${a.status === 'pending' ? 'badge-pending' : a.status === 'approved' ? 'badge-approved' : 'badge-rejected'}">${a.status}</span></td>
+          <td>${a.status === 'pending' ? `<button class="btn btn-success btn-sm" onclick="approveApp('${a.id}')">Approve</button> <button class="btn btn-danger btn-sm" onclick="rejectApp('${a.id}')">Reject</button>` : '-'}</td>
+        </tr>`).join('');
+    }
+
+    async function approveApp(id) {
+      const { data: app } = await sb.from('applications').select('*').eq('id', id).single();
+      await sb.from('applications').update({ status: 'approved', reviewed_by: currentAdmin.id }).eq('id', id);
+      if (app) {
+        const updates = {};
+        if (app.type === 'agent') updates.role = 'agent';
+        else if (app.type === 'worker') updates.role = 'worker';
+        else if (app.type === 'dept_admin') { updates.role = 'dept_admin'; if (app.department_id) updates.department = app.department_id; }
+        else if (app.type === 'job_poster') updates.can_post_jobs = true;
+        else if (app.type === 'marketplace_poster') updates.can_post_marketplace = true;
+        await sb.from('profiles').update(updates).eq('id', app.applicant_id);
+      }
+      showToast('Approved'); loadApplications();
+    }
+    async function rejectApp(id) {
+      await sb.from('applications').update({ status: 'rejected', reviewed_by: currentAdmin.id }).eq('id', id);
+      showToast('Rejected'); loadApplications();
+    }
+
+    // ---- MESSAGES ----
+    async function loadMessages() {
+      const { data } = await sb.from('contact_messages').select('*').order('created_at', { ascending: false });
+      document.querySelector('#msg-table tbody').innerHTML = data.map(m => `
+        <tr><td>${m.name}</td><td>${m.email}</td><td>${m.subject || '-'}</td><td>${m.message}</td><td>${new Date(m.created_at).toLocaleDateString()}</td></tr>`).join('');
+    }
+
+    // ---- SETTINGS ----
+    async function loadSettings() {
+      const { data } = await sb.from('site_settings').select('*');
+      const container = document.getElementById('settings-form');
+      container.innerHTML = data.map(s => `
+        <div class="form-group" style="margin-bottom:12px;">
+          <label>${s.key}</label>
+          <input id="set-${s.key}" value="${s.value || ''}">
+        </div>`).join('');
+    }
+
+    async function saveSettings() {
+      const inputs = document.querySelectorAll('#settings-form input');
+      for (let inp of inputs) {
+        const key = inp.id.replace('set-', '');
+        await sb.from('site_settings').update({ value: inp.value }).eq('key', key);
+      }
+      showToast('Settings saved');
+    }
+
+    // ---- Generic delete ----
+    async function deleteItem(table, id) {
+      if (!confirm('Delete permanently?')) return;
+      await sb.from(table).delete().eq('id', id);
+      showToast('Deleted');
+      loadTabData(table === 'departments' ? 'departments' : table === 'authority' ? 'authority' : table === 'jobs' ? 'jobs' : table === 'services' ? 'services' : table === 'marketplace_items' ? 'marketplace' : table === 'news_posts' ? 'news' : table === 'announcements' ? 'announcements' : 'users');
+    }
+
+    // Initial load of departments for selects
+    loadDepartments();
+  </script>
+</body>
+</html>

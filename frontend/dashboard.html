@@ -1,16 +1,151 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Dashboard - Ascenda Groups</title><link rel="stylesheet" href="style.css"><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script></head><body>
-<!-- INSERT UNIVERSAL NAVBAR HERE -->
-<div class="container" style="max-width:700px;margin:40px auto;">
-  <h2>Welcome, <span id="dash-name">User</span></h2>
-  <p>Role: <strong id="dash-role">user</strong></p>
-  <div class="card" style="margin-top:20px;">
-    <h3>Quick Actions</h3>
-    <a href="profile.html" class="btn btn-outline">Edit Profile</a>
-    <a href="jobs.html" class="btn btn-outline">Browse Jobs</a>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard – Ascenda Groups</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <!-- UNIVERSAL NAVBAR -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="logo"><img src="https://rfogomnbicceentrhymy.supabase.co/storage/v1/object/public/Ascenda%20pics/logo.png" alt="Ascenda" style="height:36px;"></a>
+      <div class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="services.html">Services</a>
+        <a href="marketplace.html">Marketplace</a>
+        <a href="jobs.html">Jobs</a>
+        <a href="news.html">News</a>
+        <a href="contact.html">Contact</a>
+        <a href="login.html" class="btn btn-outline nav-login">Login</a>
+        <a href="register.html" class="btn btn-primary nav-register">Sign Up</a>
+        <a href="profile.html" class="btn btn-outline nav-profile" style="display:none;">👤 <span class="nav-username"></span></a>
+        <a href="admin.html" class="btn btn-outline nav-admin" style="display:none;color:#f59e0b;border-color:#f59e0b;">⚡ Admin</a>
+        <a href="#" class="btn btn-outline nav-logout" style="display:none;" onclick="logout()">Logout</a>
+      </div>
+      <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+    </div>
+  </nav>
+  <div class="mobile-nav" id="mobileNav">
+    <a href="index.html">🏠 Home</a>
+    <a href="about.html">📖 About</a>
+    <a href="services.html">🔧 Services</a>
+    <a href="marketplace.html">🏪 Marketplace</a>
+    <a href="jobs.html">💼 Jobs</a>
+    <a href="news.html">📰 News</a>
+    <a href="contact.html">✉️ Contact</a>
+    <a href="login.html" class="mob-login">🔑 Login</a>
+    <a href="register.html" class="mob-register">🚀 Sign Up</a>
+    <a href="profile.html" class="mob-profile" style="display:none;">👤 Profile</a>
+    <a href="admin.html" class="mob-admin" style="display:none;color:#f59e0b;">⚡ Admin</a>
+    <a href="#" class="mob-logout" style="display:none;" onclick="logout()">🚪 Logout</a>
   </div>
-  <div id="admin-link" style="display:none;margin-top:20px;" class="card"><h3 style="color:var(--gold);">Admin</h3><a href="admin.html" class="btn btn-gold">Admin Panel</a></div>
-  <div id="dept-link" style="display:none;margin-top:20px;" class="card"><h3 style="color:var(--purple);">Department</h3><a href="dept-admin.html" class="btn btn-primary">Manage Department</a></div>
-</div>
-<footer class="footer"><p>© 2026 Ascenda Groups</p></footer>
-<script src="supabase.js"></script><script src="script.js"></script>
-</body></html>
+
+  <!-- DASHBOARD CONTENT -->
+  <div class="container" style="max-width:700px; margin:40px auto;">
+    <h2>Welcome, <span id="dash-name">User</span>!</h2>
+    <p>Role: <strong id="dash-role">user</strong></p>
+
+    <!-- Quick Actions -->
+    <div class="card" style="margin-top:20px;">
+      <h3>👤 Quick Actions</h3>
+      <a href="profile.html" class="btn btn-outline">Edit Profile</a>
+      <a href="jobs.html" class="btn btn-outline">Browse Jobs</a>
+      <button class="btn btn-primary" onclick="applyAsAgent()">Apply as Agent 🤝</button>
+    </div>
+
+    <!-- Admin Link (visible only for admin) -->
+    <div id="admin-link" style="display:none; margin-top:20px;" class="card">
+      <h3 style="color:var(--gold);">⚡ Admin Access</h3>
+      <a href="admin.html" class="btn btn-gold">Open Admin Panel</a>
+    </div>
+
+    <!-- Department Admin Link (visible for dept_admin & admin) -->
+    <div id="dept-link" style="display:none; margin-top:20px;" class="card">
+      <h3 style="color:var(--purple);">🏢 Department Management</h3>
+      <a href="dept-admin.html" class="btn btn-primary">Manage Department</a>
+    </div>
+
+    <!-- Agent Panel (visible for approved agents) -->
+    <div id="agent-panel" style="display:none; margin-top:20px;" class="card">
+      <h3 style="color:var(--green);">🤝 Agent Dashboard</h3>
+      <p>Status: <strong id="agent-status">-</strong></p>
+      <p>Commission Rate: <strong id="agent-rate">-</strong>%</p>
+      <p>Total Earnings: <strong style="color:var(--green);">$<span id="agent-earnings">0</span></strong></p>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <p>© <span data-setting="copyright_year">2026</span> Ascenda Groups. CEO: <span data-setting="ceo_name">Eyakem Takele Kebede</span></p>
+    <p><a href="https://t.me/ascendagroups" target="_blank">Telegram</a></p>
+  </footer>
+
+  <script src="supabase.js"></script>
+  <script>
+    const sbDash = window.supabaseClient || supabase.createClient(
+      'https://rfogomnbicceentrhymy.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmb2dvbW5iaWNjZWVudHJoeW15Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyNDQwOTEsImV4cCI6MjA5NTgyMDA5MX0.wke5a7GEdU2oepfKfSD-rthLTEmpk3GqVfFRM_MjZ9c',
+      { auth: { persistSession: true, autoRefreshToken: true, storage: localStorage } }
+    );
+
+    async function initDashboard() {
+      const { data: { user } } = await sbDash.auth.getUser();
+      if (!user) { window.location.href = 'login.html'; return; }
+
+      const { data: profile } = await sbDash.from('profiles').select('*').eq('id', user.id).single();
+      if (!profile) return;
+
+      document.getElementById('dash-name').textContent = profile.full_name || user.email?.split('@')[0];
+      document.getElementById('dash-role').textContent = profile.role.toUpperCase();
+
+      // Admin?
+      const isAdmin = profile.role === 'admin' || profile.role === 'ceo' || profile.email === 'takeleeyakem@gmail.com';
+      if (isAdmin) {
+        document.getElementById('admin-link').style.display = 'block';
+        document.getElementById('dept-link').style.display = 'block';
+      }
+
+      // Department admin?
+      if (profile.role === 'dept_admin') {
+        document.getElementById('dept-link').style.display = 'block';
+      }
+
+      // Agent?
+      if (profile.role === 'agent') {
+        document.getElementById('agent-panel').style.display = 'block';
+        const { data: agent } = await sbDash.from('agents').select('*').eq('profile_id', user.id).single();
+        if (agent) {
+          document.getElementById('agent-status').textContent = agent.status;
+          document.getElementById('agent-rate').textContent = agent.commission_rate;
+          document.getElementById('agent-earnings').textContent = agent.total_earnings || 0;
+        }
+      }
+    }
+
+    // Apply as agent
+    window.applyAsAgent = async function() {
+      const { data: { user } } = await sbDash.auth.getUser();
+      if (!user) return alert('Login first');
+      const { error } = await sbDash.from('applications').insert({
+        applicant_id: user.id,
+        type: 'agent',
+        status: 'pending'
+      });
+      if (error) alert('Error: ' + error.message);
+      else alert('Application submitted! Admin will review.');
+    };
+
+    // Logout (used by navbar)
+    window.logout = async function() {
+      await sbDash.auth.signOut();
+      window.location.href = 'index.html';
+    };
+
+    initDashboard();
+  </script>
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,72 +1,78 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>About - Ascenda Groups</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About – Ascenda Groups</title>
   <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
-<nav class="navbar"><div class="nav-container">
-  <a href="index.html" class="logo"><img src="https://rfogomnbicceentrhymy.supabase.co/storage/v1/object/public/Ascenda%20pics/logo.png" alt="Ascenda"></a>
-  <div class="nav-links">
-    <a href="index.html">Home</a><a href="about.html" class="active">About</a><a href="services.html">Services</a><a href="marketplace.html">Marketplace</a><a href="jobs.html">Jobs</a><a href="news.html">News</a><a href="contact.html">Contact</a>
-    <a href="login.html" class="btn btn-outline auth-login-btn">Login</a><a href="register.html" class="btn btn-primary auth-register-btn">Sign Up</a>
-    <span class="auth-user-name" style="display:none;color:var(--blue);font-weight:600;"></span>
-    <a href="#" class="btn btn-outline auth-logout-btn" style="display:none;">Logout</a>
-  </div>
-  <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
-</div></nav>
-<div class="mobile-nav" id="mobileNav">
-  <a href="index.html">Home</a><a href="about.html">About</a><a href="services.html">Services</a><a href="marketplace.html">Marketplace</a><a href="jobs.html">Jobs</a><a href="news.html">News</a><a href="contact.html">Contact</a><a href="login.html">Login</a><a href="register.html">Sign Up</a>
-</div>
-
-<section class="section">
-  <div class="container">
-    <div class="section-header">
-      <span class="section-badge">Our Story</span>
-      <h2>About Ascenda Groups</h2>
-      <p>Building bridges between opportunity and talent worldwide</p>
-    </div>
-
-    <!-- CEO Section -->
-    <div class="card" style="max-width:800px;margin:0 auto 40px;border-color:var(--gold);">
-      <div style="text-align:center;">
-        <img src="https://via.placeholder.com/120" class="avatar-lg" style="border:3px solid var(--gold);">
-        <h3 style="color:var(--gold);">⭐ CEO & Founder</h3>
-        <h2 data-setting="ceo_name" style="font-size:1.8rem;">Eyakem Takele Kebede</h2>
-        <p data-setting="ceo_email" style="color:var(--text-muted);">takeleeyakem@gmail.com</p>
-        <p style="margin-top:12px;line-height:1.8;">Visionary leader driving Ascenda Groups forward. Empowering traders, businesses, and communities through innovative digital solutions.</p>
-        <div style="display:flex;gap:12px;justify-content:center;margin-top:16px;">
-          <a href="#" class="btn btn-outline btn-icon" id="ceo-instagram">📷</a>
-          <a href="#" class="btn btn-outline btn-icon" id="ceo-tiktok">🎵</a>
-          <a href="https://t.me/ascendagroups" class="btn btn-outline btn-icon" target="_blank">📱</a>
-        </div>
+  <!-- UNIVERSAL NAVBAR -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="logo"><img src="https://rfogomnbicceentrhymy.supabase.co/storage/v1/object/public/Ascenda%20pics/logo.png" alt="Ascenda" style="height:36px;"></a>
+      <div class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="services.html">Services</a>
+        <a href="marketplace.html">Marketplace</a>
+        <a href="jobs.html">Jobs</a>
+        <a href="news.html">News</a>
+        <a href="contact.html">Contact</a>
+        <a href="login.html" class="btn btn-outline nav-login">Login</a>
+        <a href="register.html" class="btn btn-primary nav-register">Sign Up</a>
+        <a href="profile.html" class="btn btn-outline nav-profile" style="display:none;">👤 <span class="nav-username"></span></a>
+        <a href="admin.html" class="btn btn-outline nav-admin" style="display:none;color:#f59e0b;border-color:#f59e0b;">⚡ Admin</a>
+        <a href="#" class="btn btn-outline nav-logout" style="display:none;" onclick="logout()">Logout</a>
       </div>
+      <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
     </div>
-
-    <!-- Authority Ladder -->
-    <div class="section-header"><span class="section-badge">Leadership</span><h2>Authority Ladder</h2></div>
-    <div id="authority-ladder" style="max-width:600px;margin:0 auto 40px;">
-      <div class="skeleton" style="height:200px;"></div>
-    </div>
-
-    <!-- Departments -->
-    <div class="section-header"><span class="section-badge">Structure</span><h2>Our Departments</h2></div>
-    <div id="departments-list" class="cards-grid"></div>
-
-    <!-- Workers -->
-    <div class="section-header" style="margin-top:40px;"><span class="section-badge">Team</span><h2>Our Workers</h2></div>
-    <div id="workers-grid" class="cards-grid"></div>
+  </nav>
+  <div class="mobile-nav" id="mobileNav">
+    <a href="index.html">🏠 Home</a>
+    <a href="about.html">📖 About</a>
+    <a href="services.html">🔧 Services</a>
+    <a href="marketplace.html">🏪 Marketplace</a>
+    <a href="jobs.html">💼 Jobs</a>
+    <a href="news.html">📰 News</a>
+    <a href="contact.html">✉️ Contact</a>
+    <a href="login.html" class="mob-login">🔑 Login</a>
+    <a href="register.html" class="mob-register">🚀 Sign Up</a>
+    <a href="profile.html" class="mob-profile" style="display:none;">👤 Profile</a>
+    <a href="admin.html" class="mob-admin" style="display:none;color:#f59e0b;">⚡ Admin</a>
+    <a href="#" class="mob-logout" style="display:none;" onclick="logout()">🚪 Logout</a>
   </div>
-</section>
 
-<footer class="footer"><div class="footer-content">
-  <div class="footer-links"><a href="index.html">Home</a><a href="about.html">About</a><a href="services.html">Services</a><a href="contact.html">Contact</a></div>
-  <p>© <span data-setting="copyright_year">2026</span> Ascenda Groups. CEO: <span data-setting="ceo_name">Eyakem Takele Kebede</span></p>
-  <p><a href="https://t.me/ascendagroups" target="_blank">Telegram</a></p>
-</div></footer>
-<script src="supabase.js"></script><script src="script.js"></script>
+  <!-- CEO Section -->
+  <section class="container" style="padding:40px 20px; text-align:center;">
+    <img src="https://rfogomnbicceentrhymy.supabase.co/storage/v1/object/public/Ascenda%20pics/logo.png" alt="CEO" style="width:120px; border-radius:50%; margin-bottom:20px;">
+    <h2 data-setting="ceo_name">Eyakem Takele Kebede</h2>
+    <p class="text-muted">CEO & Founder</p>
+    <p style="max-width:600px; margin:0 auto; color:var(--text-muted);">Visionary leader driving Ascenda Groups forward. Empowering traders, businesses, and communities through innovative digital solutions.</p>
+    <div style="margin-top:20px;">
+      <a href="https://t.me/ascendagroups" target="_blank" class="btn btn-outline">Telegram</a>
+    </div>
+  </section>
+
+  <!-- Workers Grid -->
+  <section class="container" style="padding:40px 20px;">
+    <h2>Our Team</h2>
+    <div id="workers-grid" class="cards-grid"></div>
+  </section>
+
+  <!-- Authority Ladder -->
+  <section class="container" style="padding:40px 20px;">
+    <h2>Authority Ladder</h2>
+    <div id="authority-ladder"></div>
+  </section>
+
+  <footer class="footer">
+    <p>© <span data-setting="copyright_year">2026</span> Ascenda Groups. CEO: <span data-setting="ceo_name">Eyakem Takele Kebede</span></p>
+    <p><a href="https://t.me/ascendagroups" target="_blank">Telegram</a></p>
+  </footer>
+
+  <script src="supabase.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>

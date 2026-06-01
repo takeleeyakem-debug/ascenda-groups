@@ -1,27 +1,20 @@
-// ============================================
-// ASCENDA GROUPS - FINAL SCRIPT
-// All fixes applied
-// ============================================
-
-if (window.supabase && !window.supabaseClient) {
-  window.supabaseClient = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY, {
-    auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, storage: window.localStorage }
-  });
-}
-const sb = window.supabaseClient;
+// Ascenda Groups – Complete Script
+const sb = window.supabaseClient || window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY, {
+  auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, storage: window.localStorage }
+});
 
 let currentUser = null;
 let currentProfile = null;
 let isAdmin = false;
 
-// ========== DOM READY ==========
+// ---------- DOM READY ----------
 document.addEventListener('DOMContentLoaded', async () => {
   initMobileNav();
   await restoreSession();
   initPageLogic();
 });
 
-// ========== MOBILE NAV ==========
+// ---------- MOBILE NAV (right slide, half screen) ----------
 function initMobileNav() {
   const hamburger = document.getElementById('hamburger');
   const mobileNav = document.getElementById('mobileNav');
@@ -38,149 +31,160 @@ function initMobileNav() {
   function open() {
     hamburger.classList.add('active'); mobileNav.style.transform = 'translateX(0)'; mobileNav.style.visibility = 'visible';
     overlay.style.opacity = '1'; overlay.style.pointerEvents = 'all'; document.body.style.overflow = 'hidden';
-    const s = hamburger.querySelectorAll('span'); s[0].style.transform = 'rotate(45deg) translate(5px,6px)'; s[0].style.background = '#3b82f6'; s[1].style.opacity = '0'; s[2].style.transform = 'rotate(-45deg) translate(5px,-6px)'; s[2].style.background = '#3b82f6';
+    const s = hamburger.querySelectorAll('span');
+    s[0].style.transform = 'rotate(45deg) translate(5px,6px)'; s[0].style.background = '#3b82f6';
+    s[1].style.opacity = '0'; s[2].style.transform = 'rotate(-45deg) translate(5px,-6px)'; s[2].style.background = '#3b82f6';
   }
   function close() {
     hamburger.classList.remove('active'); mobileNav.style.transform = 'translateX(100%)'; mobileNav.style.visibility = 'hidden';
     overlay.style.opacity = '0'; overlay.style.pointerEvents = 'none'; document.body.style.overflow = '';
-    const s = hamburger.querySelectorAll('span'); s[0].style.transform = 'rotate(0)'; s[0].style.background = '#f1f5f9'; s[1].style.opacity = '1'; s[2].style.transform = 'rotate(0)'; s[2].style.background = '#f1f5f9';
+    const s = hamburger.querySelectorAll('span');
+    s[0].style.transform = 'rotate(0)'; s[0].style.background = '#f1f5f9';
+    s[1].style.opacity = '1'; s[2].style.transform = 'rotate(0)'; s[2].style.background = '#f1f5f9';
   }
 
   hamburger.addEventListener('click', (e) => { e.stopPropagation(); hamburger.classList.contains('active') ? close() : open(); });
   overlay.addEventListener('click', close);
-  mobileNav.querySelectorAll('a').forEach(l => { l.style.cssText = 'display:block;width:100%;color:#f1f5f9;text-decoration:none;padding:14px 18px;font-size:1rem;border-radius:10px;margin-bottom:4px;background:rgba(26,35,50,0.6);'; l.addEventListener('click', close); });
+  mobileNav.querySelectorAll('a').forEach(l => l.addEventListener('click', close));
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
+
   function check() { hamburger.style.display = window.innerWidth <= 768 ? 'flex' : 'none'; if (window.innerWidth > 768) close(); }
   window.addEventListener('resize', check); check();
+
+  mobileNav.querySelectorAll('a').forEach(l => {
+    l.style.cssText = 'display:block;width:100%;color:#f1f5f9;text-decoration:none;padding:14px 18px;font-size:1rem;border-radius:10px;margin-bottom:4px;background:rgba(26,35,50,0.6);';
+  });
 }
 
-// ========== SESSION & AUTH UI ==========
+// ---------- AUTH & SESSION ----------
 async function restoreSession() {
-  try {
-    const { data: { session } } = await sb.auth.getSession();
-    if (session?.user) {
-      currentUser = session.user;
-      const { data: profile } = await sb.from('profiles').select('*').eq('id', currentUser.id).single();
-      currentProfile = profile || { id: currentUser.id, role: 'user', full_name: currentUser.user_metadata?.full_name || currentUser.email };
-      isAdmin = currentProfile.role === 'admin' || currentProfile.role === 'ceo' || currentProfile.email === 'takeleeyakem@gmail.com';
-      showLoggedInUI();
-    } else { showLoggedOutUI(); }
-  } catch (e) { showLoggedOutUI(); }
+  const { data: { session } } = await sb.auth.getSession();
+  if (session?.user) {
+    currentUser = session.user;
+    const { data: profile } = await sb.from('profiles').select('*').eq('id', currentUser.id).single();
+    currentProfile = profile || { id: currentUser.id, role: 'user', full_name: currentUser.user_metadata?.full_name || currentUser.email };
+    isAdmin = currentProfile.role === 'admin' || currentProfile.role === 'ceo' || currentProfile.email === window.CEO_EMAIL;
+    updateUIForRole();
+  } else {
+    updateUIForRole();
+  }
 
   sb.auth.onAuthStateChange(async (event, session) => {
     if (event === 'SIGNED_IN' && session?.user) {
       currentUser = session.user;
       const { data: profile } = await sb.from('profiles').select('*').eq('id', currentUser.id).single();
       currentProfile = profile || { id: currentUser.id, role: 'user' };
-      isAdmin = currentProfile.role === 'admin' || currentProfile.role === 'ceo' || currentProfile.email === 'takeleeyakem@gmail.com';
-      showLoggedInUI();
+      isAdmin = currentProfile.role === 'admin' || currentProfile.role === 'ceo' || currentProfile.email === window.CEO_EMAIL;
+      updateUIForRole();
     }
-    if (event === 'SIGNED_OUT') { currentUser = null; currentProfile = null; isAdmin = false; showLoggedOutUI(); }
+    if (event === 'SIGNED_OUT') {
+      currentUser = null; currentProfile = null; isAdmin = false; updateUIForRole();
+    }
   });
 }
 
-function showLoggedInUI() {
-  document.querySelectorAll('.nav-login').forEach(e => e.style.display = 'none');
-  document.querySelectorAll('.nav-register').forEach(e => e.style.display = 'none');
-  document.querySelectorAll('.nav-profile').forEach(e => e.style.display = 'inline-flex');
-  document.querySelectorAll('.nav-logout').forEach(e => e.style.display = 'inline-flex');
-  document.querySelectorAll('.nav-username').forEach(e => { e.textContent = currentProfile?.full_name || currentUser?.email?.split('@')[0] || 'User'; });
-  if (isAdmin) document.querySelectorAll('.nav-admin').forEach(e => e.style.display = 'inline-flex');
-  document.querySelectorAll('.mob-login').forEach(e => e.style.display = 'none');
-  document.querySelectorAll('.mob-register').forEach(e => e.style.display = 'none');
-  document.querySelectorAll('.mob-profile').forEach(e => e.style.display = 'block');
-  document.querySelectorAll('.mob-logout').forEach(e => e.style.display = 'block');
-  if (isAdmin) document.querySelectorAll('.mob-admin').forEach(e => e.style.display = 'block');
-}
+function updateUIForRole() {
+  const loggedIn = !!currentUser;
+  document.querySelectorAll('.nav-login').forEach(e => e.style.display = loggedIn ? 'none' : 'inline-flex');
+  document.querySelectorAll('.nav-register').forEach(e => e.style.display = loggedIn ? 'none' : 'inline-flex');
+  document.querySelectorAll('.nav-profile').forEach(e => e.style.display = loggedIn ? 'inline-flex' : 'none');
+  document.querySelectorAll('.nav-logout').forEach(e => e.style.display = loggedIn ? 'inline-flex' : 'none');
+  document.querySelectorAll('.nav-admin').forEach(e => e.style.display = (loggedIn && isAdmin) ? 'inline-flex' : 'none');
+  if (loggedIn) {
+    document.querySelectorAll('.nav-username').forEach(e => { e.textContent = currentProfile?.full_name || currentUser.email?.split('@')[0]; });
+  }
 
-function showLoggedOutUI() {
-  document.querySelectorAll('.nav-login').forEach(e => e.style.display = 'inline-flex');
-  document.querySelectorAll('.nav-register').forEach(e => e.style.display = 'inline-flex');
-  document.querySelectorAll('.nav-profile').forEach(e => e.style.display = 'none');
-  document.querySelectorAll('.nav-logout').forEach(e => e.style.display = 'none');
-  document.querySelectorAll('.nav-admin').forEach(e => e.style.display = 'none');
-  document.querySelectorAll('.mob-login').forEach(e => e.style.display = 'block');
-  document.querySelectorAll('.mob-register').forEach(e => e.style.display = 'block');
-  document.querySelectorAll('.mob-profile').forEach(e => e.style.display = 'none');
-  document.querySelectorAll('.mob-logout').forEach(e => e.style.display = 'none');
-  document.querySelectorAll('.mob-admin').forEach(e => e.style.display = 'none');
+  document.querySelectorAll('.mob-login').forEach(e => e.style.display = loggedIn ? 'none' : 'block');
+  document.querySelectorAll('.mob-register').forEach(e => e.style.display = loggedIn ? 'none' : 'block');
+  document.querySelectorAll('.mob-profile').forEach(e => e.style.display = loggedIn ? 'block' : 'none');
+  document.querySelectorAll('.mob-logout').forEach(e => e.style.display = loggedIn ? 'block' : 'none');
+  document.querySelectorAll('.mob-admin').forEach(e => e.style.display = (loggedIn && isAdmin) ? 'block' : 'none');
 }
 
 async function logout() { await sb.auth.signOut(); window.location.href = 'index.html'; }
 
-function showToast(msg, err) {
-  const t = document.createElement('div'); t.style.cssText = `position:fixed;top:20px;right:20px;padding:14px 20px;background:#1a2332;border:1px solid ${err?'#ef4444':'#10b981'};border-radius:12px;color:white;z-index:9999;font-size:0.9rem;`;
-  t.textContent = (err ? '❌ ' : '✅ ') + msg; document.body.appendChild(t); setTimeout(() => t.remove(), 3000);
+function showToast(msg, isError = false) {
+  const t = document.createElement('div');
+  t.style.cssText = `position:fixed;top:20px;right:20px;padding:14px 20px;background:#1a2332;border:1px solid ${isError?'#ef4444':'#10b981'};border-radius:12px;color:white;z-index:9999;font-size:0.9rem;`;
+  t.textContent = (isError ? '❌ ' : '✅ ') + msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3000);
 }
 
-// ========== PAGE ROUTER ==========
+// ---------- PAGE ROUTER ----------
 function initPageLogic() {
-  const p = window.location.pathname;
-  if (p.includes('index.html') || p === '/' || p.endsWith('/frontend/')) loadHome();
-  if (p.includes('services.html')) loadServices();
-  if (p.includes('dashboard.html')) loadDashboard();
-  if (p.includes('admin.html')) initAdmin();
-  if (p.includes('dept-admin.html')) initDept();
-  if (p.includes('profile.html')) { if (!currentUser) window.location.href = 'login.html'; }
+  const path = window.location.pathname;
+  if (path.includes('index.html') || path === '/' || path.endsWith('/frontend/')) loadHome();
+  else if (path.includes('about.html')) loadAbout();
+  else if (path.includes('services.html')) loadServices();
+  else if (path.includes('marketplace.html')) loadMarketplace();
+  else if (path.includes('jobs.html')) loadJobs();
+  else if (path.includes('news.html')) loadNews();
+  else if (path.includes('dashboard.html')) loadDashboard();
+  // admin and dept-admin are self-contained, but we still call their init if needed
+  else if (path.includes('profile.html')) { if (!currentUser) window.location.href = 'login.html'; }
 }
 
+// ---- dynamic page loaders (called by router) ----
 async function loadHome() {
   const [jobs, services] = await Promise.all([
     sb.from('jobs').select('*').eq('is_active', true).limit(4),
     sb.from('services').select('*').eq('is_active', true).limit(4)
   ]);
-  const jc = document.getElementById('featured-jobs'); if (jc) jc.innerHTML = (jobs.data || []).map(j => `<div class="card"><span class="badge badge-blue">Job</span><h3>${j.title}</h3><p>${j.location || 'Remote'}</p></div>`).join('') || '<p>No jobs</p>';
-  const sc = document.getElementById('featured-services'); if (sc) sc.innerHTML = (services.data || []).map(s => `<div class="card"><span class="badge badge-purple">Service</span><h3>${s.title}</h3></div>`).join('') || '<p>No services</p>';
+  const jc = document.getElementById('featured-jobs');
+  if (jc) jc.innerHTML = (jobs.data || []).map(j => `<div class="card"><span class="badge badge-blue">Job</span><h3>${j.title}</h3><p>${j.location || 'Remote'}</p></div>`).join('') || '<p>No jobs</p>';
+  const sc = document.getElementById('featured-services');
+  if (sc) sc.innerHTML = (services.data || []).map(s => `<div class="card"><span class="badge badge-purple">Service</span><h3>${s.title}</h3></div>`).join('') || '<p>No services</p>';
+}
+
+async function loadAbout() {
+  const [workers, authority] = await Promise.all([
+    sb.from('profiles').select('*').or('role.eq.worker,role.eq.dept_admin'),
+    sb.from('authority').select('*, profiles(full_name), departments(name)').order('level')
+  ]);
+  const wc = document.getElementById('workers-grid');
+  if (wc) wc.innerHTML = (workers.data || []).map(w => `<div class="card text-center"><img src="${w.avatar_url || 'https://via.placeholder.com/100'}" style="width:80px;height:80px;border-radius:50%;margin:0 auto 12px;"><h3>${w.full_name}</h3><p>${w.position || 'Worker'}</p></div>`).join('') || '<p>No workers</p>';
+  const ac = document.getElementById('authority-ladder');
+  if (ac) ac.innerHTML = authority.data?.map(a => `<div class="card"><h3>${a.title} (Level ${a.level})</h3><p>${a.profiles?.full_name || 'Unassigned'} – ${a.departments?.name || 'N/A'}</p></div>`).join('') || '<p>No authority set</p>';
 }
 
 async function loadServices() {
   const { data } = await sb.from('services').select('*, departments(name)').eq('is_active', true);
-  const c = document.getElementById('services-list'); if (c) c.innerHTML = (data || []).map(s => `<div class="card"><span class="badge badge-purple">Service</span><h3>${s.title}</h3><p>${(s.description || '').substring(0, 80)}...</p>${s.price ? `<p style="color:var(--green);">${s.price}</p>` : ''}${s.departments?.name ? `<span style="font-size:0.75rem;color:var(--purple);">${s.departments.name}</span>` : ''}</div>`).join('') || '<p>No services</p>';
+  const c = document.getElementById('services-list');
+  if (c) c.innerHTML = (data || []).map(s => `<div class="card"><span class="badge badge-purple">Service</span><h3>${s.title}</h3><p>${(s.description || '').substring(0, 80)}...</p>${s.price ? `<p style="color:var(--green);">${s.price}</p>` : ''}${s.departments?.name ? `<span style="font-size:0.75rem;color:var(--purple);">${s.departments.name}</span>` : ''}</div>`).join('') || '<p>No services</p>';
+}
+
+async function loadMarketplace() {
+  const { data } = await sb.from('marketplace_items').select('*').eq('is_active', true);
+  const c = document.getElementById('marketplace-list');
+  if (c) c.innerHTML = data?.map(i => `<div class="card"><span class="badge badge-green">${i.category}</span><h3>${i.title}</h3><p style="color:var(--green);">$${i.price}</p><p>${i.description || ''}</p><small>📞 ${i.seller_contact || 'N/A'}</small></div>`).join('') || '<p>No items</p>';
+}
+
+async function loadJobs() {
+  const { data } = await sb.from('jobs').select('*').eq('is_active', true);
+  const c = document.getElementById('jobs-list');
+  if (c) c.innerHTML = data?.map(j => `<div class="card"><span class="badge badge-blue">Job</span><h3>${j.title}</h3><p>📍 ${j.location || 'Remote'}</p><p>${j.description || ''}</p><button class="btn btn-primary" onclick="applyForJob('${j.id}')">Apply</button></div>`).join('') || '<p>No jobs</p>';
+}
+
+async function applyForJob(jobId) {
+  if (!currentUser) { showToast('Login first', true); window.location.href = 'login.html'; return; }
+  const { error } = await sb.from('job_applications').insert({ job_id: jobId, applicant_id: currentUser.id });
+  error ? showToast('Failed: ' + error.message, true) : showToast('Applied!');
+}
+
+async function loadNews() {
+  const { data } = await sb.from('news_posts').select('*').eq('is_published', true).order('created_at', { ascending: false });
+  const c = document.getElementById('news-list');
+  if (c) c.innerHTML = data?.map(n => `<div class="card">${n.media_url ? (n.type === 'video' ? `<video src="${n.media_url}" controls style="width:100%;border-radius:8px;"></video>` : `<img src="${n.media_url}" style="width:100%;border-radius:8px;">`) : ''}<span class="badge badge-gold">${n.type}</span><h3>${n.title}</h3><p>${n.content || ''}</p></div>`).join('') || '<p>No news</p>';
 }
 
 async function loadDashboard() {
   if (!currentUser) { window.location.href = 'login.html'; return; }
   document.getElementById('dash-name').textContent = currentProfile?.full_name || 'User';
   document.getElementById('dash-role').textContent = (currentProfile?.role || 'user').toUpperCase();
-  if (isAdmin) { document.getElementById('admin-link').style.display = 'block'; document.getElementById('dept-link').style.display = 'block'; }
+  if (isAdmin) {
+    document.getElementById('admin-link').style.display = 'block';
+    document.getElementById('dept-link').style.display = 'block';
+  }
   if (currentProfile?.role === 'dept_admin') document.getElementById('dept-link').style.display = 'block';
 }
-
-// ========== ADMIN PANEL ==========
-function initAdmin() { if (!isAdmin) { window.location.href = 'index.html'; return; } loadAdminTab('users'); }
-async function loadAdminTab(tab) {
-  const c = document.getElementById('admin-content'); c.innerHTML = '<div class="skeleton" style="height:200px;"></div>'; let h = '';
-  if (tab === 'users') {
-    const { data } = await sb.from('profiles').select('*');
-    h = `<div class="card"><h3>👥 Users (${data.length})</h3><table><thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Actions</th></tr></thead><tbody>${data.map(u => `<tr><td>${u.full_name || ''}</td><td>${u.email}</td><td>${u.role}</td><td><select onchange="updateRole('${u.id}',this.value)"><option ${u.role === 'user' ? 'selected' : ''}>user</option><option ${u.role === 'agent' ? 'selected' : ''}>agent</option><option ${u.role === 'worker' ? 'selected' : ''}>worker</option><option ${u.role === 'dept_admin' ? 'selected' : ''}>dept_admin</option><option ${u.role === 'admin' ? 'selected' : ''}>admin</option></select> <button class="btn btn-danger btn-sm" onclick="deleteUser('${u.id}')">Del</button></td></tr>`).join('')}</tbody></table></div>`;
-  }
-  if (tab === 'departments') {
-    const { data } = await sb.from('departments').select('*');
-    h = `<div class="card"><h3>➕ Add Department</h3><input id="dept-name" placeholder="Name"><input id="dept-desc" placeholder="Description"><button class="btn btn-primary" onclick="addDept()">Add</button></div><div class="card"><h3>Departments</h3><table>${data.map(d => `<tr><td>${d.name}</td><td>${d.description || ''}</td><td><button class="btn btn-danger btn-sm" onclick="deleteItem('departments','${d.id}')">Del</button></td></tr>`).join('')}</table></div>`;
-  }
-  if (tab === 'services') {
-    const { data: d } = await sb.from('departments').select('*');
-    const { data: s } = await sb.from('services').select('*, departments(name)');
-    h = `<div class="card"><h3>➕ Add Service</h3><input id="svc-title" placeholder="Title*"><input id="svc-price" placeholder="Price"><select id="svc-dept"><option value="">Dept</option>${d.map(x => `<option value="${x.id}">${x.name}</option>`).join('')}</select><textarea id="svc-desc"></textarea><button class="btn btn-primary" onclick="addService()">Add</button></div><div class="card"><h3>Services</h3><table><thead><tr><th>Title</th><th>Price</th><th>Dept</th><th>Actions</th></tr></thead><tbody>${s.map(x => `<tr><td>${x.title}</td><td>${x.price || '-'}</td><td>${x.departments?.name || '-'}</td><td><button class="btn btn-sm btn-primary" onclick="toggleService('${x.id}',${!x.is_active})">${x.is_active ? 'Hide' : 'Show'}</button> <button class="btn btn-sm btn-danger" onclick="deleteItem('services','${x.id}')">Del</button></td></tr>`).join('')}</tbody></table></div>`;
-  }
-  if (tab === 'messages') {
-    const { data } = await sb.from('contact_messages').select('*').order('created_at', { ascending: false });
-    h = `<div class="card"><h3>✉️ Messages (${data.length})</h3><table><thead><tr><th>From</th><th>Email</th><th>Message</th><th>Date</th></tr></thead><tbody>${data.map(m => `<tr><td>${m.name}</td><td>${m.email}</td><td>${m.message?.substring(0, 80)}</td><td>${new Date(m.created_at).toLocaleDateString()}</td></tr>`).join('')}</tbody></table></div>`;
-  }
-  c.innerHTML = h;
-}
-async function addDept() { const n = document.getElementById('dept-name').value; if (!n) return showToast('Name required', 1); await sb.from('departments').insert({ name: n, description: document.getElementById('dept-desc').value }); showToast('Created!'); loadAdminTab('departments'); }
-async function addService() { const t = document.getElementById('svc-title').value; if (!t) return showToast('Title required', 1); await sb.from('services').insert({ title: t, description: document.getElementById('svc-desc').value, price: document.getElementById('svc-price').value, department_id: document.getElementById('svc-dept').value || null, posted_by: currentUser.id }); showToast('Added!'); loadAdminTab('services'); }
-async function toggleService(id, s) { await sb.from('services').update({ is_active: s }).eq('id', id); showToast(s ? 'Active' : 'Hidden'); loadAdminTab('services'); }
-async function updateRole(id, r) { await sb.from('profiles').update({ role: r }).eq('id', id); showToast('Updated!'); loadAdminTab('users'); }
-async function deleteUser(id) { if (confirm('Delete?')) { await sb.from('profiles').delete().eq('id', id); showToast('Deleted!'); loadAdminTab('users'); } }
-async function deleteItem(t, id) { if (confirm('Delete?')) { await sb.from(t).delete().eq('id', id); showToast('Deleted!'); loadAdminTab(t); } }
-
-// ========== DEPT ADMIN ==========
-function initDept() { if (!currentUser || (currentProfile?.role !== 'dept_admin' && !isAdmin)) { window.location.href = 'dashboard.html'; return; } loadDeptData(); }
-async function loadDeptData() { document.getElementById('dept-name').textContent = 'Loading...'; if (currentProfile?.department) { const { data: d } = await sb.from('departments').select('name').eq('id', currentProfile.department).single(); document.getElementById('dept-name').textContent = d?.name || 'Department'; } else { document.getElementById('dept-name').textContent = 'All'; } loadDS(); loadDJ(); }
-async function loadDS() { let q = sb.from('services').select('*').eq('is_active', true); if (currentProfile?.department) q = q.eq('department_id', currentProfile.department); const { data } = await q; document.getElementById('dept-svc-tbody').innerHTML = (data || []).map(s => `<tr><td>${s.title}</td><td>${s.price || '-'}</td><td><button class="btn btn-danger btn-sm" onclick="delD('services','${s.id}')">Del</button></td></tr>`).join('') || '<tr><td colspan="3">None</td></tr>'; }
-async function loadDJ() { let q = sb.from('jobs').select('*').eq('is_active', true); if (currentProfile?.department) q = q.eq('department_id', currentProfile.department); const { data } = await q; document.getElementById('dept-job-tbody').innerHTML = (data || []).map(j => `<tr><td>${j.title}</td><td>${j.location || '-'}</td><td><button class="btn btn-danger btn-sm" onclick="delD('jobs','${j.id}')">Del</button></td></tr>`).join('') || '<tr><td colspan="3">None</td></tr>'; }
-async function addDS() { const t = document.getElementById('dept-svc-title').value; if (!t) return showToast('Title required', 1); await sb.from('services').insert({ title: t, description: document.getElementById('dept-svc-desc').value, price: document.getElementById('dept-svc-price').value, department_id: currentProfile?.department || null, posted_by: currentUser.id }); showToast('Added!'); loadDS(); }
-async function delD(t, id) { if (confirm('Delete?')) { await sb.from(t).delete().eq('id', id); showToast('Deleted!'); t === 'services' ? loadDS() : loadDJ(); } }
-
-console.log('✅ Ascenda Final Ready');

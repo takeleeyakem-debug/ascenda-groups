@@ -1,24 +1,108 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Login - Ascenda Groups</title><link rel="stylesheet" href="style.css"><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script></head><body>
-<!-- INSERT UNIVERSAL NAVBAR HERE -->
-<div class="form-container"><h2>Welcome Back</h2><div id="msg" style="display:none;padding:10px;border-radius:8px;margin-bottom:10px;"></div>
-<input type="email" id="login-email" placeholder="Email"><input type="password" id="login-password" placeholder="Password">
-<button class="btn btn-primary btn-block btn-lg" id="login-btn">Login</button>
-<p style="text-align:center;margin-top:12px;">No account? <a href="register.html">Sign Up</a></p></div>
-<script src="supabase.js"></script>
-<script>
-const sb = window.supabaseClient || window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY, {auth:{persistSession:true}});
-document.getElementById('login-btn').addEventListener('click', async () => {
-  const email = document.getElementById('login-email').value, password = document.getElementById('login-password').value;
-  const msg = document.getElementById('msg');
-  if(!email||!password){ msg.textContent='Fill all fields'; msg.style.display='block'; msg.style.color='#ef4444'; return; }
-  const { error } = await sb.auth.signInWithPassword({email, password});
-  if (error) { msg.textContent=error.message; msg.style.display='block'; msg.style.color='#ef4444'; }
-  else {
-    const {data:{user}} = await sb.auth.getUser();
-    const {data:profile} = await sb.from('profiles').select('role').eq('id',user.id).single();
-    if(profile?.role==='admin'||profile?.role==='ceo'||email==='takeleeyakem@gmail.com') window.location.href='admin.html';
-    else window.location.href='index.html';
-  }
-});
-</script>
-</body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login – Ascenda Groups</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <!-- UNIVERSAL NAVBAR -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="logo"><img src="https://rfogomnbicceentrhymy.supabase.co/storage/v1/object/public/Ascenda%20pics/logo.png" alt="Ascenda" style="height:36px;"></a>
+      <div class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="services.html">Services</a>
+        <a href="marketplace.html">Marketplace</a>
+        <a href="jobs.html">Jobs</a>
+        <a href="news.html">News</a>
+        <a href="contact.html">Contact</a>
+        <a href="login.html" class="btn btn-outline nav-login">Login</a>
+        <a href="register.html" class="btn btn-primary nav-register">Sign Up</a>
+        <a href="profile.html" class="btn btn-outline nav-profile" style="display:none;">👤 <span class="nav-username"></span></a>
+        <a href="admin.html" class="btn btn-outline nav-admin" style="display:none;color:#f59e0b;border-color:#f59e0b;">⚡ Admin</a>
+        <a href="#" class="btn btn-outline nav-logout" style="display:none;" onclick="logout()">Logout</a>
+      </div>
+      <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+    </div>
+  </nav>
+  <div class="mobile-nav" id="mobileNav">
+    <a href="index.html">🏠 Home</a>
+    <a href="about.html">📖 About</a>
+    <a href="services.html">🔧 Services</a>
+    <a href="marketplace.html">🏪 Marketplace</a>
+    <a href="jobs.html">💼 Jobs</a>
+    <a href="news.html">📰 News</a>
+    <a href="contact.html">✉️ Contact</a>
+    <a href="login.html" class="mob-login">🔑 Login</a>
+    <a href="register.html" class="mob-register">🚀 Sign Up</a>
+    <a href="profile.html" class="mob-profile" style="display:none;">👤 Profile</a>
+    <a href="admin.html" class="mob-admin" style="display:none;color:#f59e0b;">⚡ Admin</a>
+    <a href="#" class="mob-logout" style="display:none;" onclick="logout()">🚪 Logout</a>
+  </div>
+
+  <!-- LOGIN FORM -->
+  <div class="form-container">
+    <h2>Welcome Back 👋</h2>
+    <div id="login-msg" style="display:none; padding:10px; border-radius:8px; margin-bottom:12px;"></div>
+    <div class="form-group">
+      <label>Email</label>
+      <input type="email" id="login-email" required placeholder="you@example.com">
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" id="login-password" required placeholder="••••••••">
+    </div>
+    <button class="btn btn-primary btn-block btn-lg" id="login-btn">Login</button>
+    <p style="text-align:center; margin-top:16px;">No account? <a href="register.html">Sign Up</a></p>
+  </div>
+
+  <footer class="footer">
+    <p>© <span data-setting="copyright_year">2026</span> Ascenda Groups. CEO: <span data-setting="ceo_name">Eyakem Takele Kebede</span></p>
+    <p><a href="https://t.me/ascendagroups" target="_blank">Telegram</a></p>
+  </footer>
+
+  <script src="supabase.js"></script>
+  <script>
+    const sbLogin = window.supabaseClient || supabase.createClient(
+      'https://rfogomnbicceentrhymy.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmb2dvbW5iaWNjZWVudHJoeW15Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyNDQwOTEsImV4cCI6MjA5NTgyMDA5MX0.wke5a7GEdU2oepfKfSD-rthLTEmpk3GqVfFRM_MjZ9c',
+      { auth: { persistSession: true, autoRefreshToken: true, storage: localStorage } }
+    );
+
+    document.getElementById('login-btn').addEventListener('click', async () => {
+      const email = document.getElementById('login-email').value.trim();
+      const password = document.getElementById('login-password').value;
+      const msgEl = document.getElementById('login-msg');
+
+      if (!email || !password) {
+        msgEl.textContent = 'Please fill all fields.';
+        msgEl.style.display = 'block';
+        msgEl.style.color = '#ef4444';
+        return;
+      }
+
+      msgEl.textContent = 'Logging in...';
+      msgEl.style.display = 'block';
+      msgEl.style.color = '#f59e0b';
+
+      const { data, error } = await sbLogin.auth.signInWithPassword({ email, password });
+
+      if (error) {
+        msgEl.textContent = error.message;
+        msgEl.style.color = '#ef4444';
+        return;
+      }
+
+      // Check role for redirect
+      const { data: profile } = await sbLogin.from('profiles').select('role').eq('id', data.user.id).single();
+      const isAdminUser = profile?.role === 'admin' || profile?.role === 'ceo' || email === 'takeleeyakem@gmail.com';
+      window.location.href = isAdminUser ? 'admin.html' : 'index.html';
+    });
+  </script>
+  <script src="script.js"></script>
+</body>
+</html>
