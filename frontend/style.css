@@ -977,6 +977,17 @@ input::placeholder, textarea::placeholder {
   transition: top 0.3s;
 }
 .skip-link:focus { top: 16px; }
+/* Mobile fixes */
+@media (max-width: 768px) {
+  .nav-links { display: none !important; }
+  .hamburger { display: flex !important; }
+  .mobile-nav a { font-size: 1rem; padding: 16px 20px; }
+  .card { padding: 16px; }
+  .form-container { margin: 20px; padding: 20px; }
+  body { overflow-x: hidden; }
+  img { max-width: 100%; height: auto; }
+}
 
 /* ===== END OF CSS ===== */
 /* Total: ~2000 lines of premium styling */
+
