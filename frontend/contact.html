@@ -9,11 +9,37 @@
 </head>
 <body>
   <!-- Universal Navbar -->
-  <nav class="navbar">...</nav>
-  <div class="mobile-nav" id="mobileNav">...</div>
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="logo"><img src="https://rfogomnbicceentrhymy.supabase.co/storage/v1/object/public/Ascenda%20pics/logo.png" alt="Ascenda" style="height:36px;"></a>
+      <div class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="services.html">Services</a>
+        <a href="marketplace.html">Marketplace</a>
+        <a href="jobs.html">Jobs</a>
+        <a href="news.html">News</a>
+        <a href="contact.html">Contact</a>
+        <a href="login.html" class="btn btn-outline nav-login">Login</a>
+        <a href="register.html" class="btn btn-primary nav-register">Sign Up</a>
+        <a href="profile.html" class="btn btn-outline nav-profile" style="display:none;">👤 <span class="nav-username"></span></a>
+        <a href="admin.html" class="btn btn-outline nav-admin" style="display:none;color:#f59e0b;border-color:#f59e0b;">⚡ Admin</a>
+        <a href="#" class="btn btn-outline nav-logout" style="display:none;" onclick="logout()">Logout</a>
+      </div>
+      <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+    </div>
+  </nav>
+  <div class="mobile-nav" id="mobileNav">
+    <a href="index.html">🏠 Home</a><a href="about.html">📖 About</a><a href="services.html">🔧 Services</a>
+    <a href="marketplace.html">🏪 Marketplace</a><a href="jobs.html">💼 Jobs</a><a href="news.html">📰 News</a>
+    <a href="contact.html">✉️ Contact</a>
+    <a href="login.html" class="mob-login">🔑 Login</a><a href="register.html" class="mob-register">🚀 Sign Up</a>
+    <a href="profile.html" class="mob-profile" style="display:none;">👤 Profile</a>
+    <a href="admin.html" class="mob-admin" style="display:none;color:#f59e0b;">⚡ Admin</a>
+    <a href="#" class="mob-logout" style="display:none;" onclick="logout()">🚪 Logout</a>
+  </div>
 
   <div class="container" style="max-width:600px;margin:40px auto;padding:0 20px;">
-    <!-- Contact Form -->
     <h2>Contact Us</h2>
     <form id="contact-form" onsubmit="return false;">
       <div class="form-group"><label>Name *</label><input type="text" name="name" required></div>
@@ -24,7 +50,6 @@
       <p id="form-msg" style="text-align:center;margin-top:12px;display:none;"></p>
     </form>
 
-    <!-- Application Form (e.g. for jobs/agent) -->
     <h2 style="margin-top:40px;">Apply for a Position</h2>
     <form id="apply-form" onsubmit="return false;">
       <div class="form-group"><label>Full Name *</label><input type="text" id="app-name" required></div>
@@ -41,7 +66,6 @@
       <p id="apply-msg" style="text-align:center;margin-top:12px;display:none;"></p>
     </form>
 
-    <!-- Payment Info -->
     <div class="card" style="margin-top:30px;text-align:center;">
       <h3>🏦 Payment Information</h3>
       <p>Dashen Bank</p>
@@ -86,10 +110,8 @@
       if (!name || !email) { msg.textContent = 'Name and email required'; msg.style.color = 'red'; msg.style.display = 'block'; return; }
       btn.disabled = true; btn.textContent = 'Submitting...';
       const sb = window.supabaseClient || supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
-      // First, ensure a profile exists or use existing user?
-      // Since this is a public application, we'll insert into 'applications' table directly
       const { error } = await sb.from('applications').insert({
-        applicant_id: null, // can be null for external applicants
+        applicant_id: null,  // external applicant
         type: type,
         message: message,
         status: 'pending'
