@@ -1,12 +1,10 @@
 // ============================================
-// ASCENDA GROUPS - COMPLETE SCRIPT v8
-// Mobile nav, auth, all page loaders, admin helpers
+// ASCENDA GROUPS - FINAL SCRIPT
 // ============================================
-
-const sb = window.supabaseClient || window.supabase.createClient(
+const sb = window.supabaseClient || supabase.createClient(
   'https://rfogomnbicceentrhymy.supabase.co',
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmb2dvbW5iaWNjZWVudHJoeW15Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyNDQwOTEsImV4cCI6MjA5NTgyMDA5MX0.wke5a7GEdU2oepfKfSD-rthLTEmpk3GqVfFRM_MjZ9c',
-  { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, storage: window.localStorage } }
+  { auth: { persistSession: true, autoRefreshToken: true, storage: localStorage } }
 );
 
 let currentUser = null;
@@ -17,7 +15,7 @@ let isAdmin = false;
 document.addEventListener('DOMContentLoaded', async () => {
   initMobileNav();
   await restoreSession();
-  initPageLogic();
+  routePage();
 });
 
 // ========== MOBILE NAV ==========
@@ -56,155 +54,144 @@ function initMobileNav() {
 
   function check() { hamburger.style.display = window.innerWidth <= 768 ? 'flex' : 'none'; if (window.innerWidth > 768) close(); }
   window.addEventListener('resize', check); check();
-
-  mobileNav.querySelectorAll('a').forEach(l => {
-    l.style.cssText = 'display:block;width:100%;color:#f1f5f9;text-decoration:none;padding:14px 18px;font-size:1rem;border-radius:10px;margin-bottom:4px;background:rgba(26,35,50,0.6);';
-  });
 }
 
-// ========== AUTH & SESSION ==========
+// ========== AUTH ==========
 async function restoreSession() {
-  try {
-    const { data: { session } } = await sb.auth.getSession();
-    if (session?.user) {
-      currentUser = session.user;
-      const { data: profile } = await sb.from('profiles').select('*').eq('id', currentUser.id).single();
-      currentProfile = profile || { id: currentUser.id, role: 'user', full_name: currentUser.user_metadata?.full_name || currentUser.email };
-      isAdmin = currentProfile.role === 'admin' || currentProfile.role === 'ceo' || currentUser.email === 'takeleeyakem@gmail.com';
-      updateUIForRole();
-      
-      const path = window.location.pathname;
-      if (path.includes('login.html') || path.includes('register.html') || path.includes('landing.html')) {
-        window.location.href = isAdmin ? 'admin.html' : 'index.html';
-      }
-    } else {
-      updateUIForRole();
+  const { data: { session } } = await sb.auth.getSession();
+  if (session?.user) {
+    currentUser = session.user;
+    const { data: p } = await sb.from('profiles').select('*').eq('id', currentUser.id).single();
+    currentProfile = p || { id: currentUser.id, role: 'user' };
+    isAdmin = currentProfile.role === 'admin' || currentProfile.role === 'ceo' || currentUser.email === 'takeleeyakem@gmail.com';
+    updateUI();
+    const path = window.location.pathname;
+    if (path.includes('login.html') || path.includes('register.html') || path.includes('landing.html')) {
+      window.location.href = isAdmin ? 'admin.html' : 'index.html';
     }
-  } catch (e) { updateUIForRole(); }
+  } else { updateUI(); }
 
   sb.auth.onAuthStateChange(async (event, session) => {
-    if (event === 'SIGNED_IN' && session?.user) {
-      currentUser = session.user;
-      const { data: profile } = await sb.from('profiles').select('*').eq('id', currentUser.id).single();
-      currentProfile = profile || { id: currentUser.id, role: 'user' };
-      isAdmin = currentProfile.role === 'admin' || currentProfile.role === 'ceo' || currentUser.email === 'takeleeyakem@gmail.com';
-      updateUIForRole();
-    }
-    if (event === 'SIGNED_OUT') { currentUser = null; currentProfile = null; isAdmin = false; updateUIForRole(); }
+    if (event === 'SIGNED_IN') window.location.reload();
+    if (event === 'SIGNED_OUT') { currentUser = null; currentProfile = null; isAdmin = false; updateUI(); }
   });
 }
 
-function updateUIForRole() {
-  const loggedIn = !!currentUser;
-  document.querySelectorAll('.nav-login').forEach(e => e.style.display = loggedIn ? 'none' : 'inline-flex');
-  document.querySelectorAll('.nav-register').forEach(e => e.style.display = loggedIn ? 'none' : 'inline-flex');
-  document.querySelectorAll('.nav-profile').forEach(e => e.style.display = loggedIn ? 'inline-flex' : 'none');
-  document.querySelectorAll('.nav-logout').forEach(e => e.style.display = loggedIn ? 'inline-flex' : 'none');
-  document.querySelectorAll('.nav-admin').forEach(e => e.style.display = (loggedIn && isAdmin) ? 'inline-flex' : 'none');
-  if (loggedIn) document.querySelectorAll('.nav-username').forEach(e => { e.textContent = currentProfile?.full_name || currentUser.email?.split('@')[0]; });
-  
-  document.querySelectorAll('.mob-login').forEach(e => e.style.display = loggedIn ? 'none' : 'block');
-  document.querySelectorAll('.mob-register').forEach(e => e.style.display = loggedIn ? 'none' : 'block');
-  document.querySelectorAll('.mob-profile').forEach(e => e.style.display = loggedIn ? 'block' : 'none');
-  document.querySelectorAll('.mob-logout').forEach(e => e.style.display = loggedIn ? 'block' : 'none');
-  document.querySelectorAll('.mob-admin').forEach(e => e.style.display = (loggedIn && isAdmin) ? 'block' : 'none');
+function updateUI() {
+  const logged = !!currentUser;
+  document.querySelectorAll('.nav-login').forEach(e => e.style.display = logged ? 'none' : 'inline-flex');
+  document.querySelectorAll('.nav-register').forEach(e => e.style.display = logged ? 'none' : 'inline-flex');
+  document.querySelectorAll('.nav-profile').forEach(e => e.style.display = logged ? 'inline-flex' : 'none');
+  document.querySelectorAll('.nav-logout').forEach(e => e.style.display = logged ? 'inline-flex' : 'none');
+  document.querySelectorAll('.nav-admin').forEach(e => e.style.display = (logged && isAdmin) ? 'inline-flex' : 'none');
+  if (logged) document.querySelectorAll('.nav-username').forEach(e => e.textContent = currentProfile?.full_name || currentUser.email?.split('@')[0]);
+  document.querySelectorAll('.mob-login').forEach(e => e.style.display = logged ? 'none' : 'block');
+  document.querySelectorAll('.mob-register').forEach(e => e.style.display = logged ? 'none' : 'block');
+  document.querySelectorAll('.mob-profile').forEach(e => e.style.display = logged ? 'block' : 'none');
+  document.querySelectorAll('.mob-logout').forEach(e => e.style.display = logged ? 'block' : 'none');
+  document.querySelectorAll('.mob-admin').forEach(e => e.style.display = (logged && isAdmin) ? 'block' : 'none');
 }
 
 async function logout() { await sb.auth.signOut(); window.location.href = 'landing.html'; }
 
-function showToast(msg, isError = false) {
+function showToast(msg, err) {
   const t = document.createElement('div');
-  t.style.cssText = `position:fixed;top:20px;right:20px;padding:14px 20px;background:#1a2332;border:1px solid ${isError?'#ef4444':'#10b981'};border-radius:12px;color:white;z-index:9999;font-size:0.9rem;`;
-  t.textContent = (isError ? '❌ ' : '✅ ') + msg;
+  t.style.cssText = `position:fixed;top:20px;right:20px;padding:14px 20px;background:#1a2332;border:1px solid ${err?'#ef4444':'#10b981'};border-radius:12px;color:white;z-index:9999;font-size:0.9rem;`;
+  t.textContent = (err ? '❌ ' : '✅ ') + msg;
   document.body.appendChild(t);
   setTimeout(() => t.remove(), 3000);
 }
 
 // ========== PAGE ROUTER ==========
-function initPageLogic() {
+function routePage() {
   const path = window.location.pathname;
-  console.log('Page loaded:', path);
+  console.log('📍 Route:', path);
   
   if (path.includes('index.html') || path === '/' || path.endsWith('/frontend/')) loadHome();
+  else if (path.includes('about.html')) loadAbout();
   else if (path.includes('services.html')) loadServices();
   else if (path.includes('marketplace.html')) loadMarketplace();
   else if (path.includes('jobs.html')) loadJobs();
   else if (path.includes('news.html')) loadNews();
-  else if (path.includes('about.html')) loadAbout();
   else if (path.includes('contact.html')) initContactForm();
   else if (path.includes('dashboard.html')) loadDashboard();
-  else if (path.includes('profile.html')) { if (!currentUser) window.location.href = 'login.html'; }
 }
 
-// ========== HOME PAGE ==========
+// ========== HOME ==========
 async function loadHome() {
   const [jobs, services] = await Promise.all([
     sb.from('jobs').select('*').eq('is_active', true).limit(4),
     sb.from('services').select('*').eq('is_active', true).limit(4)
   ]);
-  console.log('Home - Jobs:', jobs.data?.length, 'Services:', services.data?.length);
-  
   const jc = document.getElementById('featured-jobs');
-  if (jc) jc.innerHTML = (jobs.data?.length ? jobs.data.map(j => `<div class="card"><span class="badge badge-blue">Job</span><h3>${j.title}</h3><p>${j.location || 'Remote'}</p></div>`).join('') : '<p style="text-align:center;color:var(--text-muted);">No jobs yet</p>');
-  
+  if (jc) jc.innerHTML = jobs.data?.length ? jobs.data.map(j => `<div class="card"><span class="badge badge-blue">Job</span><h3>${j.title}</h3><p>${j.location||'Remote'}</p></div>`).join('') : '<p>No jobs</p>';
   const sc = document.getElementById('featured-services');
-  if (sc) sc.innerHTML = (services.data?.length ? services.data.map(s => `<div class="card"><span class="badge badge-purple">Service</span><h3>${s.title}</h3></div>`).join('') : '<p style="text-align:center;color:var(--text-muted);">No services yet</p>');
+  if (sc) sc.innerHTML = services.data?.length ? services.data.map(s => `<div class="card"><span class="badge badge-purple">Service</span><h3>${s.title}</h3></div>`).join('') : '<p>No services</p>';
 }
 
-// ========== ABOUT PAGE ==========
+// ========== ABOUT ==========
 async function loadAbout() {
   const [workers, authority] = await Promise.all([
     sb.from('profiles').select('*').or('role.eq.worker,role.eq.dept_admin'),
     sb.from('authority').select('*, profiles(full_name), departments(name)').order('level')
   ]);
-  console.log('About - Workers:', workers.data?.length, 'Authority:', authority.data?.length);
-  
   const wc = document.getElementById('workers-grid');
-  if (wc) wc.innerHTML = (workers.data?.length ? workers.data.map(w => `<div class="card text-center"><img src="${w.avatar_url || 'https://via.placeholder.com/100'}" style="width:80px;height:80px;border-radius:50%;margin:0 auto 12px;"><h3>${w.full_name}</h3><p>${w.position || 'Worker'}</p></div>`).join('') : '<p>No workers yet</p>');
-  
+  if (wc) wc.innerHTML = workers.data?.length ? workers.data.map(w => `<div class="card text-center"><img src="${w.avatar_url||'https://via.placeholder.com/100'}" style="width:80px;height:80px;border-radius:50%;margin:0 auto 12px;"><h3>${w.full_name}</h3><p>${w.position||'Worker'}</p></div>`).join('') : '<p>No workers</p>';
   const ac = document.getElementById('authority-ladder');
-  if (ac) ac.innerHTML = (authority.data?.length ? authority.data.map(a => `<div class="card"><h3>${a.title} (Level ${a.level})</h3><p>${a.profiles?.full_name || 'Unassigned'} - ${a.departments?.name || 'N/A'}</p></div>`).join('') : '<p>No authority set</p>');
+  if (ac) ac.innerHTML = authority.data?.length ? authority.data.map(a => `<div class="card"><h3>${a.title} (Level ${a.level})</h3><p>${a.profiles?.full_name||'Unassigned'} - ${a.departments?.name||'N/A'}</p></div>`).join('') : '<p>No authority</p>';
 }
 
-// ========== SERVICES PAGE ==========
+// ========== SERVICES ==========
 async function loadServices() {
-  const { data, error } = await sb.from('services').select('*, departments(name)').eq('is_active', true);
-  console.log('Services page - Data:', data?.length, 'Error:', error);
+  console.log('🔧 Loading services...');
+  const { data, error } = await sb.from('services').select('*, departments(name)').eq('is_active', true).order('created_at', { ascending: false });
+  console.log('Services:', data, 'Error:', error);
   const c = document.getElementById('services-list');
-  if (c) c.innerHTML = (data?.length ? data.map(s => `<div class="card"><span class="badge badge-purple">Service</span><h3>${s.title}</h3><p>${(s.description || '').substring(0, 80)}...</p>${s.price ? `<p style="color:var(--green);">${s.price}</p>` : ''}${s.departments?.name ? `<span style="font-size:0.75rem;color:var(--purple);">${s.departments.name}</span>` : ''}</div>`).join('') : '<p style="text-align:center;color:var(--text-muted);">No services yet. Admin can add them from the admin panel.</p>');
+  if (!c) { console.error('❌ #services-list not found'); return; }
+  if (error) { c.innerHTML = `<p style="color:red;">Error: ${error.message}</p>`; return; }
+  c.innerHTML = data?.length ? data.map(s => `<div class="card"><span class="badge badge-purple">Service</span><h3>${s.title}</h3><p>${(s.description||'').substring(0,100)}</p>${s.price?`<p style="color:var(--green);font-weight:700;">${s.price}</p>`:''}${s.departments?.name?`<span style="font-size:0.75rem;color:var(--purple);">${s.departments.name}</span>`:''}</div>`).join('') : '<p style="text-align:center;color:var(--text-muted);">No services yet. Add from admin panel.</p>';
 }
 
-// ========== MARKETPLACE PAGE ==========
+// ========== MARKETPLACE ==========
 async function loadMarketplace() {
-  const { data, error } = await sb.from('marketplace_items').select('*').eq('is_active', true);
-  console.log('Marketplace page - Data:', data?.length, 'Error:', error);
+  console.log('🏪 Loading marketplace...');
+  const { data, error } = await sb.from('marketplace_items').select('*').eq('is_active', true).order('created_at', { ascending: false });
+  console.log('Marketplace:', data, 'Error:', error);
   const c = document.getElementById('marketplace-list');
-  if (c) c.innerHTML = (data?.length ? data.map(i => `<div class="card"><span class="badge badge-green">${i.category}</span><h3>${i.title}</h3><p style="color:var(--green);font-weight:700;">$${i.price || 0}</p><p>${i.description || ''}</p><small style="color:var(--text-muted);">📞 ${i.seller_contact || 'Contact admin'}</small></div>`).join('') : '<p style="text-align:center;color:var(--text-muted);">No items yet. Admin can add them.</p>');
+  if (!c) { console.error('❌ #marketplace-list not found'); return; }
+  if (error) { c.innerHTML = `<p style="color:red;">Error: ${error.message}</p>`; return; }
+  c.innerHTML = data?.length ? data.map(i => `<div class="card"><span class="badge badge-green">${i.category}</span><h3>${i.title}</h3><p style="color:var(--green);font-weight:700;">$${i.price||0}</p><p>${i.description||''}</p><small>📞 ${i.seller_contact||'N/A'}</small></div>`).join('') : '<p style="text-align:center;color:var(--text-muted);">No items yet. Add from admin panel.</p>';
 }
 
-// ========== JOBS PAGE ==========
+// ========== JOBS ==========
 async function loadJobs() {
-  const { data, error } = await sb.from('jobs').select('*').eq('is_active', true);
-  console.log('Jobs page - Data:', data?.length, 'Error:', error);
+  console.log('💼 Loading jobs...');
+  const { data, error } = await sb.from('jobs').select('*').eq('is_active', true).order('created_at', { ascending: false });
+  console.log('Jobs:', data, 'Error:', error);
   const c = document.getElementById('jobs-list');
-  if (c) c.innerHTML = (data?.length ? data.map(j => `<div class="card"><span class="badge badge-blue">Job</span><h3>${j.title}</h3><p>📍 ${j.location || 'Remote'} · ${j.type || 'Full-time'}</p><p>${j.description || ''}</p><button class="btn btn-primary" onclick="applyForJob('${j.id}')">Apply Now</button></div>`).join('') : '<p style="text-align:center;color:var(--text-muted);">No jobs yet. Admin can post them.</p>');
+  if (!c) { console.error('❌ #jobs-list not found'); return; }
+  if (error) { c.innerHTML = `<p style="color:red;">Error: ${error.message}</p>`; return; }
+  c.innerHTML = data?.length ? data.map(j => `<div class="card"><span class="badge badge-blue">Job</span><h3>${j.title}</h3><p>📍 ${j.location||'Remote'} · ${j.type||'Full-time'}</p><p>${j.description||''}</p><button class="btn btn-primary" onclick="applyForJob('${j.id}')">Apply</button></div>`).join('') : '<p style="text-align:center;color:var(--text-muted);">No jobs yet. Add from admin panel.</p>';
 }
 
 async function applyForJob(jobId) {
-  if (!currentUser) { showToast('Please login first', true); window.location.href = 'login.html'; return; }
+  if (!currentUser) { showToast('Login first', true); window.location.href = 'login.html'; return; }
   const { error } = await sb.from('job_applications').insert({ job_id: jobId, applicant_id: currentUser.id });
-  error ? showToast('Failed: ' + error.message, true) : showToast('Applied successfully! ✅');
+  error ? showToast('Failed: ' + error.message, true) : showToast('Applied! ✅');
 }
 
-// ========== NEWS PAGE ==========
+// ========== NEWS ==========
 async function loadNews() {
+  console.log('📰 Loading news...');
   const { data, error } = await sb.from('news_posts').select('*').eq('is_published', true).order('created_at', { ascending: false });
-  console.log('News page - Data:', data?.length, 'Error:', error);
+  console.log('News:', data, 'Error:', error);
   const c = document.getElementById('news-list');
-  if (c) c.innerHTML = (data?.length ? data.map(n => `<div class="card">${n.media_url ? (n.type === 'video' ? `<video src="${n.media_url}" controls style="width:100%;border-radius:8px;"></video>` : `<img src="${n.media_url}" style="width:100%;border-radius:8px;">`) : ''}<span class="badge badge-gold">${n.type}</span><h3>${n.title}</h3><p>${n.content || ''}</p></div>`).join('') : '<p style="text-align:center;color:var(--text-muted);">No news yet.</p>');
+  if (!c) { console.error('❌ #news-list not found'); return; }
+  if (error) { c.innerHTML = `<p style="color:red;">Error: ${error.message}</p>`; return; }
+  c.innerHTML = data?.length ? data.map(n => `<div class="card">${n.media_url ? (n.type==='video'?`<video src="${n.media_url}" controls style="width:100%;border-radius:8px;"></video>`:`<img src="${n.media_url}" style="width:100%;border-radius:8px;">`) : ''}<span class="badge badge-gold">${n.type}</span><h3>${n.title}</h3><p>${n.content||''}</p></div>`).join('') : '<p style="text-align:center;color:var(--text-muted);">No news yet. Add from admin panel.</p>';
 }
 
-// ========== CONTACT FORM ==========
+// ========== CONTACT ==========
 function initContactForm() {
   const form = document.getElementById('contact-form');
   if (!form) return;
@@ -217,8 +204,7 @@ function initContactForm() {
       subject: form.subject?.value, message: form.message?.value
     });
     btn.disabled = false; btn.textContent = 'Send Message ✉️';
-    if (error) showToast('Error: ' + error.message, true);
-    else { showToast('Message sent! ✅'); form.reset(); }
+    error ? showToast('Error: ' + error.message, true) : (showToast('Sent! ✅'), form.reset());
   });
 }
 
@@ -231,4 +217,4 @@ async function loadDashboard() {
   if (currentProfile?.role === 'dept_admin') document.getElementById('dept-link').style.display = 'block';
 }
 
-console.log('✅ Ascenda Groups Script v8 Loaded');
+console.log('✅ Ascenda Script Ready');
