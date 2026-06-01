@@ -1,15 +1,30 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Ascenda Groups - Home</title><link rel="stylesheet" href="style.css"><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"></head><body>
-<nav class="navbar"><div class="nav-container"><a href="index.html" class="logo"><img src="https://rfogomnbicceentrhymy.supabase.co/storage/v1/object/public/Ascenda%20pics/logo.png" alt="Ascenda"></a><div class="nav-links"><a href="index.html">Home</a><a href="about.html">About</a><a href="services.html">Services</a><a href="marketplace.html">Marketplace</a><a href="jobs.html">Jobs</a><a href="news.html">News</a><a href="contact.html">Contact</a><a href="login.html" class="btn btn-outline auth-login-btn">Login</a><a href="register.html" class="btn btn-primary auth-register-btn">Sign Up</a><span class="auth-user-name" style="display:none;color:var(--blue);"></span><a href="#" class="btn btn-outline auth-logout-btn" style="display:none;">Logout</a></div><button class="hamburger" id="hamburger"><span></span><span></span><span></span></button></div></nav>
-<div class="mobile-nav" id="mobileNav"><a href="index.html">Home</a><a href="about.html">About</a><a href="services.html">Services</a><a href="marketplace.html">Marketplace</a><a href="jobs.html">Jobs</a><a href="news.html">News</a><a href="contact.html">Contact</a><a href="login.html">Login</a><a href="register.html">Sign Up</a></div>
+<nav class="navbar"><div class="nav-container">
+  <a href="index.html" class="logo"><img src="https://rfogomnbicceentrhymy.supabase.co/storage/v1/object/public/Ascenda%20pics/logo.png" alt="Ascenda"></a>
+  <div class="nav-links">
+    <a href="index.html">Home</a><a href="about.html">About</a><a href="services.html">Services</a><a href="marketplace.html">Marketplace</a><a href="jobs.html">Jobs</a><a href="news.html">News</a><a href="contact.html">Contact</a>
+    <a href="login.html" class="btn btn-outline auth-login-btn">Login</a>
+    <a href="register.html" class="btn btn-primary auth-register-btn">Sign Up</a>
+    <a href="profile.html" class="btn btn-outline auth-profile-link" style="display:none;">👤 <span class="auth-user-name" style="display:none;"></span></a>
+    <a href="#" class="btn btn-outline auth-logout-btn" style="display:none;">Logout</a>
+  </div>
+  <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+</div></nav>
+<div class="mobile-nav" id="mobileNav">
+  <a href="index.html">🏠 Home</a><a href="about.html">📖 About</a><a href="services.html">🔧 Services</a><a href="marketplace.html">🏪 Marketplace</a><a href="jobs.html">💼 Jobs</a><a href="news.html">📰 News</a><a href="contact.html">✉️ Contact</a>
+  <a href="login.html" class="mobile-auth-login">🔑 Login</a>
+  <a href="register.html" class="mobile-auth-register">🚀 Sign Up</a>
+  <a href="profile.html" class="mobile-auth-profile" style="display:none;">👤 Profile</a>
+  <a href="#" class="mobile-auth-logout" style="display:none;" onclick="logout()">🚪 Logout</a>
+</div>
 
 <div id="announcements-bar" style="display:none;background:var(--bg-card);padding:8px 16px;text-align:center;border-bottom:1px solid var(--border);"></div>
 
 <section class="hero"><div class="hero-content"><img src="https://rfogomnbicceentrhymy.supabase.co/storage/v1/object/public/Ascenda%20pics/banner.png" class="hero-banner"><h1 data-setting="site_name">Ascenda Groups</h1><p data-setting="site_description">Your gateway to forex mastery, web development, marketplace & youth empowerment</p><div class="hero-buttons"><a href="register.html" class="btn btn-primary btn-xl">Get Started</a><a href="services.html" class="btn btn-outline btn-xl">Services</a></div></div></section>
 
 <section class="section section-dark"><div class="container"><div class="section-header"><span class="section-badge">Careers</span><h2>Latest Jobs</h2></div><div id="featured-jobs" class="cards-grid"></div><a href="jobs.html" class="btn btn-outline mt-8">View All Jobs</a></div></section>
+
 <section class="section"><div class="container"><div class="section-header"><span class="section-badge">Services</span><h2>Our Services</h2></div><div id="featured-services" class="cards-grid"></div><a href="services.html" class="btn btn-primary mt-8">All Services</a></div></section>
-<section class="section section-dark"><div class="container"><div class="section-header"><span class="section-badge">News</span><h2>Latest News</h2></div><div id="featured-news" class="cards-grid"></div><a href="news.html" class="btn btn-outline mt-8">All News</a></div></section>
-<section class="section"><div class="container"><div class="section-header"><span class="section-badge">Marketplace</span><h2>Buy & Sell</h2></div><div id="featured-marketplace" class="cards-grid"></div><a href="marketplace.html" class="btn btn-primary mt-8">Explore</a></div></section>
 
 <footer class="footer"><div class="footer-content"><div class="footer-links"><a href="index.html">Home</a><a href="about.html">About</a><a href="services.html">Services</a><a href="contact.html">Contact</a></div><p>© <span data-setting="copyright_year">2026</span> Ascenda Groups. CEO: <span data-setting="ceo_name">Eyakem Takele Kebede</span></p><p><a href="https://t.me/ascendagroups" target="_blank">Telegram</a></p></div></footer>
 <script src="supabase.js"></script><script src="script.js"></script></body></html>
