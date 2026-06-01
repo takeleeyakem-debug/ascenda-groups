@@ -16,7 +16,7 @@
         <a href="index.html">Home</a>
         <a href="about.html">About</a>
         <a href="services.html">Services</a>
-        <a href="marketplace.html">Marketplace</a>
+        <a href="marketplace.html" class="active">Marketplace</a>
         <a href="jobs.html">Jobs</a>
         <a href="news.html">News</a>
         <a href="contact.html">Contact</a>
@@ -39,17 +39,67 @@
     <a href="#" class="mob-logout" style="display:none;" onclick="logout()">🚪 Logout</a>
   </div>
 
+  <!-- Marketplace Content -->
   <section class="container" style="padding:40px 20px;">
-    <h2>Marketplace</h2>
-    <div id="marketplace-list" class="cards-grid"></div>
+    <h2 style="text-align:center;margin-bottom:24px;">Marketplace</h2>
+    <div id="marketplace-list" class="cards-grid">
+      <p style="text-align:center;color:var(--text-muted);">Loading items...</p>
+    </div>
   </section>
 
   <footer class="footer">
-    <p>© <span data-setting="copyright_year">2026</span> Ascenda Groups. CEO: <span data-setting="ceo_name">Eyakem Takele Kebede</span></p>
+    <p>© 2026 Ascenda Groups. CEO: Eyakem Takele Kebede</p>
     <p><a href="https://t.me/ascendagroups" target="_blank">Telegram</a></p>
   </footer>
 
   <script src="supabase.js"></script>
   <script src="script.js"></script>
+  <script>
+    // Override loadMarketplace to run only once
+    window.originalLoadMarketplace = window.loadMarketplace || function(){};
+    window.loadMarketplace = async function() {
+      if (window.marketplaceLoaded) return;
+      window.marketplaceLoaded = true;
+
+      const container = document.getElementById('marketplace-list');
+      if (!container) return;
+
+      try {
+        const sb = window.supabaseClient || supabase.createClient(
+          window.SUPABASE_URL,
+          window.SUPABASE_ANON_KEY,
+          { auth: { persistSession: true } }
+        );
+        const { data, error } = await sb
+          .from('marketplace_items')
+          .select('*')
+          .eq('is_active', true)
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        if (!data || data.length === 0) {
+          container.innerHTML = '<p style="text-align:center;color:var(--text-muted);">No items yet. Add from admin panel.</p>';
+          return;
+        }
+
+        container.innerHTML = data.map(i => `
+          <div class="card">
+            <span class="badge badge-green">${i.category || 'Other'}</span>
+            <h3>${i.title}</h3>
+            <p style="color:var(--green);font-weight:700;">$${i.price || 0}</p>
+            <p>${(i.description || '').substring(0, 100)}</p>
+            <small style="color:var(--text-muted);">📞 ${i.seller_contact || 'Contact admin'}</small>
+          </div>
+        `).join('');
+      } catch (err) {
+        container.innerHTML = `<p style="color:red;">Error: ${err.message}</p>`;
+      }
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+      setTimeout(() => { if (typeof loadMarketplace === 'function') loadMarketplace(); }, 100);
+    });
+  </script>
 </body>
 </html>

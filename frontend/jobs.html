@@ -17,7 +17,7 @@
         <a href="about.html">About</a>
         <a href="services.html">Services</a>
         <a href="marketplace.html">Marketplace</a>
-        <a href="jobs.html">Jobs</a>
+        <a href="jobs.html" class="active">Jobs</a>
         <a href="news.html">News</a>
         <a href="contact.html">Contact</a>
         <a href="login.html" class="btn btn-outline nav-login">Login</a>
@@ -39,17 +39,77 @@
     <a href="#" class="mob-logout" style="display:none;" onclick="logout()">🚪 Logout</a>
   </div>
 
+  <!-- Jobs Content -->
   <section class="container" style="padding:40px 20px;">
-    <h2>Job Board</h2>
-    <div id="jobs-list" class="cards-grid"></div>
+    <h2 style="text-align:center;margin-bottom:24px;">Job Board</h2>
+    <div id="jobs-list" class="cards-grid">
+      <p style="text-align:center;color:var(--text-muted);">Loading jobs...</p>
+    </div>
   </section>
 
   <footer class="footer">
-    <p>© <span data-setting="copyright_year">2026</span> Ascenda Groups. CEO: <span data-setting="ceo_name">Eyakem Takele Kebede</span></p>
+    <p>© 2026 Ascenda Groups. CEO: Eyakem Takele Kebede</p>
     <p><a href="https://t.me/ascendagroups" target="_blank">Telegram</a></p>
   </footer>
 
   <script src="supabase.js"></script>
   <script src="script.js"></script>
+  <script>
+    // Override loadJobs to run only once
+    window.originalLoadJobs = window.loadJobs || function(){};
+    window.loadJobs = async function() {
+      if (window.jobsLoaded) return;
+      window.jobsLoaded = true;
+
+      const container = document.getElementById('jobs-list');
+      if (!container) return;
+
+      try {
+        const sb = window.supabaseClient || supabase.createClient(
+          window.SUPABASE_URL,
+          window.SUPABASE_ANON_KEY,
+          { auth: { persistSession: true } }
+        );
+        const { data, error } = await sb
+          .from('jobs')
+          .select('*')
+          .eq('is_active', true)
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        if (!data || data.length === 0) {
+          container.innerHTML = '<p style="text-align:center;color:var(--text-muted);">No jobs yet. Add from admin panel.</p>';
+          return;
+        }
+
+        container.innerHTML = data.map(j => `
+          <div class="card">
+            <span class="badge badge-blue">Job</span>
+            <h3>${j.title}</h3>
+            <p>📍 ${j.location || 'Remote'} · ${j.type || 'Full-time'}</p>
+            <p>${(j.description || '').substring(0, 100)}</p>
+            <button class="btn btn-primary" onclick="applyForJob('${j.id}')">Apply Now</button>
+          </div>
+        `).join('');
+
+        // Re‑attach apply function
+        window.applyForJob = async function(jobId) {
+          const sb = window.supabaseClient || supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+          const { data: { user } } = await sb.auth.getUser();
+          if (!user) { alert('Please login first'); window.location.href='login.html'; return; }
+          const { error } = await sb.from('job_applications').insert({ job_id: jobId, applicant_id: user.id });
+          if (error) alert('Application failed: ' + error.message);
+          else alert('Applied successfully!');
+        };
+      } catch (err) {
+        container.innerHTML = `<p style="color:red;">Error: ${err.message}</p>`;
+      }
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+      setTimeout(() => { if (typeof loadJobs === 'function') loadJobs(); }, 100);
+    });
+  </script>
 </body>
 </html>
