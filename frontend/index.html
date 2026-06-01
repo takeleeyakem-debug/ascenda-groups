@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Home – Ascenda Groups</title>
+  <title>Ascenda Groups – Home</title>
   <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-  <!-- UNIVERSAL NAVBAR (with guest link to landing) -->
+  <!-- ========== UNIVERSAL NAVBAR ========== -->
   <nav class="navbar">
     <div class="nav-container">
-      <a href="landing.html" class="logo"><img src="https://rfogomnbicceentrhymy.supabase.co/storage/v1/object/public/Ascenda%20pics/logo.png" alt="Ascenda" style="height:36px;"></a>
+      <a href="index.html" class="logo"><img src="https://rfogomnbicceentrhymy.supabase.co/storage/v1/object/public/Ascenda%20pics/logo.png" alt="Ascenda" style="height:36px;"></a>
       <div class="nav-links">
         <a href="index.html">Home</a>
         <a href="about.html">About</a>
@@ -20,7 +20,6 @@
         <a href="jobs.html">Jobs</a>
         <a href="news.html">News</a>
         <a href="contact.html">Contact</a>
-        <a href="landing.html" class="btn btn-outline nav-guest">🏠 Landing</a>
         <a href="login.html" class="btn btn-outline nav-login">Login</a>
         <a href="register.html" class="btn btn-primary nav-register">Sign Up</a>
         <a href="profile.html" class="btn btn-outline nav-profile" style="display:none;">👤 <span class="nav-username"></span></a>
@@ -31,36 +30,159 @@
     </div>
   </nav>
   <div class="mobile-nav" id="mobileNav">
-    <a href="index.html">🏠 Home</a>
-    <a href="about.html">📖 About</a>
-    <a href="services.html">🔧 Services</a>
-    <a href="marketplace.html">🏪 Marketplace</a>
-    <a href="jobs.html">💼 Jobs</a>
-    <a href="news.html">📰 News</a>
+    <a href="index.html">🏠 Home</a><a href="about.html">📖 About</a><a href="services.html">🔧 Services</a>
+    <a href="marketplace.html">🏪 Marketplace</a><a href="jobs.html">💼 Jobs</a><a href="news.html">📰 News</a>
     <a href="contact.html">✉️ Contact</a>
-    <a href="landing.html" class="mob-guest">🏠 Landing</a>
-    <a href="login.html" class="mob-login">🔑 Login</a>
-    <a href="register.html" class="mob-register">🚀 Sign Up</a>
+    <a href="login.html" class="mob-login">🔑 Login</a><a href="register.html" class="mob-register">🚀 Sign Up</a>
     <a href="profile.html" class="mob-profile" style="display:none;">👤 Profile</a>
     <a href="admin.html" class="mob-admin" style="display:none;color:#f59e0b;">⚡ Admin</a>
     <a href="#" class="mob-logout" style="display:none;" onclick="logout()">🚪 Logout</a>
   </div>
 
+  <!-- ========== ANNOUNCEMENTS BAR ========== -->
+  <div id="announcements-bar" style="display:none;background:var(--bg-card);padding:10px 16px;text-align:center;border-bottom:1px solid var(--border);font-size:0.9rem;overflow:hidden;white-space:nowrap;"></div>
+
+  <!-- ========== HERO ========== -->
   <section class="hero">
     <img src="https://rfogomnbicceentrhymy.supabase.co/storage/v1/object/public/Ascenda%20pics/banner.png" style="max-width:500px;border-radius:16px;margin-bottom:20px;">
     <h1 data-setting="site_name">Ascenda Groups</h1>
-    <p data-setting="site_description">Your gateway to forex mastery, web development, marketplace & youth empowerment</p>
+    <p data-setting="site_description">Forex, Web Development, Marketplace & Jobs</p>
+    <div style="margin-top:20px;">
+      <a href="register.html" class="btn btn-primary btn-lg">Get Started</a>
+      <a href="services.html" class="btn btn-outline btn-lg">Services</a>
+    </div>
   </section>
 
-  <section class="container" style="padding:40px 20px;"><h2>Latest Jobs</h2><div id="featured-jobs" class="cards-grid"></div></section>
-  <section class="container" style="padding:40px 20px;"><h2>Our Services</h2><div id="featured-services" class="cards-grid"></div></section>
+  <!-- ========== FEATURED JOBS ========== -->
+  <section class="container" style="padding:40px 20px;">
+    <h2>Latest Jobs</h2>
+    <div id="featured-jobs" class="cards-grid">
+      <p style="text-align:center;color:var(--text-muted);">Loading jobs...</p>
+    </div>
+  </section>
 
+  <!-- ========== FEATURED SERVICES ========== -->
+  <section class="container" style="padding:40px 20px;">
+    <h2>Our Services</h2>
+    <div id="featured-services" class="cards-grid">
+      <p style="text-align:center;color:var(--text-muted);">Loading services...</p>
+    </div>
+  </section>
+
+  <!-- ========== FOOTER ========== -->
   <footer class="footer">
     <p>© <span data-setting="copyright_year">2026</span> Ascenda Groups. CEO: <span data-setting="ceo_name">Eyakem Takele Kebede</span></p>
     <p><a href="https://t.me/ascendagroups" target="_blank">Telegram</a></p>
   </footer>
 
+  <!-- ========== SCRIPTS ========== -->
   <script src="supabase.js"></script>
   <script src="script.js"></script>
+  <script>
+    // Override loadHome and loadAnnouncements to run only once
+    window.originalLoadHome = window.loadHome || function(){};
+    window.originalLoadAnnouncements = window.loadAnnouncements || function(){};
+
+    window.loadHome = async function() {
+      if (window.homeLoaded) return;
+      window.homeLoaded = true;
+
+      const jobsContainer = document.getElementById('featured-jobs');
+      const servicesContainer = document.getElementById('featured-services');
+
+      try {
+        const sb = window.supabaseClient || supabase.createClient(
+          window.SUPABASE_URL,
+          window.SUPABASE_ANON_KEY,
+          { auth: { persistSession: true } }
+        );
+
+        const [jobsRes, servicesRes] = await Promise.all([
+          sb.from('jobs').select('*').eq('is_active', true).limit(4),
+          sb.from('services').select('*').eq('is_active', true).limit(4)
+        ]);
+
+        // Jobs
+        if (jobsContainer) {
+          const jobs = jobsRes.data;
+          if (jobsRes.error) throw jobsRes.error;
+          if (!jobs || jobs.length === 0) {
+            jobsContainer.innerHTML = '<p style="text-align:center;color:var(--text-muted);">No jobs yet.</p>';
+          } else {
+            jobsContainer.innerHTML = jobs.map(j => `
+              <div class="card">
+                <span class="badge badge-blue">Job</span>
+                <h3>${j.title}</h3>
+                <p>${j.location || 'Remote'}</p>
+              </div>
+            `).join('');
+          }
+        }
+
+        // Services
+        if (servicesContainer) {
+          const services = servicesRes.data;
+          if (servicesRes.error) throw servicesRes.error;
+          if (!services || services.length === 0) {
+            servicesContainer.innerHTML = '<p style="text-align:center;color:var(--text-muted);">No services yet.</p>';
+          } else {
+            servicesContainer.innerHTML = services.map(s => `
+              <div class="card">
+                <span class="badge badge-purple">Service</span>
+                <h3>${s.title}</h3>
+              </div>
+            `).join('');
+          }
+        }
+      } catch (err) {
+        if (jobsContainer) jobsContainer.innerHTML = `<p style="color:red;">Error: ${err.message}</p>`;
+        if (servicesContainer) servicesContainer.innerHTML = `<p style="color:red;">Error: ${err.message}</p>`;
+      }
+    };
+
+    window.loadAnnouncements = async function() {
+      if (window.announcementsLoaded) return;
+      window.announcementsLoaded = true;
+
+      const bar = document.getElementById('announcements-bar');
+      if (!bar) return;
+
+      try {
+        const sb = window.supabaseClient || supabase.createClient(
+          window.SUPABASE_URL,
+          window.SUPABASE_ANON_KEY,
+          { auth: { persistSession: true } }
+        );
+        const { data, error } = await sb
+          .from('announcements')
+          .select('*')
+          .eq('is_active', true)
+          .order('created_at', { ascending: false })
+          .limit(3);
+
+        if (error) throw error;
+
+        if (!data || data.length === 0) {
+          bar.style.display = 'none';
+          return;
+        }
+
+        bar.innerHTML = data.map(a => 
+          `<span style="color:${a.type==='urgent'?'#ef4444':a.type==='warning'?'#f59e0b':'#60a5fa'};margin:0 16px;">📢 ${a.message}</span>`
+        ).join('');
+        bar.style.display = 'block';
+      } catch (err) {
+        console.error('Announcements error:', err);
+      }
+    };
+
+    // Trigger after DOM ready
+    document.addEventListener('DOMContentLoaded', () => {
+      setTimeout(() => {
+        if (typeof loadAnnouncements === 'function') loadAnnouncements();
+        if (typeof loadHome === 'function') loadHome();
+      }, 100);
+    });
+  </script>
 </body>
 </html>
