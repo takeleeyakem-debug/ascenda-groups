@@ -1,5 +1,289 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>News – Ascenda Groups</title><link rel="stylesheet" href="style.css"><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script></head><body>
-<!-- UNIVERSAL NAVBAR HERE -->
-<section class="container" style="padding:40px 20px;"><h2 style="text-align:center;margin-bottom:24px;">News & Updates</h2><div id="news-list" class="cards-grid"></div></section>
-<footer class="footer"><p>© 2026 Ascenda Groups. CEO: Eyakem Takele Kebede</p></footer>
-<script src="supabase.js"></script><script src="script.js"></script></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ascenda Groups - News</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0e27;
+            color: #ffffff;
+        }
+
+        nav {
+            background: #0f1444;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(102, 126, 234, 0.2);
+        }
+
+        .nav-logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: #a0aec0;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            color: #667eea;
+        }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+        }
+
+        .hamburger span {
+            width: 25px;
+            height: 3px;
+            background: white;
+            border-radius: 3px;
+        }
+
+        .page-header {
+            text-align: center;
+            padding: 4rem 2rem 2rem;
+            background: linear-gradient(135deg, #1a1f4e, #0f1444);
+        }
+
+        .page-header h1 {
+            font-size: 3rem;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+        }
+
+        .news-container {
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .news-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .news-card {
+            background: linear-gradient(135deg, #1a1f4e, #0f1444);
+            border-radius: 15px;
+            padding: 2rem;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            transition: all 0.3s;
+        }
+
+        .news-card:hover {
+            border-color: #667eea;
+            transform: translateX(5px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.2);
+        }
+
+        .news-type {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .type-article { background: rgba(72, 187, 120, 0.2); color: #48bb78; }
+        .type-youtube { background: rgba(245, 101, 101, 0.2); color: #f56565; }
+        .type-image { background: rgba(159, 122, 234, 0.2); color: #9f7aea; }
+        .type-document { background: rgba(56, 178, 172, 0.2); color: #38b2ac; }
+
+        .news-title {
+            font-size: 1.5rem;
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+
+        .news-content {
+            color: #a0aec0;
+            line-height: 1.8;
+            margin-bottom: 1rem;
+        }
+
+        .news-media {
+            margin: 1rem 0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .news-media img, .news-media video {
+            width: 100%;
+            max-height: 400px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+
+        .news-date {
+            color: #718096;
+            font-size: 0.9rem;
+        }
+
+        .no-news {
+            text-align: center;
+            padding: 3rem;
+            color: #a0aec0;
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+                position: fixed;
+                top: 0;
+                right: -100%;
+                width: 300px;
+                height: 100vh;
+                background: #0f1444;
+                flex-direction: column;
+                padding: 2rem;
+                transition: right 0.3s ease;
+            }
+
+            .nav-links.active { right: 0; }
+            .hamburger { display: flex; }
+
+            .page-header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="index.html" class="nav-logo">ASCENDA</a>
+        <div class="nav-links" id="navLinks">
+            <a href="index.html">Home</a>
+            <a href="about.html">About</a>
+            <a href="services.html">Services</a>
+            <a href="marketplace.html">Marketplace</a>
+            <a href="jobs.html">Jobs</a>
+            <a href="news.html" class="active">News</a>
+            <a href="contact.html">Contact</a>
+            <a href="profile.html" id="profileLink">Profile</a>
+            <a href="#" id="logoutBtn">Logout</a>
+        </div>
+        <div class="hamburger" id="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </nav>
+
+    <div class="page-header">
+        <h1>News & Updates</h1>
+        <p>Stay updated with the latest from Ascenda Groups</p>
+    </div>
+
+    <div class="news-container">
+        <div class="news-grid" id="newsGrid">
+            <div class="no-news">Loading news...</div>
+        </div>
+    </div>
+
+    <script src="supabase.js"></script>
+    <script>
+        async function loadNews() {
+            const { data, error } = await supabase
+                .from('news_posts')
+                .select('*')
+                .eq('is_published', true)
+                .order('created_at', { ascending: false });
+
+            const grid = document.getElementById('newsGrid');
+            
+            if (error) {
+                grid.innerHTML = '<div class="no-news">Error loading news. Please try again.</div>';
+                console.error('Error:', error);
+                return;
+            }
+
+            if (!data || data.length === 0) {
+                grid.innerHTML = '<div class="no-news">No news articles yet. Check back soon!</div>';
+                return;
+            }
+
+            grid.innerHTML = data.map(news => `
+                <div class="news-card">
+                    <span class="news-type type-${news.type || 'article'}">${(news.type || 'article').toUpperCase()}</span>
+                    <h2 class="news-title">${news.title}</h2>
+                    <p class="news-content">${news.content || 'No content'}</p>
+                    ${news.media_url ? `
+                        <div class="news-media">
+                            ${news.type === 'youtube' ? 
+                                `<iframe width="100%" height="315" src="${news.media_url}" frameborder="0" allowfullscreen></iframe>` :
+                                `<img src="${news.media_url}" alt="${news.title}" loading="lazy">`
+                            }
+                        </div>
+                    ` : ''}
+                    <p class="news-date">📅 ${new Date(news.created_at).toLocaleDateString('en-US', { 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric' 
+                    })}</p>
+                </div>
+            `).join('');
+        }
+
+        // Mobile navigation
+        document.getElementById('hamburger').addEventListener('click', () => {
+            document.getElementById('navLinks').classList.toggle('active');
+        });
+
+        document.querySelectorAll('#navLinks a').forEach(link => {
+            link.addEventListener('click', () => {
+                document.getElementById('navLinks').classList.remove('active');
+            });
+        });
+
+        // Auth check
+        async function init() {
+            const user = await checkAuth();
+            if (!user) {
+                document.getElementById('profileLink').href = 'login.html';
+                document.getElementById('profileLink').textContent = 'Login';
+                document.getElementById('logoutBtn').style.display = 'none';
+            } else {
+                document.getElementById('logoutBtn').addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    await supabase.auth.signOut();
+                    window.location.href = 'landing.html';
+                });
+            }
+            loadNews();
+        }
+
+        init();
+    </script>
+</body>
+</html>

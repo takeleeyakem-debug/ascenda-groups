@@ -1,386 +1,936 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Panel – Ascenda Groups</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <style>
-    :root { --bg:#0b1120; --card:#1a2332; --border:#2d3a4f; --text:#e2e8f0; --muted:#94a3b8; --blue:#3b82f6; --red:#ef4444; --green:#10b981; --gold:#f59e0b; --purple:#8b5cf6; }
-    * { box-sizing:border-box; margin:0; padding:0; }
-    body { font-family: system-ui, sans-serif; background:var(--bg); color:var(--text); display:flex; min-height:100vh; }
-    .sidebar { width:260px; background:var(--card); border-right:1px solid var(--border); padding:20px; position:fixed; top:0; left:0; bottom:0; overflow-y:auto; z-index:10; }
-    .sidebar h3 { color:var(--gold); margin-bottom:16px; font-size:0.85rem; text-transform:uppercase; letter-spacing:1px; }
-    .sidebar a { display:flex; align-items:center; gap:8px; padding:10px 14px; border-radius:10px; color:var(--muted); text-decoration:none; font-size:0.9rem; margin-bottom:2px; cursor:pointer; transition:all 0.2s; }
-    .sidebar a:hover, .sidebar a.active { background:rgba(59,130,246,0.1); color:var(--blue); }
-    .main { margin-left:260px; flex:1; padding:30px; }
-    .card { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:24px; margin-bottom:20px; }
-    .card h3 { margin-bottom:16px; font-size:1.1rem; }
-    .form-row { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:10px; }
-    .form-group { flex:1; min-width:180px; margin-bottom:8px; }
-    .form-group label { display:block; font-size:0.75rem; color:var(--muted); margin-bottom:4px; text-transform:uppercase; letter-spacing:0.5px; }
-    input, select, textarea { width:100%; padding:10px; background:var(--bg); border:1px solid var(--border); color:white; border-radius:8px; font-family:inherit; font-size:0.9rem; }
-    textarea { resize:vertical; min-height:70px; }
-    button { padding:10px 20px; border-radius:8px; font-weight:600; cursor:pointer; border:none; font-size:0.9rem; transition:all 0.2s; }
-    button:hover { opacity:0.9; transform:translateY(-1px); }
-    .btn-primary { background:var(--blue); color:white; }
-    .btn-danger { background:var(--red); color:white; }
-    .btn-success { background:var(--green); color:white; }
-    .btn-gold { background:var(--gold); color:black; }
-    .btn-sm { padding:6px 12px; font-size:0.75rem; }
-    table { width:100%; border-collapse:collapse; margin-top:12px; }
-    th { text-align:left; padding:10px 12px; color:var(--muted); font-size:0.7rem; text-transform:uppercase; letter-spacing:0.5px; border-bottom:2px solid var(--border); }
-    td { padding:10px 12px; border-bottom:1px solid var(--border); font-size:0.9rem; }
-    tr:hover td { background:rgba(59,130,246,0.03); }
-    .badge { display:inline-block; padding:4px 10px; border-radius:20px; font-size:0.7rem; font-weight:600; }
-    .badge-active { background:rgba(16,185,129,0.2); color:var(--green); }
-    .badge-hidden { background:rgba(239,68,68,0.2); color:var(--red); }
-    .badge-pending { background:rgba(245,158,11,0.2); color:var(--gold); }
-    .toast { position:fixed; top:20px; right:20px; background:var(--card); border:1px solid var(--green); padding:14px 20px; border-radius:12px; z-index:999; font-size:0.9rem; box-shadow:0 10px 30px rgba(0,0,0,0.5); animation:slideIn 0.3s ease; }
-    .toast.error { border-color:var(--red); }
-    @keyframes slideIn { from{opacity:0;transform:translateX(100%);} to{opacity:1;transform:translateX(0);} }
-    .skeleton { height:200px; background:linear-gradient(90deg,var(--card) 25%,var(--border) 50%,var(--card) 75%); background-size:200% 100%; animation:shimmer 1.5s infinite; border-radius:16px; }
-    @keyframes shimmer { 0%{background-position:200% 0;} 100%{background-position:-200% 0;} }
-    @media (max-width:768px) { .sidebar { display:none; } .main { margin-left:0; padding:20px; } }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ascenda Groups - Admin Panel</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0e27;
+            color: #ffffff;
+        }
+
+        .admin-header {
+            background: #0f1444;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(102, 126, 234, 0.3);
+        }
+
+        .admin-header h1 {
+            font-size: 1.5rem;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .btn-back {
+            padding: 0.5rem 1.5rem;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            padding: 1rem;
+            background: #0f1444;
+            overflow-x: auto;
+            flex-wrap: wrap;
+            border-bottom: 1px solid rgba(102, 126, 234, 0.2);
+        }
+
+        .tab-btn {
+            padding: 0.6rem 1.2rem;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            background: transparent;
+            color: #a0aec0;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            white-space: nowrap;
+            font-size: 0.9rem;
+        }
+
+        .tab-btn:hover, .tab-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            color: #667eea;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-card {
+            background: #1a1f4e;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.3rem;
+            color: #667eea;
+            font-size: 0.9rem;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 0.7rem;
+            border-radius: 8px;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            background: #0a0e27;
+            color: white;
+            font-size: 0.9rem;
+        }
+
+        .btn {
+            padding: 0.7rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-danger {
+            background: #f56565;
+            color: white;
+        }
+
+        .btn-success {
+            background: #48bb78;
+            color: white;
+        }
+
+        .btn-warning {
+            background: #ed8936;
+            color: white;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            background: #1a1f4e;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+        }
+
+        th {
+            background: #0f1444;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .badge {
+            padding: 0.2rem 0.6rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+        }
+
+        .badge-admin { background: rgba(159, 122, 234, 0.3); color: #9f7aea; }
+        .badge-user { background: rgba(102, 126, 234, 0.3); color: #667eea; }
+        .badge-agent { background: rgba(72, 187, 120, 0.3); color: #48bb78; }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            table {
+                font-size: 0.8rem;
+            }
+            
+            th, td {
+                padding: 0.5rem;
+            }
+        }
+    </style>
 </head>
 <body>
+    <div class="admin-header">
+        <h1>⚙️ Admin Panel</h1>
+        <a href="index.html" class="btn-back">← Back to Site</a>
+    </div>
 
-<!-- SIDEBAR -->
-<div class="sidebar" id="sidebar">
-  <div style="margin-bottom:20px;">
-    <img src="https://rfogomnbicceentrhymy.supabase.co/storage/v1/object/public/Ascenda%20pics/logo.png" style="height:30px;">
-  </div>
-  <h3>Admin Panel</h3>
-  <a class="active" onclick="switchTab('users')">👥 Users</a>
-  <a onclick="switchTab('departments')">🏢 Departments</a>
-  <a onclick="switchTab('authority')">⭐ Authority</a>
-  <a onclick="switchTab('jobs')">💼 Jobs</a>
-  <a onclick="switchTab('services')">🔧 Services</a>
-  <a onclick="switchTab('marketplace')">🏪 Marketplace</a>
-  <a onclick="switchTab('news')">📰 News</a>
-  <a onclick="switchTab('announcements')">📢 Announcements</a>
-  <a onclick="switchTab('applications')">📋 Applications</a>
-  <a onclick="switchTab('messages')">✉️ Messages</a>
-  <a onclick="switchTab('settings')">⚙️ Settings</a>
-  <a href="index.html" style="margin-top:20px;">🏠 Back to Site</a>
-  <a onclick="logout()" style="color:var(--red);">🚪 Logout</a>
-</div>
+    <div class="tabs">
+        <button class="tab-btn active" data-tab="users">👥 Users</button>
+        <button class="tab-btn" data-tab="departments">🏢 Departments</button>
+        <button class="tab-btn" data-tab="authority">📊 Authority</button>
+        <button class="tab-btn" data-tab="jobs">💼 Jobs</button>
+        <button class="tab-btn" data-tab="services">🛠️ Services</button>
+        <button class="tab-btn" data-tab="marketplace">🛒 Marketplace</button>
+        <button class="tab-btn" data-tab="news">📰 News</button>
+        <button class="tab-btn" data-tab="announcements">📢 Announcements</button>
+        <button class="tab-btn" data-tab="applications">📝 Applications</button>
+        <button class="tab-btn" data-tab="messages">💬 Messages</button>
+        <button class="tab-btn" data-tab="settings">⚙️ Settings</button>
+    </div>
 
-<!-- MAIN CONTENT -->
-<div class="main" id="main-content">
-  <div class="skeleton"></div>
-</div>
+    <!-- Users Tab -->
+    <div class="tab-content active" id="tab-users">
+        <h2 class="section-title">Manage Users</h2>
+        <div id="usersTable"></div>
+    </div>
 
-<script src="supabase.js"></script>
-<script>
-// ========== SUPABASE ==========
-const sb = window.supabaseClient || supabase.createClient(
-  'https://rfogomnbicceentrhymy.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmb2dvbW5iaWNjZWVudHJoeW15Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyNDQwOTEsImV4cCI6MjA5NTgyMDA5MX0.wke5a7GEdU2oepfKfSD-rthLTEmpk3GqVfFRM_MjZ9c',
-  { auth: { persistSession: true, autoRefreshToken: true, storage: localStorage } }
-);
+    <!-- Departments Tab -->
+    <div class="tab-content" id="tab-departments">
+        <h2 class="section-title">Departments</h2>
+        <div class="form-card">
+            <h3 style="color:#667eea;margin-bottom:1rem;">Add Department</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Department Name</label>
+                    <input type="text" id="deptName" placeholder="e.g., Forex Trading">
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <input type="text" id="deptDesc" placeholder="Department description">
+                </div>
+            </div>
+            <button class="btn btn-primary" onclick="addDepartment()">Add Department</button>
+        </div>
+        <div id="departmentsTable"></div>
+    </div>
 
-let adminUser = null;
+    <!-- Jobs Tab -->
+    <div class="tab-content" id="tab-jobs">
+        <h2 class="section-title">Job Postings</h2>
+        <div class="form-card">
+            <h3 style="color:#667eea;margin-bottom:1rem;">Post New Job</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Job Title</label>
+                    <input type="text" id="jobTitle" placeholder="Job title">
+                </div>
+                <div class="form-group">
+                    <label>Department</label>
+                    <select id="jobDept"></select>
+                </div>
+                <div class="form-group">
+                    <label>Job Type</label>
+                    <select id="jobType">
+                        <option>Full-time</option>
+                        <option>Part-time</option>
+                        <option>Contract</option>
+                        <option>Remote</option>
+                        <option>Freelance</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Location</label>
+                    <input type="text" id="jobLocation" placeholder="Location">
+                </div>
+                <div class="form-group">
+                    <label>Salary</label>
+                    <input type="text" id="jobSalary" placeholder="e.g., $50,000/year">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Description</label>
+                <textarea id="jobDesc" rows="4" placeholder="Job description..."></textarea>
+            </div>
+            <button class="btn btn-primary" onclick="addJob()">Post Job</button>
+        </div>
+        <div id="jobsTable"></div>
+    </div>
 
-// ========== AUTH CHECK ==========
-async function init() {
-  const { data: { user }, error } = await sb.auth.getUser();
-  if (error || !user) { window.location.href = 'login.html'; return; }
-  adminUser = user;
-  
-  if (user.email === 'takeleeyakem@gmail.com') {
-    console.log('✅ CEO Access');
-    switchTab('users');
-    return;
-  }
-  
-  const { data: profile } = await sb.from('profiles').select('role').eq('id', user.id).single();
-  if (profile?.role === 'admin' || profile?.role === 'ceo') {
-    console.log('✅ Admin Access');
-    switchTab('users');
-    return;
-  }
-  
-  window.location.href = 'index.html';
-}
+    <!-- Services Tab -->
+    <div class="tab-content" id="tab-services">
+        <h2 class="section-title">Services</h2>
+        <div class="form-card">
+            <h3 style="color:#667eea;margin-bottom:1rem;">Add Service</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Service Title</label>
+                    <input type="text" id="serviceTitle" placeholder="Service name">
+                </div>
+                <div class="form-group">
+                    <label>Price</label>
+                    <input type="text" id="servicePrice" placeholder="e.g., $100">
+                </div>
+                <div class="form-group">
+                    <label>Department</label>
+                    <select id="serviceDept"></select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Description</label>
+                <textarea id="serviceDesc" rows="3" placeholder="Service description..."></textarea>
+            </div>
+            <button class="btn btn-primary" onclick="addService()">Add Service</button>
+        </div>
+        <div id="servicesTable"></div>
+    </div>
 
-// ========== LOGOUT ==========
-async function logout() { await sb.auth.signOut(); window.location.href = 'landing.html'; }
+    <!-- Marketplace Tab -->
+    <div class="tab-content" id="tab-marketplace">
+        <h2 class="section-title">Marketplace Items</h2>
+        <div class="form-card">
+            <h3 style="color:#667eea;margin-bottom:1rem;">Add Item</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Item Title</label>
+                    <input type="text" id="itemTitle" placeholder="Item name">
+                </div>
+                <div class="form-group">
+                    <label>Category</label>
+                    <select id="itemCategory">
+                        <option>Houses</option>
+                        <option>Cars</option>
+                        <option>Valuables</option>
+                        <option>E-Services</option>
+                        <option>Digital</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Price</label>
+                    <input type="text" id="itemPrice" placeholder="Price">
+                </div>
+                <div class="form-group">
+                    <label>Seller Contact</label>
+                    <input type="text" id="itemContact" placeholder="Phone or email">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Description</label>
+                <textarea id="itemDesc" rows="3" placeholder="Item description..."></textarea>
+            </div>
+            <button class="btn btn-primary" onclick="addMarketplaceItem()">Add Item</button>
+        </div>
+        <div id="marketplaceTable"></div>
+    </div>
 
-// ========== TOAST ==========
-function showToast(msg, isError) {
-  const t = document.createElement('div');
-  t.className = 'toast' + (isError ? ' error' : '');
-  t.textContent = (isError ? '❌ ' : '✅ ') + msg;
-  document.body.appendChild(t);
-  setTimeout(() => t.remove(), 3000);
-}
+    <!-- News Tab -->
+    <div class="tab-content" id="tab-news">
+        <h2 class="section-title">News Posts</h2>
+        <div class="form-card">
+            <h3 style="color:#667eea;margin-bottom:1rem;">Publish News</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Title</label>
+                    <input type="text" id="newsTitle" placeholder="News title">
+                </div>
+                <div class="form-group">
+                    <label>Type</label>
+                    <select id="newsType">
+                        <option value="article">Article</option>
+                        <option value="youtube">YouTube</option>
+                        <option value="image">Image</option>
+                        <option value="document">Document</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Media URL</label>
+                    <input type="text" id="newsMedia" placeholder="Optional media URL">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Content</label>
+                <textarea id="newsContent" rows="4" placeholder="News content..."></textarea>
+            </div>
+            <button class="btn btn-primary" onclick="addNews()">Publish News</button>
+        </div>
+        <div id="newsTable"></div>
+    </div>
 
-// ========== TAB SWITCH ==========
-async function switchTab(tabName) {
-  document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active'));
-  const links = document.querySelectorAll('.sidebar a');
-  links.forEach(a => { if (a.textContent.toLowerCase().includes(tabName)) a.classList.add('active'); });
-  if (tabName === 'users') links[0].classList.add('active');
-  
-  document.getElementById('main-content').innerHTML = '<div class="skeleton"></div>';
-  await loadTabContent(tabName);
-}
+    <!-- Announcements Tab -->
+    <div class="tab-content" id="tab-announcements">
+        <h2 class="section-title">Announcements</h2>
+        <div class="form-card">
+            <h3 style="color:#667eea;margin-bottom:1rem;">Post Announcement</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Message</label>
+                    <input type="text" id="announceMsg" placeholder="Announcement message">
+                </div>
+                <div class="form-group">
+                    <label>Type</label>
+                    <select id="announceType">
+                        <option>info</option>
+                        <option>success</option>
+                        <option>warning</option>
+                        <option>urgent</option>
+                    </select>
+                </div>
+            </div>
+            <button class="btn btn-primary" onclick="addAnnouncement()">Post Announcement</button>
+        </div>
+        <div id="announcementsTable"></div>
+    </div>
 
-// ========== LOAD TAB CONTENT ==========
-async function loadTabContent(tabName) {
-  const main = document.getElementById('main-content');
-  let html = '';
+    <!-- Applications Tab -->
+    <div class="tab-content" id="tab-applications">
+        <h2 class="section-title">Applications</h2>
+        <div id="applicationsTable"></div>
+    </div>
 
-  try {
-    // ===== USERS =====
-    if (tabName === 'users') {
-      const { data: users } = await sb.from('profiles').select('*');
-      html = `<div class="card"><h3>👥 All Users (${users?.length || 0})</h3>
-        <table><thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Actions</th></tr></thead><tbody>
-        ${(users||[]).map(u => `<tr><td>${u.full_name||'-'}</td><td>${u.email||'-'}</td><td>${u.role||'user'}</td>
-        <td><select onchange="updateRole('${u.id}',this.value)" style="padding:4px 8px;background:var(--bg);color:white;border:1px solid var(--border);border-radius:6px;">
-        <option ${u.role==='user'?'selected':''}>user</option><option ${u.role==='agent'?'selected':''}>agent</option><option ${u.role==='worker'?'selected':''}>worker</option><option ${u.role==='dept_admin'?'selected':''}>dept_admin</option><option ${u.role==='admin'?'selected':''}>admin</option></select>
-        <button class="btn-danger btn-sm" onclick="deleteUser('${u.id}')">Del</button></td></tr>`).join('')}</tbody></table></div>`;
-    }
+    <!-- Messages Tab -->
+    <div class="tab-content" id="tab-messages">
+        <h2 class="section-title">Contact Messages</h2>
+        <div id="messagesTable"></div>
+    </div>
 
-    // ===== DEPARTMENTS =====
-    else if (tabName === 'departments') {
-      const { data: depts } = await sb.from('departments').select('*');
-      html = `<div class="card"><h3>➕ Create Department</h3>
-        <div class="form-row"><div class="form-group"><label>Name</label><input id="dept-name"></div><div class="form-group"><label>Description</label><input id="dept-desc"></div></div>
-        <button class="btn-primary" onclick="addDepartment()">Create Department</button></div>
-        <div class="card"><h3>🏢 Departments</h3><table><thead><tr><th>Name</th><th>Description</th><th>Actions</th></tr></thead><tbody>
-        ${(depts||[]).map(d => `<tr><td>${d.name}</td><td>${d.description||''}</td><td><button class="btn-danger btn-sm" onclick="deleteItem('departments','${d.id}')">Del</button></td></tr>`).join('')}</tbody></table></div>`;
-    }
+    <!-- Settings Tab -->
+    <div class="tab-content" id="tab-settings">
+        <h2 class="section-title">Site Settings</h2>
+        <div class="form-card">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Site Name</label>
+                    <input type="text" id="siteName" placeholder="Ascenda Groups">
+                </div>
+                <div class="form-group">
+                    <label>Site Description</label>
+                    <input type="text" id="siteDesc" placeholder="Site description">
+                </div>
+                <div class="form-group">
+                    <label>Copyright Year</label>
+                    <input type="text" id="copyrightYear" placeholder="2026">
+                </div>
+            </div>
+            <button class="btn btn-primary" onclick="saveSettings()">Save Settings</button>
+        </div>
+    </div>
 
-    // ===== AUTHORITY =====
-    else if (tabName === 'authority') {
-      const [auth, users, depts] = await Promise.all([
-        sb.from('authority').select('*, profiles(full_name), departments(name)').order('level'),
-        sb.from('profiles').select('id,full_name'),
-        sb.from('departments').select('id,name')
-      ]);
-      html = `<div class="card"><h3>⭐ Assign Authority</h3>
-        <div class="form-row"><div class="form-group"><label>Title</label><input id="auth-title"></div><div class="form-group"><label>Level</label><input id="auth-level" type="number"></div></div>
-        <div class="form-row"><div class="form-group"><label>User</label><select id="auth-user"><option value="">Select</option>${(users.data||[]).map(u=>`<option value="${u.id}">${u.full_name||u.id}</option>`).join('')}</select></div>
-        <div class="form-group"><label>Department</label><select id="auth-dept"><option value="">Select</option>${(depts.data||[]).map(d=>`<option value="${d.id}">${d.name}</option>`).join('')}</select></div></div>
-        <button class="btn-primary" onclick="addAuthority()">Assign</button></div>
-        <div class="card"><h3>Authority Ladder</h3><table><thead><tr><th>Title</th><th>Level</th><th>User</th><th>Dept</th><th>Actions</th></tr></thead><tbody>
-        ${(auth.data||[]).map(a => `<tr><td>${a.title}</td><td>${a.level}</td><td>${a.profiles?.full_name||'-'}</td><td>${a.departments?.name||'-'}</td><td><button class="btn-danger btn-sm" onclick="deleteItem('authority','${a.id}')">Del</button></td></tr>`).join('')}</tbody></table></div>`;
-    }
+    <script src="supabase.js"></script>
+    <script>
+        let currentUser = null;
+        let currentProfile = null;
 
-    // ===== JOBS =====
-    else if (tabName === 'jobs') {
-      const [jobs, depts] = await Promise.all([
-        sb.from('jobs').select('*, departments(name)').order('created_at',{ascending:false}),
-        sb.from('departments').select('id,name')
-      ]);
-      html = `<div class="card"><h3>💼 Post New Job</h3>
-        <div class="form-row"><div class="form-group"><label>Title</label><input id="job-title"></div><div class="form-group"><label>Department</label><select id="job-dept"><option value="">Select</option>${(depts.data||[]).map(d=>`<option value="${d.id}">${d.name}</option>`).join('')}</select></div></div>
-        <div class="form-row"><div class="form-group"><label>Location</label><input id="job-loc"></div><div class="form-group"><label>Type</label><input id="job-type"></div><div class="form-group"><label>Salary</label><input id="job-salary"></div></div>
-        <div class="form-group"><label>Description</label><textarea id="job-desc" rows="3"></textarea></div>
-        <button class="btn-primary" onclick="addJob()">Post Job</button></div>
-        <div class="card"><h3>Posted Jobs</h3><table><thead><tr><th>Title</th><th>Location</th><th>Dept</th><th>Actions</th></tr></thead><tbody>
-        ${(jobs.data||[]).map(j => `<tr><td>${j.title}</td><td>${j.location||'-'}</td><td>${j.departments?.name||'-'}</td><td><button class="btn-danger btn-sm" onclick="deleteItem('jobs','${j.id}')">Del</button></td></tr>`).join('')}</tbody></table></div>`;
-    }
+        // Tab switching
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                btn.classList.add('active');
+                document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+                
+                loadTabData(btn.dataset.tab);
+            });
+        });
 
-    // ===== SERVICES =====
-    else if (tabName === 'services') {
-      const [svcs, depts] = await Promise.all([
-        sb.from('services').select('*, departments(name)').order('created_at',{ascending:false}),
-        sb.from('departments').select('id,name')
-      ]);
-      html = `<div class="card"><h3>🔧 Add Service</h3>
-        <div class="form-row"><div class="form-group"><label>Title</label><input id="svc-title"></div><div class="form-group"><label>Price</label><input id="svc-price"></div></div>
-        <div class="form-group"><label>Department</label><select id="svc-dept"><option value="">Select</option>${(depts.data||[]).map(d=>`<option value="${d.id}">${d.name}</option>`).join('')}</select></div>
-        <div class="form-group"><label>Description</label><textarea id="svc-desc" rows="3"></textarea></div>
-        <button class="btn-primary" onclick="addService()">Add Service</button></div>
-        <div class="card"><h3>Services</h3><table><thead><tr><th>Title</th><th>Price</th><th>Dept</th><th>Status</th><th>Actions</th></tr></thead><tbody>
-        ${(svcs.data||[]).map(s => `<tr><td>${s.title}</td><td>${s.price||'-'}</td><td>${s.departments?.name||'-'}</td><td><span class="badge ${s.is_active?'badge-active':'badge-hidden'}">${s.is_active?'Active':'Hidden'}</span></td><td><button class="btn-success btn-sm" onclick="toggleService('${s.id}',${!s.is_active})">Toggle</button> <button class="btn-danger btn-sm" onclick="deleteItem('services','${s.id}')">Del</button></td></tr>`).join('')}</tbody></table></div>`;
-    }
+        // Initialize
+        async function init() {
+            currentUser = await checkAuth();
+            if (!currentUser) {
+                window.location.href = 'login.html';
+                return;
+            }
 
-    // ===== MARKETPLACE =====
-    else if (tabName === 'marketplace') {
-      const { data: items } = await sb.from('marketplace_items').select('*').order('created_at',{ascending:false});
-      html = `<div class="card"><h3>🏪 Add Marketplace Item</h3>
-        <div class="form-row"><div class="form-group"><label>Title</label><input id="mp-title"></div><div class="form-group"><label>Category</label><select id="mp-cat"><option>house</option><option>car</option><option>value_item</option><option>e_service</option><option>digital_product</option><option>other</option></select></div></div>
-        <div class="form-row"><div class="form-group"><label>Price ($)</label><input id="mp-price" type="number" step="0.01"></div><div class="form-group"><label>Contact</label><input id="mp-contact"></div></div>
-        <div class="form-group"><label>Image URL</label><input id="mp-image" placeholder="https://..."></div>
-        <div class="form-group"><label>Description</label><textarea id="mp-desc" rows="3"></textarea></div>
-        <button class="btn-primary" onclick="addMarketplaceItem()">Add Item</button></div>
-        <div class="card"><h3>📦 Items (${items?.length || 0})</h3><table><thead><tr><th>Title</th><th>Category</th><th>Price</th><th>Contact</th><th>Actions</th></tr></thead><tbody>
-        ${(items||[]).map(i => `<tr><td>${i.title}</td><td>${i.category}</td><td>$${i.price||0}</td><td>${i.seller_contact||'-'}</td><td><button class="btn-danger btn-sm" onclick="deleteItem('marketplace_items','${i.id}')">Del</button></td></tr>`).join('') || '<tr><td colspan="5">No items yet</td></tr>'}</tbody></table></div>`;
-    }
+            currentProfile = await getUserProfile(currentUser.id);
+            if (!isAdmin(currentProfile)) {
+                alert('Access denied. Admin only.');
+                window.location.href = 'index.html';
+                return;
+            }
 
-    // ===== NEWS =====
-    else if (tabName === 'news') {
-      const { data: news } = await sb.from('news_posts').select('*').order('created_at',{ascending:false});
-      html = `<div class="card"><h3>📰 Publish News</h3>
-        <div class="form-row"><div class="form-group"><label>Title</label><input id="news-title"></div><div class="form-group"><label>Type</label><select id="news-type"><option>article</option><option>youtube</option><option>image</option><option>document</option></select></div></div>
-        <div class="form-group"><label>Media URL</label><input id="news-media"></div>
-        <div class="form-group"><label>Content</label><textarea id="news-content" rows="3"></textarea></div>
-        <button class="btn-primary" onclick="addNews()">Publish</button></div>
-        <div class="card"><h3>News (${news?.length || 0})</h3><table><thead><tr><th>Title</th><th>Type</th><th>Date</th><th>Actions</th></tr></thead><tbody>
-        ${(news||[]).map(n => `<tr><td>${n.title}</td><td>${n.type}</td><td>${new Date(n.created_at).toLocaleDateString()}</td><td><button class="btn-danger btn-sm" onclick="deleteItem('news_posts','${n.id}')">Del</button></td></tr>`).join('') || '<tr><td colspan="4">No news</td></tr>'}</tbody></table></div>`;
-    }
+            loadTabData('users');
+        }
 
-    // ===== ANNOUNCEMENTS =====
-    else if (tabName === 'announcements') {
-      const { data: anns } = await sb.from('announcements').select('*').order('created_at',{ascending:false});
-      html = `<div class="card"><h3>📢 Post Announcement</h3>
-        <div class="form-group"><label>Message</label><textarea id="ann-msg" rows="2" placeholder="Type announcement..."></textarea></div>
-        <div class="form-group"><label>Type</label><select id="ann-type"><option>info</option><option>success</option><option>warning</option><option>urgent</option></select></div>
-        <button class="btn-primary" onclick="addAnnouncement()">Post</button></div>
-        <div class="card"><h3>Announcements (${anns?.length || 0})</h3><table><thead><tr><th>Message</th><th>Type</th><th>Date</th><th>Actions</th></tr></thead><tbody>
-        ${(anns||[]).map(a => `<tr><td>${a.message}</td><td style="color:${a.type==='urgent'?'#ef4444':a.type==='warning'?'#f59e0b':'#60a5fa'};">${a.type}</td><td>${new Date(a.created_at).toLocaleDateString()}</td><td><button class="btn-danger btn-sm" onclick="deleteItem('announcements','${a.id}')">Del</button></td></tr>`).join('') || '<tr><td colspan="4">No announcements</td></tr>'}</tbody></table></div>`;
-    }
+        function loadTabData(tab) {
+            switch(tab) {
+                case 'users': loadUsers(); break;
+                case 'departments': loadDepartments(); break;
+                case 'jobs': loadJobs(); loadDeptDropdowns(); break;
+                case 'services': loadServices(); loadDeptDropdowns(); break;
+                case 'marketplace': loadMarketplace(); break;
+                case 'news': loadNews(); break;
+                case 'announcements': loadAnnouncements(); break;
+                case 'applications': loadApplications(); break;
+                case 'messages': loadMessages(); break;
+            }
+        }
 
-    // ===== APPLICATIONS =====
-    else if (tabName === 'applications') {
-      const { data: apps } = await sb.from('applications').select('*, profiles(full_name), departments(name)').order('created_at',{ascending:false});
-      html = `<div class="card"><h3>📋 Applications (${apps?.length || 0})</h3><table><thead><tr><th>User</th><th>Type</th><th>Department</th><th>Status</th><th>Actions</th></tr></thead><tbody>
-        ${(apps||[]).map(a => `<tr><td>${a.profiles?.full_name||'-'}</td><td>${a.type}</td><td>${a.departments?.name||'-'}</td><td><span class="badge badge-pending">${a.status}</span></td><td>${a.status==='pending'?`<button class="btn-success btn-sm" onclick="approveApp('${a.id}')">Approve</button> <button class="btn-danger btn-sm" onclick="rejectApp('${a.id}')">Reject</button>`:'-'}</td></tr>`).join('') || '<tr><td colspan="5">No applications</td></tr>'}</tbody></table></div>`;
-    }
+        // Load Users
+        async function loadUsers() {
+            const { data, error } = await supabase.from('profiles').select('*').order('created_at', { ascending: false });
+            if (error) return console.error(error);
 
-    // ===== MESSAGES =====
-    else if (tabName === 'messages') {
-      const { data: msgs } = await sb.from('contact_messages').select('*').order('created_at',{ascending:false});
-      html = `<div class="card"><h3>✉️ Contact Messages (${msgs?.length || 0})</h3><table><thead><tr><th>From</th><th>Email</th><th>Subject</th><th>Message</th><th>Date</th></tr></thead><tbody>
-        ${(msgs||[]).map(m => `<tr><td>${m.name}</td><td>${m.email}</td><td>${m.subject||'-'}</td><td>${m.message?.substring(0,80)}</td><td>${new Date(m.created_at).toLocaleDateString()}</td></tr>`).join('') || '<tr><td colspan="5">No messages</td></tr>'}</tbody></table></div>`;
-    }
+            document.getElementById('usersTable').innerHTML = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${data.map(user => `
+                            <tr>
+                                <td>${user.full_name || 'N/A'}</td>
+                                <td>${user.email || 'N/A'}</td>
+                                <td>
+                                    <select onchange="changeUserRole('${user.id}', this.value)" style="background:#0a0e27;color:white;border:1px solid #667eea;border-radius:5px;padding:0.3rem;">
+                                        <option ${user.role === 'user' ? 'selected' : ''}>user</option>
+                                        <option ${user.role === 'agent' ? 'selected' : ''}>agent</option>
+                                        <option ${user.role === 'worker' ? 'selected' : ''}>worker</option>
+                                        <option ${user.role === 'dept_admin' ? 'selected' : ''}>dept_admin</option>
+                                        <option ${user.role === 'admin' ? 'selected' : ''}>admin</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <button class="btn btn-danger" onclick="deleteUser('${user.id}')" style="padding:0.3rem 0.8rem;font-size:0.8rem;">Delete</button>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
 
-    // ===== SETTINGS =====
-    else if (tabName === 'settings') {
-      const { data: settings } = await sb.from('site_settings').select('*');
-      html = `<div class="card"><h3>⚙️ Site Settings</h3>
-        ${(settings||[]).map(s => `<div class="form-group"><label>${s.key}</label><input id="set-${s.key}" value="${s.value||''}"></div>`).join('')}
-        <button class="btn-primary" onclick="saveSettings()">Save Settings</button></div>`;
-    }
+        async function changeUserRole(userId, newRole) {
+            const { error } = await supabase.from('profiles').update({ role: newRole }).eq('id', userId);
+            if (error) alert('Error: ' + error.message);
+            else alert('Role updated!');
+        }
 
-    main.innerHTML = html;
-  } catch (err) {
-    console.error('Tab load error:', err);
-    main.innerHTML = `<div class="card"><h3>Error</h3><p style="color:var(--red);">${err.message}</p><button class="btn-primary" onclick="switchTab('users')">Retry</button></div>`;
-  }
-}
+        async function deleteUser(userId) {
+            if (!confirm('Are you sure you want to delete this user?')) return;
+            const { error } = await supabase.from('profiles').delete().eq('id', userId);
+            if (error) alert('Error: ' + error.message);
+            else {
+                alert('User deleted!');
+                loadUsers();
+            }
+        }
 
-// ========== CRUD FUNCTIONS ==========
-async function addDepartment() {
-  const name = document.getElementById('dept-name')?.value?.trim();
-  if (!name) return showToast('Name required', true);
-  const { error } = await sb.from('departments').insert({ name, description: document.getElementById('dept-desc')?.value });
-  error ? showToast(error.message, true) : showToast('Department created!');
-  switchTab('departments');
-}
+        // Load Departments
+        async function loadDepartments() {
+            const { data, error } = await supabase.from('departments').select('*');
+            if (error) return console.error(error);
 
-async function addAuthority() {
-  const title = document.getElementById('auth-title')?.value?.trim();
-  const level = parseInt(document.getElementById('auth-level')?.value);
-  if (!title || !level) return showToast('Title & level required', true);
-  const { error } = await sb.from('authority').insert({ title, level, profile_id: document.getElementById('auth-user')?.value || null, department_id: document.getElementById('auth-dept')?.value || null });
-  error ? showToast(error.message, true) : showToast('Authority assigned!');
-  switchTab('authority');
-}
+            document.getElementById('departmentsTable').innerHTML = `
+                <table>
+                    <thead><tr><th>Name</th><th>Description</th><th>Status</th><th>Actions</th></tr></thead>
+                    <tbody>
+                        ${data.map(dept => `
+                            <tr>
+                                <td>${dept.name}</td>
+                                <td>${dept.description || 'N/A'}</td>
+                                <td>${dept.is_active ? '✅ Active' : '❌ Inactive'}</td>
+                                <td>
+                                    <button class="btn btn-danger" onclick="deleteDepartment('${dept.id}')" style="padding:0.3rem 0.8rem;font-size:0.8rem;">Delete</button>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
 
-async function addJob() {
-  const title = document.getElementById('job-title')?.value?.trim();
-  if (!title) return showToast('Title required', true);
-  const { error } = await sb.from('jobs').insert({ title, description: document.getElementById('job-desc')?.value, department_id: document.getElementById('job-dept')?.value || null, location: document.getElementById('job-loc')?.value, type: document.getElementById('job-type')?.value, salary: document.getElementById('job-salary')?.value, posted_by: adminUser.id });
-  error ? showToast(error.message, true) : showToast('Job posted!');
-  switchTab('jobs');
-}
+        async function addDepartment() {
+            const name = document.getElementById('deptName').value;
+            const desc = document.getElementById('deptDesc').value;
+            if (!name) return alert('Enter department name');
 
-async function addService() {
-  const title = document.getElementById('svc-title')?.value?.trim();
-  if (!title) return showToast('Title required', true);
-  const { error } = await sb.from('services').insert({ title, description: document.getElementById('svc-desc')?.value, price: document.getElementById('svc-price')?.value, department_id: document.getElementById('svc-dept')?.value || null, posted_by: adminUser.id });
-  error ? showToast(error.message, true) : showToast('Service added!');
-  switchTab('services');
-}
+            const { error } = await supabase.from('departments').insert({ name, description: desc, is_active: true });
+            if (error) alert('Error: ' + error.message);
+            else {
+                alert('Department added!');
+                document.getElementById('deptName').value = '';
+                document.getElementById('deptDesc').value = '';
+                loadDepartments();
+            }
+        }
 
-async function toggleService(id, status) {
-  await sb.from('services').update({ is_active: status }).eq('id', id);
-  showToast(status ? 'Activated' : 'Hidden');
-  switchTab('services');
-}
+        async function deleteDepartment(id) {
+            if (!confirm('Delete this department?')) return;
+            const { error } = await supabase.from('departments').delete().eq('id', id);
+            if (error) alert('Error: ' + error.message);
+            else {
+                alert('Deleted!');
+                loadDepartments();
+            }
+        }
 
-async function addMarketplaceItem() {
-  const title = document.getElementById('mp-title')?.value?.trim();
-  if (!title) return showToast('Title required', true);
-  const { error } = await sb.from('marketplace_items').insert({ title, description: document.getElementById('mp-desc')?.value, category: document.getElementById('mp-cat')?.value, price: parseFloat(document.getElementById('mp-price')?.value) || 0, seller_contact: document.getElementById('mp-contact')?.value, images: document.getElementById('mp-image')?.value ? [document.getElementById('mp-image').value] : [], posted_by: adminUser.id });
-  error ? showToast(error.message, true) : showToast('Item added!');
-  switchTab('marketplace');
-}
+        // Load dropdowns
+        async function loadDeptDropdowns() {
+            const { data } = await supabase.from('departments').select('*').eq('is_active', true);
+            if (!data) return;
 
-async function addNews() {
-  const title = document.getElementById('news-title')?.value?.trim();
-  if (!title) return showToast('Title required', true);
-  const { error } = await sb.from('news_posts').insert({ title, content: document.getElementById('news-content')?.value, type: document.getElementById('news-type')?.value, media_url: document.getElementById('news-media')?.value, posted_by: adminUser.id });
-  error ? showToast(error.message, true) : showToast('News published!');
-  switchTab('news');
-}
+            const dropdowns = ['jobDept', 'serviceDept'];
+            dropdowns.forEach(dropId => {
+                const select = document.getElementById(dropId);
+                if (select) {
+                    select.innerHTML = '<option value="">Select department</option>' + 
+                        data.map(d => `<option value="${d.id}">${d.name}</option>`).join('');
+                }
+            });
+        }
 
-async function addAnnouncement() {
-  const msg = document.getElementById('ann-msg')?.value?.trim();
-  if (!msg) return showToast('Message required', true);
-  const { error } = await sb.from('announcements').insert({ message: msg, type: document.getElementById('ann-type')?.value, posted_by: adminUser.id });
-  error ? showToast(error.message, true) : showToast('Posted!');
-  switchTab('announcements');
-}
+        // Add Job
+        async function addJob() {
+            const job = {
+                title: document.getElementById('jobTitle').value,
+                department_id: document.getElementById('jobDept').value,
+                type: document.getElementById('jobType').value,
+                location: document.getElementById('jobLocation').value,
+                salary: document.getElementById('jobSalary').value,
+                description: document.getElementById('jobDesc').value,
+                is_active: true,
+                posted_by: currentUser.id
+            };
 
-async function updateRole(userId, role) {
-  await sb.from('profiles').update({ role }).eq('id', userId);
-  showToast('Role updated!');
-  switchTab('users');
-}
+            if (!job.title) return alert('Enter job title');
 
-async function deleteUser(userId) {
-  if (!confirm('Delete user permanently?')) return;
-  await sb.from('profiles').delete().eq('id', userId);
-  showToast('User deleted!');
-  switchTab('users');
-}
+            const { error } = await supabase.from('jobs').insert(job);
+            if (error) alert('Error: ' + error.message);
+            else {
+                alert('Job posted!');
+                loadJobs();
+            }
+        }
 
-async function approveApp(id) {
-  const { data: app } = await sb.from('applications').select('*').eq('id', id).single();
-  await sb.from('applications').update({ status: 'approved', reviewed_by: adminUser.id }).eq('id', id);
-  if (app) {
-    const updates = {};
-    if (app.type === 'agent') updates.role = 'agent';
-    else if (app.type === 'worker') updates.role = 'worker';
-    else if (app.type === 'dept_admin') { updates.role = 'dept_admin'; if (app.department_id) updates.department = app.department_id; }
-    await sb.from('profiles').update(updates).eq('id', app.applicant_id);
-  }
-  showToast('Approved!');
-  switchTab('applications');
-}
+        async function loadJobs() {
+            const { data } = await supabase.from('jobs').select('*, departments(name)').order('created_at', { ascending: false });
+            document.getElementById('jobsTable').innerHTML = data ? `
+                <table>
+                    <thead><tr><th>Title</th><th>Department</th><th>Type</th><th>Actions</th></tr></thead>
+                    <tbody>
+                        ${data.map(job => `
+                            <tr>
+                                <td>${job.title}</td>
+                                <td>${job.departments?.name || 'N/A'}</td>
+                                <td>${job.type}</td>
+                                <td>
+                                    <button class="btn btn-danger" onclick="deleteJob('${job.id}')" style="padding:0.3rem 0.8rem;font-size:0.8rem;">Delete</button>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            ` : '<p>No jobs</p>';
+        }
 
-async function rejectApp(id) {
-  await sb.from('applications').update({ status: 'rejected', reviewed_by: adminUser.id }).eq('id', id);
-  showToast('Rejected!');
-  switchTab('applications');
-}
+        async function deleteJob(id) {
+            if (!confirm('Delete this job?')) return;
+            await supabase.from('jobs').delete().eq('id', id);
+            loadJobs();
+        }
 
-async function deleteItem(table, id) {
-  if (!confirm('Delete permanently?')) return;
-  await sb.from(table).delete().eq('id', id);
-  showToast('Deleted!');
-  switchTab(table === 'departments' ? 'departments' : table === 'authority' ? 'authority' : table === 'jobs' ? 'jobs' : table === 'services' ? 'services' : table === 'marketplace_items' ? 'marketplace' : table === 'news_posts' ? 'news' : table === 'announcements' ? 'announcements' : 'users');
-}
+        // Add Service
+        async function addService() {
+            const service = {
+                title: document.getElementById('serviceTitle').value,
+                price: document.getElementById('servicePrice').value,
+                department_id: document.getElementById('serviceDept').value,
+                description: document.getElementById('serviceDesc').value,
+                is_active: true,
+                posted_by: currentUser.id
+            };
 
-async function saveSettings() {
-  const inputs = document.querySelectorAll('[id^="set-"]');
-  for (let inp of inputs) {
-    const key = inp.id.replace('set-', '');
-    await sb.from('site_settings').update({ value: inp.value }).eq('key', key);
-  }
-  showToast('Settings saved!');
-}
+            if (!service.title) return alert('Enter service title');
 
-// ========== START ==========
-init();
-</script>
+            const { error } = await supabase.from('services').insert(service);
+            if (error) alert('Error: ' + error.message);
+            else {
+                alert('Service added!');
+                loadServices();
+            }
+        }
+
+        async function loadServices() {
+            const { data } = await supabase.from('services').select('*, departments(name)').order('created_at', { ascending: false });
+            document.getElementById('servicesTable').innerHTML = data ? `
+                <table>
+                    <thead><tr><th>Title</th><th>Price</th><th>Department</th><th>Actions</th></tr></thead>
+                    <tbody>
+                        ${data.map(s => `
+                            <tr>
+                                <td>${s.title}</td>
+                                <td>${s.price || 'N/A'}</td>
+                                <td>${s.departments?.name || 'N/A'}</td>
+                                <td>
+                                    <button class="btn btn-danger" onclick="deleteService('${s.id}')" style="padding:0.3rem 0.8rem;font-size:0.8rem;">Delete</button>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            ` : '<p>No services</p>';
+        }
+
+        async function deleteService(id) {
+            if (!confirm('Delete this service?')) return;
+            await supabase.from('services').delete().eq('id', id);
+            loadServices();
+        }
+
+        // Marketplace
+        async function addMarketplaceItem() {
+            const item = {
+                title: document.getElementById('itemTitle').value,
+                category: document.getElementById('itemCategory').value,
+                price: document.getElementById('itemPrice').value,
+                seller_contact: document.getElementById('itemContact').value,
+                description: document.getElementById('itemDesc').value,
+                is_active: true,
+                posted_by: currentUser.id
+            };
+
+            if (!item.title) return alert('Enter item title');
+
+            const { error } = await supabase.from('marketplace_items').insert(item);
+            if (error) alert('Error: ' + error.message);
+            else {
+                alert('Item added!');
+                loadMarketplace();
+            }
+        }
+
+        async function loadMarketplace() {
+            const { data } = await supabase.from('marketplace_items').select('*').order('created_at', { ascending: false });
+            document.getElementById('marketplaceTable').innerHTML = data ? `
+                <table>
+                    <thead><tr><th>Title</th><th>Category</th><th>Price</th><th>Actions</th></tr></thead>
+                    <tbody>
+                        ${data.map(item => `
+                            <tr>
+                                <td>${item.title}</td>
+                                <td>${item.category}</td>
+                                <td>${item.price || 'N/A'}</td>
+                                <td>
+                                    <button class="btn btn-danger" onclick="deleteItem('${item.id}')" style="padding:0.3rem 0.8rem;font-size:0.8rem;">Delete</button>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            ` : '<p>No items</p>';
+        }
+
+        async function deleteItem(id) {
+            if (!confirm('Delete this item?')) return;
+            await supabase.from('marketplace_items').delete().eq('id', id);
+            loadMarketplace();
+        }
+
+        // News
+        async function addNews() {
+            const news = {
+                title: document.getElementById('newsTitle').value,
+                type: document.getElementById('newsType').value,
+                media_url: document.getElementById('newsMedia').value,
+                content: document.getElementById('newsContent').value,
+                is_published: true,
+                posted_by: currentUser.id
+            };
+
+            if (!news.title) return alert('Enter news title');
+
+            const { error } = await supabase.from('news_posts').insert(news);
+            if (error) alert('Error: ' + error.message);
+            else {
+                alert('News published!');
+                loadNews();
+            }
+        }
+
+        async function loadNews() {
+            const { data } = await supabase.from('news_posts').select('*').order('created_at', { ascending: false });
+            document.getElementById('newsTable').innerHTML = data ? `
+                <table>
+                    <thead><tr><th>Title</th><th>Type</th><th>Date</th><th>Actions</th></tr></thead>
+                    <tbody>
+                        ${data.map(n => `
+                            <tr>
+                                <td>${n.title}</td>
+                                <td>${n.type}</td>
+                                <td>${new Date(n.created_at).toLocaleDateString()}</td>
+                                <td>
+                                    <button class="btn btn-danger" onclick="deleteNews('${n.id}')" style="padding:0.3rem 0.8rem;font-size:0.8rem;">Delete</button>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            ` : '<p>No news</p>';
+        }
+
+        async function deleteNews(id) {
+            if (!confirm('Delete this news post?')) return;
+            await supabase.from('news_posts').delete().eq('id', id);
+            loadNews();
+        }
+
+        // Announcements
+        async function addAnnouncement() {
+            const announcement = {
+                message: document.getElementById('announceMsg').value,
+                type: document.getElementById('announceType').value,
+                is_active: true,
+                posted_by: currentUser.id
+            };
+
+            if (!announcement.message) return alert('Enter announcement message');
+
+            const { error } = await supabase.from('announcements').insert(announcement);
+            if (error) alert('Error: ' + error.message);
+            else {
+                alert('Announcement posted!');
+                loadAnnouncements();
+            }
+        }
+
+        async function loadAnnouncements() {
+            const { data } = await supabase.from('announcements').select('*').order('created_at', { ascending: false });
+            document.getElementById('announcementsTable').innerHTML = data ? `
+                <table>
+                    <thead><tr><th>Message</th><th>Type</th><th>Status</th><th>Actions</th></tr></thead>
+                    <tbody>
+                        ${data.map(a => `
+                            <tr>
+                                <td>${a.message}</td>
+                                <td><span class="badge badge-${a.type === 'urgent' ? 'admin' : 'user'}">${a.type}</span></td>
+                                <td>${a.is_active ? '✅' : '❌'}</td>
+                                <td>
+                                    <button class="btn btn-danger" onclick="deleteAnnouncement('${a.id}')" style="padding:0.3rem 0.8rem;font-size:0.8rem;">Delete</button>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            ` : '<p>No announcements</p>';
+        }
+
+        async function deleteAnnouncement(id) {
+            if (!confirm('Delete this announcement?')) return;
+            await supabase.from('announcements').delete().eq('id', id);
+            loadAnnouncements();
+        }
+
+        // Applications
+        async function loadApplications() {
+            const { data } = await supabase.from('applications').select('*, profiles!applications_applicant_id_fkey(full_name, email)').order('created_at', { ascending: false });
+            document.getElementById('applicationsTable').innerHTML = data ? `
+                <table>
+                    <thead><tr><th>Applicant</th><th>Type</th><th>Status</th><th>Actions</th></tr></thead>
+                    <tbody>
+                        ${data.map(app => `
+                            <tr>
+                                <td>${app.profiles?.full_name || 'N/A'}</td>
+                                <td>${app.type}</td>
+                                <td><span class="badge badge-${app.status === 'approved' ? 'agent' : app.status === 'rejected' ? 'admin' : 'user'}">${app.status}</span></td>
+                                <td>
+                                    ${app.status === 'pending' ? `
+                                        <button class="btn btn-success" onclick="updateApplication('${app.id}', 'approved', '${app.applicant_id}')" style="padding:0.3rem 0.8rem;font-size:0.8rem;">Approve</button>
+                                        <button class="btn btn-danger" onclick="updateApplication('${app.id}', 'rejected', '${app.applicant_id}')" style="padding:0.3rem 0.8rem;font-size:0.8rem;">Reject</button>
+                                    ` : '<span>Processed</span>'}
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            ` : '<p>No applications</p>';
+        }
+
+        async function updateApplication(id, status, userId) {
+            const { error } = await supabase.from('applications').update({ status, reviewed_by: currentUser.id }).eq('id', id);
+            if (error) return alert('Error: ' + error.message);
+            
+            if (status === 'approved') {
+                await supabase.from('profiles').update({ role: 'agent' }).eq('id', userId);
+            }
+            
+            alert('Application ' + status + '!');
+            loadApplications();
+        }
+
+        // Messages
+        async function loadMessages() {
+            const { data } = await supabase.from('contact_messages').select('*').order('created_at', { ascending: false });
+            document.getElementById('messagesTable').innerHTML = data ? `
+                <table>
+                    <thead><tr><th>From</th><th>Subject</th><th>Message</th><th>Date</th></tr></thead>
+                    <tbody>
+                        ${data.map(msg => `
+                            <tr>
+                                <td>${msg.name}<br><small>${msg.email}</small></td>
+                                <td>${msg.subject}</td>
+                                <td>${msg.message?.substring(0, 100)}...</td>
+                                <td>${new Date(msg.created_at).toLocaleDateString()}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            ` : '<p>No messages</p>';
+        }
+
+        // Settings
+        async function saveSettings() {
+            const settings = [
+                { key: 'site_name', value: document.getElementById('siteName').value },
+                { key: 'site_description', value: document.getElementById('siteDesc').value },
+                { key: 'copyright_year', value: document.getElementById('copyrightYear').value }
+            ];
+
+            for (const setting of settings) {
+                if (setting.value) {
+                    const { error } = await supabase.from('site_settings').upsert(setting);
+                    if (error) console.error(error);
+                }
+            }
+            alert('Settings saved!');
+        }
+
+        init();
+    </script>
 </body>
 </html>

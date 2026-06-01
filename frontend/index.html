@@ -1,66 +1,539 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Home – Ascenda Groups</title>
-  <link rel="stylesheet" href="style.css">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ascenda Groups - Home</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0e27;
+            color: #ffffff;
+        }
+
+        /* Navigation */
+        nav {
+            background: #0f1444;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(102, 126, 234, 0.2);
+        }
+
+        .nav-logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: #a0aec0;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #667eea;
+        }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+        }
+
+        .hamburger span {
+            width: 25px;
+            height: 3px;
+            background: white;
+            border-radius: 3px;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+        }
+
+        /* Announcement Banner */
+        .announcement-banner {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            padding: 0.8rem;
+            text-align: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .announcement-text {
+            animation: slide 20s linear infinite;
+            white-space: nowrap;
+        }
+
+        @keyframes slide {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+
+        /* Main Content */
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .welcome-section {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .welcome-section h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Dashboard Cards */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .dashboard-card {
+            background: linear-gradient(135deg, #1a1f4e, #0f1444);
+            padding: 2rem;
+            border-radius: 15px;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            transition: all 0.3s;
+            cursor: pointer;
+            text-decoration: none;
+            color: white;
+            display: block;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            border-color: #667eea;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.2);
+        }
+
+        .card-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .card-description {
+            color: #a0aec0;
+            font-size: 0.9rem;
+        }
+
+        /* Sections */
+        .section {
+            margin-bottom: 3rem;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            color: #667eea;
+        }
+
+        .view-all {
+            color: #a0aec0;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .view-all:hover {
+            color: #667eea;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .item-card {
+            background: #1a1f4e;
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid rgba(102, 126, 234, 0.1);
+            transition: all 0.3s;
+        }
+
+        .item-card:hover {
+            border-color: #667eea;
+            transform: translateY(-3px);
+        }
+
+        .item-card h3 {
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+
+        .item-card p {
+            color: #a0aec0;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .item-meta {
+            display: flex;
+            gap: 1rem;
+            margin-top: 0.5rem;
+            font-size: 0.8rem;
+            color: #718096;
+        }
+
+        .badge {
+            background: rgba(102, 126, 234, 0.2);
+            color: #667eea;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+                position: fixed;
+                top: 0;
+                right: -100%;
+                width: 300px;
+                height: 100vh;
+                background: #0f1444;
+                flex-direction: column;
+                padding: 2rem;
+                transition: right 0.3s ease;
+            }
+
+            .nav-links.active {
+                right: 0;
+            }
+
+            .hamburger {
+                display: flex;
+            }
+
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
-  <!-- UNIVERSAL NAVBAR (with guest link to landing) -->
-  <nav class="navbar">
-    <div class="nav-container">
-      <a href="landing.html" class="logo"><img src="https://rfogomnbicceentrhymy.supabase.co/storage/v1/object/public/Ascenda%20pics/logo.png" alt="Ascenda" style="height:36px;"></a>
-      <div class="nav-links">
-        <a href="index.html">Home</a>
-        <a href="about.html">About</a>
-        <a href="services.html">Services</a>
-        <a href="marketplace.html">Marketplace</a>
-        <a href="jobs.html">Jobs</a>
-        <a href="news.html">News</a>
-        <a href="contact.html">Contact</a>
-        <a href="landing.html" class="btn btn-outline nav-guest">🏠 Landing</a>
-        <a href="login.html" class="btn btn-outline nav-login">Login</a>
-        <a href="register.html" class="btn btn-primary nav-register">Sign Up</a>
-        <a href="profile.html" class="btn btn-outline nav-profile" style="display:none;">👤 <span class="nav-username"></span></a>
-        <a href="admin.html" class="btn btn-outline nav-admin" style="display:none;color:#f59e0b;border-color:#f59e0b;">⚡ Admin</a>
-        <a href="#" class="btn btn-outline nav-logout" style="display:none;" onclick="logout()">Logout</a>
-      </div>
-      <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+    <!-- Announcement Banner -->
+    <div class="announcement-banner" id="announcementBanner" style="display:none;">
+        <div class="announcement-text" id="announcementText"></div>
     </div>
-  </nav>
-  <div class="mobile-nav" id="mobileNav">
-    <a href="index.html">🏠 Home</a>
-    <a href="about.html">📖 About</a>
-    <a href="services.html">🔧 Services</a>
-    <a href="marketplace.html">🏪 Marketplace</a>
-    <a href="jobs.html">💼 Jobs</a>
-    <a href="news.html">📰 News</a>
-    <a href="contact.html">✉️ Contact</a>
-    <a href="landing.html" class="mob-guest">🏠 Landing</a>
-    <a href="login.html" class="mob-login">🔑 Login</a>
-    <a href="register.html" class="mob-register">🚀 Sign Up</a>
-    <a href="profile.html" class="mob-profile" style="display:none;">👤 Profile</a>
-    <a href="admin.html" class="mob-admin" style="display:none;color:#f59e0b;">⚡ Admin</a>
-    <a href="#" class="mob-logout" style="display:none;" onclick="logout()">🚪 Logout</a>
-  </div>
 
-  <section class="hero">
-    <img src="https://rfogomnbicceentrhymy.supabase.co/storage/v1/object/public/Ascenda%20pics/banner.png" style="max-width:500px;border-radius:16px;margin-bottom:20px;">
-    <h1 data-setting="site_name">Ascenda Groups</h1>
-    <p data-setting="site_description">Your gateway to forex mastery, web development, marketplace & youth empowerment</p>
-  </section>
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-logo">ASCENDA</div>
+        <div class="nav-links" id="navLinks">
+            <a href="index.html">Home</a>
+            <a href="about.html">About</a>
+            <a href="services.html">Services</a>
+            <a href="marketplace.html">Marketplace</a>
+            <a href="jobs.html">Jobs</a>
+            <a href="news.html">News</a>
+            <a href="contact.html">Contact</a>
+            <div class="user-menu" id="userMenu"></div>
+            <a href="#" id="logoutBtn">Logout</a>
+        </div>
+        <div class="hamburger" id="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </nav>
 
-  <section class="container" style="padding:40px 20px;"><h2>Latest Jobs</h2><div id="featured-jobs" class="cards-grid"></div></section>
-  <section class="container" style="padding:40px 20px;"><h2>Our Services</h2><div id="featured-services" class="cards-grid"></div></section>
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="welcome-section" id="welcomeSection">
+            <h1>Welcome to Ascenda Groups</h1>
+            <p>Your gateway to opportunities and growth</p>
+        </div>
 
-  <footer class="footer">
-    <p>© <span data-setting="copyright_year">2026</span> Ascenda Groups. CEO: <span data-setting="ceo_name">Eyakem Takele Kebede</span></p>
-    <p><a href="https://t.me/ascendagroups" target="_blank">Telegram</a></p>
-  </footer>
+        <!-- Dashboard Quick Actions -->
+        <div class="dashboard-grid" id="dashboardGrid">
+            <a href="profile.html" class="dashboard-card">
+                <div class="card-icon">👤</div>
+                <div class="card-title">My Profile</div>
+                <div class="card-description">Manage your profile and settings</div>
+            </a>
+            <a href="jobs.html" class="dashboard-card">
+                <div class="card-icon">💼</div>
+                <div class="card-title">Find Jobs</div>
+                <div class="card-description">Browse available opportunities</div>
+            </a>
+            <a href="marketplace.html" class="dashboard-card">
+                <div class="card-icon">🛒</div>
+                <div class="card-title">Marketplace</div>
+                <div class="card-description">Buy and sell items</div>
+            </a>
+            <a href="services.html" class="dashboard-card">
+                <div class="card-icon">🛠️</div>
+                <div class="card-title">Our Services</div>
+                <div class="card-description">Explore our professional services</div>
+            </a>
+        </div>
 
-  <script src="supabase.js"></script>
-  <script src="script.js"></script>
+        <!-- Latest Jobs Section -->
+        <div class="section">
+            <div class="section-header">
+                <h2 class="section-title">Latest Job Opportunities</h2>
+                <a href="jobs.html" class="view-all">View All →</a>
+            </div>
+            <div class="cards-grid" id="latestJobs">
+                <p style="color:#a0aec0;">Loading jobs...</p>
+            </div>
+        </div>
+
+        <!-- Featured Services -->
+        <div class="section">
+            <div class="section-header">
+                <h2 class="section-title">Featured Services</h2>
+                <a href="services.html" class="view-all">View All →</a>
+            </div>
+            <div class="cards-grid" id="featuredServices">
+                <p style="color:#a0aec0;">Loading services...</p>
+            </div>
+        </div>
+
+        <!-- Latest News -->
+        <div class="section">
+            <div class="section-header">
+                <h2 class="section-title">Latest News</h2>
+                <a href="news.html" class="view-all">View All →</a>
+            </div>
+            <div class="cards-grid" id="latestNews">
+                <p style="color:#a0aec0;">Loading news...</p>
+            </div>
+        </div>
+    </div>
+
+    <footer style="text-align:center;padding:2rem;color:#a0aec0;border-top:1px solid rgba(102,126,234,0.2);">
+        <p>&copy; 2026 Ascenda Groups. All rights reserved.</p>
+    </footer>
+
+    <script src="supabase.js"></script>
+    <script>
+        let currentUser = null;
+        let currentProfile = null;
+
+        // Initialize page
+        async function init() {
+            currentUser = await checkAuth();
+            if (!currentUser) {
+                window.location.href = 'landing.html';
+                return;
+            }
+
+            currentProfile = await getUserProfile(currentUser.id);
+            if (!currentProfile) {
+                console.error('Profile not found');
+                return;
+            }
+
+            // Show admin link if admin
+            if (isAdmin(currentProfile)) {
+                const dashboardGrid = document.getElementById('dashboardGrid');
+                const adminCard = document.createElement('a');
+                adminCard.href = 'admin.html';
+                adminCard.className = 'dashboard-card';
+                adminCard.innerHTML = `
+                    <div class="card-icon">⚙️</div>
+                    <div class="card-title">Admin Panel</div>
+                    <div class="card-description">Manage the platform</div>
+                `;
+                dashboardGrid.appendChild(adminCard);
+            }
+
+            // Load content
+            loadAnnouncements();
+            loadLatestJobs();
+            loadFeaturedServices();
+            loadLatestNews();
+            updateUserMenu();
+            setupMobileNav();
+        }
+
+        // Load announcements
+        async function loadAnnouncements() {
+            const { data, error } = await supabase
+                .from('announcements')
+                .select('*')
+                .eq('is_active', true)
+                .order('created_at', { ascending: false })
+                .limit(3);
+
+            if (error || !data || data.length === 0) return;
+
+            const banner = document.getElementById('announcementBanner');
+            const text = document.getElementById('announcementText');
+            
+            const announcements = data.map(a => `🔔 ${a.message}`).join(' • ');
+            text.textContent = announcements;
+            banner.style.display = 'block';
+        }
+
+        // Load latest jobs
+        async function loadLatestJobs() {
+            const { data, error } = await supabase
+                .from('jobs')
+                .select('*, departments(name)')
+                .eq('is_active', true)
+                .order('created_at', { ascending: false })
+                .limit(6);
+
+            const container = document.getElementById('latestJobs');
+            if (error || !data || data.length === 0) {
+                container.innerHTML = '<p style="color:#a0aec0;">No jobs available yet.</p>';
+                return;
+            }
+
+            container.innerHTML = data.map(job => `
+                <div class="item-card">
+                    <h3>${job.title}</h3>
+                    <p>${job.description ? job.description.substring(0, 100) + '...' : 'No description'}</p>
+                    <div class="item-meta">
+                        ${job.location ? `<span>📍 ${job.location}</span>` : ''}
+                        ${job.type ? `<span class="badge">${job.type}</span>` : ''}
+                        ${job.departments ? `<span>🏢 ${job.departments.name}</span>` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Load featured services
+        async function loadFeaturedServices() {
+            const { data, error } = await supabase
+                .from('services')
+                .select('*')
+                .eq('is_active', true)
+                .order('created_at', { ascending: false })
+                .limit(6);
+
+            const container = document.getElementById('featuredServices');
+            if (error || !data || data.length === 0) {
+                container.innerHTML = '<p style="color:#a0aec0;">No services available yet.</p>';
+                return;
+            }
+
+            container.innerHTML = data.map(service => `
+                <div class="item-card">
+                    <h3>${service.title}</h3>
+                    <p>${service.description ? service.description.substring(0, 100) + '...' : 'No description'}</p>
+                    ${service.price ? `<p style="color:#667eea;font-weight:bold;">${service.price}</p>` : ''}
+                </div>
+            `).join('');
+        }
+
+        // Load latest news
+        async function loadLatestNews() {
+            const { data, error } = await supabase
+                .from('news_posts')
+                .select('*')
+                .eq('is_published', true)
+                .order('created_at', { ascending: false })
+                .limit(6);
+
+            const container = document.getElementById('latestNews');
+            if (error || !data || data.length === 0) {
+                container.innerHTML = '<p style="color:#a0aec0;">No news yet.</p>';
+                return;
+            }
+
+            container.innerHTML = data.map(news => `
+                <div class="item-card">
+                    <h3>${news.title}</h3>
+                    <p>${news.content ? news.content.substring(0, 100) + '...' : 'No content'}</p>
+                    <div class="item-meta">
+                        <span class="badge">${news.type || 'article'}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Update user menu
+        function updateUserMenu() {
+            const userMenu = document.getElementById('userMenu');
+            userMenu.innerHTML = `
+                <span>${currentProfile.full_name || currentUser.email}</span>
+            `;
+        }
+
+        // Setup mobile navigation
+        function setupMobileNav() {
+            const hamburger = document.getElementById('hamburger');
+            const navLinks = document.getElementById('navLinks');
+
+            hamburger.addEventListener('click', () => {
+                navLinks.classList.toggle('active');
+            });
+
+            // Close on link click
+            navLinks.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', () => {
+                    navLinks.classList.remove('active');
+                });
+            });
+        }
+
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', async (e) => {
+            e.preventDefault();
+            await supabase.auth.signOut();
+            window.location.href = 'landing.html';
+        });
+
+        init();
+    </script>
 </body>
 </html>

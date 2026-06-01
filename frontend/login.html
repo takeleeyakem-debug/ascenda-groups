@@ -1,162 +1,180 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login – Ascenda Groups</title>
-  <link rel="stylesheet" href="style.css">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ascenda Groups - Login</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1f4e 50%, #0f1444 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .login-container {
+            background: rgba(26, 31, 78, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 3rem;
+            border-radius: 20px;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .logo {
+            text-align: center;
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 1rem;
+            border-radius: 10px;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            background: #0a0e27;
+            color: white;
+            font-size: 1rem;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .error-message {
+            background: rgba(245, 101, 101, 0.2);
+            color: #f56565;
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .links {
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+
+        .links a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .links a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
-  <!-- UNIVERSAL NAVBAR -->
-  <nav class="navbar">
-    <div class="nav-container">
-      <a href="landing.html" class="logo"><img src="https://rfogomnbicceentrhymy.supabase.co/storage/v1/object/public/Ascenda%20pics/logo.png" alt="Ascenda" style="height:36px;"></a>
-      <div class="nav-links">
-        <a href="landing.html">Home</a>
-        <a href="about.html">About</a>
-        <a href="services.html">Services</a>
-        <a href="marketplace.html">Marketplace</a>
-        <a href="jobs.html">Jobs</a>
-        <a href="news.html">News</a>
-        <a href="contact.html">Contact</a>
-        <a href="login.html" class="btn btn-outline nav-login">Login</a>
-        <a href="register.html" class="btn btn-primary nav-register">Sign Up</a>
-        <a href="profile.html" class="btn btn-outline nav-profile" style="display:none;">👤 <span class="nav-username"></span></a>
-        <a href="admin.html" class="btn btn-outline nav-admin" style="display:none;color:#f59e0b;border-color:#f59e0b;">⚡ Admin</a>
-        <a href="#" class="btn btn-outline nav-logout" style="display:none;" onclick="logout()">Logout</a>
-      </div>
-      <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+    <div class="login-container">
+        <div class="logo">ASCENDA</div>
+        <h2 style="text-align:center;margin-bottom:2rem;color:#a0aec0;">Welcome Back</h2>
+        
+        <div class="error-message" id="errorMessage"></div>
+        
+        <form id="loginForm">
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="email" placeholder="your@email.com" required>
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="password" placeholder="Your password" required>
+            </div>
+            <button type="submit" class="btn-login">Sign In</button>
+        </form>
+        
+        <div class="links">
+            <p style="color:#a0aec0;">Don't have an account? <a href="register.html">Sign Up</a></p>
+            <p style="color:#a0aec0;margin-top:0.5rem;"><a href="landing.html">← Back to Home</a></p>
+        </div>
     </div>
-  </nav>
-  <div class="mobile-nav" id="mobileNav">
-    <a href="landing.html">🏠 Home</a>
-    <a href="about.html">📖 About</a>
-    <a href="services.html">🔧 Services</a>
-    <a href="marketplace.html">🏪 Marketplace</a>
-    <a href="jobs.html">💼 Jobs</a>
-    <a href="news.html">📰 News</a>
-    <a href="contact.html">✉️ Contact</a>
-    <a href="login.html" class="mob-login">🔑 Login</a>
-    <a href="register.html" class="mob-register">🚀 Sign Up</a>
-    <a href="profile.html" class="mob-profile" style="display:none;">👤 Profile</a>
-    <a href="admin.html" class="mob-admin" style="display:none;color:#f59e0b;">⚡ Admin</a>
-    <a href="#" class="mob-logout" style="display:none;" onclick="logout()">🚪 Logout</a>
-  </div>
 
-  <!-- LOGIN FORM -->
-  <div class="form-container">
-    <h2>Welcome Back 👋</h2>
-    <div id="login-msg" style="display:none; padding:10px; border-radius:8px; margin-bottom:12px;"></div>
-    <div class="form-group">
-      <label>Email</label>
-      <input type="email" id="login-email" required placeholder="you@example.com">
-    </div>
-    <div class="form-group">
-      <label>Password</label>
-      <input type="password" id="login-password" required placeholder="••••••••">
-    </div>
-    <button class="btn btn-primary btn-block btn-lg" id="login-btn">Login</button>
-    <p style="text-align:center; margin-top:16px;">No account? <a href="register.html">Sign Up</a></p>
-  </div>
-
-  <footer class="footer">
-    <p>© <span data-setting="copyright_year">2026</span> Ascenda Groups. CEO: <span data-setting="ceo_name">Eyakem Takele Kebede</span></p>
-    <p><a href="https://t.me/ascendagroups" target="_blank">Telegram</a></p>
-  </footer>
-
-  <script>
-    // ========== SUPABASE CLIENT ==========
-    const SUPABASE_URL = 'https://rfogomnbicceentrhymy.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmb2dvbW5iaWNjZWVudHJoeW15Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyNDQwOTEsImV4cCI6MjA5NTgyMDA5MX0.wke5a7GEdU2oepfKfSD-rthLTEmpk3GqVfFRM_MjZ9c';
-    const sbLogin = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-      auth: { persistSession: true, autoRefreshToken: true, storage: localStorage }
-    });
-
-    // ========== LOGIN HANDLER ==========
-    document.getElementById('login-btn').addEventListener('click', async () => {
-      const email = document.getElementById('login-email').value.trim();
-      const password = document.getElementById('login-password').value;
-      const msgEl = document.getElementById('login-msg');
-
-      // Reset message
-      msgEl.style.display = 'none';
-
-      // Validate
-      if (!email || !password) {
-        msgEl.textContent = 'Please fill all fields.';
-        msgEl.style.display = 'block';
-        msgEl.style.color = '#ef4444';
-        msgEl.style.background = 'rgba(239,68,68,0.1)';
-        return;
-      }
-
-      // Loading state
-      const btn = document.getElementById('login-btn');
-      btn.disabled = true;
-      btn.textContent = 'Logging in...';
-      msgEl.textContent = 'Logging in...';
-      msgEl.style.display = 'block';
-      msgEl.style.color = '#f59e0b';
-      msgEl.style.background = 'rgba(245,158,11,0.1)';
-
-      // Sign in
-      const { data, error } = await sbLogin.auth.signInWithPassword({ email, password });
-
-      if (error) {
-        msgEl.textContent = error.message;
-        msgEl.style.color = '#ef4444';
-        msgEl.style.background = 'rgba(239,68,68,0.1)';
-        btn.disabled = false;
-        btn.textContent = 'Login';
-        return;
-      }
-
-      // Check if admin
-      const { data: profile } = await sbLogin
-        .from('profiles')
-        .select('role')
-        .eq('id', data.user.id)
-        .single();
-
-      const isAdminUser = 
-        profile?.role === 'admin' || 
-        profile?.role === 'ceo' || 
-        email === 'takeleeyakem@gmail.com';
-
-      // Ensure profile exists
-      const { data: existingProfile } = await sbLogin
-        .from('profiles')
-        .select('id')
-        .eq('id', data.user.id)
-        .single();
-
-      if (!existingProfile) {
-        await sbLogin.from('profiles').insert({
-          id: data.user.id,
-          role: 'user',
-          full_name: data.user.user_metadata?.full_name || email.split('@')[0],
-          email: email
+    <script src="supabase.js"></script>
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const errorDiv = document.getElementById('errorMessage');
+            
+            errorDiv.style.display = 'none';
+            
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email,
+                password
+            });
+            
+            if (error) {
+                errorDiv.textContent = error.message;
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
+            // Check if admin
+            const profile = await getUserProfile(data.user.id);
+            if (profile && isAdmin(profile)) {
+                window.location.href = 'admin.html';
+            } else {
+                window.location.href = 'index.html';
+            }
         });
-      }
-
-      // Redirect
-      if (isAdminUser) {
-        window.location.href = 'admin.html';
-      } else {
-        window.location.href = 'index.html';
-      }
-    });
-
-    // ========== LOGOUT (for navbar) ==========
-    window.logout = async function() {
-      await sbLogin.auth.signOut();
-      window.location.href = 'landing.html';
-    };
-  </script>
-
-  <!-- Load shared script for mobile nav & auth UI -->
-  <script src="supabase.js"></script>
-  <script src="script.js"></script>
+        
+        // Check if already logged in
+        (async () => {
+            const user = await checkAuth();
+            if (user) {
+                const profile = await getUserProfile(user.id);
+                if (profile && isAdmin(profile)) {
+                    window.location.href = 'admin.html';
+                } else {
+                    window.location.href = 'index.html';
+                }
+            }
+        })();
+    </script>
 </body>
 </html>

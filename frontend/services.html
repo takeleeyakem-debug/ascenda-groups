@@ -1,5 +1,330 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Services – Ascenda Groups</title><link rel="stylesheet" href="style.css"><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script></head><body>
-<!-- UNIVERSAL NAVBAR HERE -->
-<section class="container" style="padding:40px 20px;"><h2 style="text-align:center;margin-bottom:24px;">Our Services</h2><div id="services-list" class="cards-grid"></div></section>
-<footer class="footer"><p>© 2026 Ascenda Groups. CEO: Eyakem Takele Kebede</p></footer>
-<script src="supabase.js"></script><script src="script.js"></script></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ascenda Groups - Services</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0e27;
+            color: #ffffff;
+        }
+
+        nav {
+            background: #0f1444;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(102, 126, 234, 0.2);
+        }
+
+        .nav-logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: #a0aec0;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            color: #667eea;
+        }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+        }
+
+        .hamburger span {
+            width: 25px;
+            height: 3px;
+            background: white;
+            border-radius: 3px;
+        }
+
+        .page-header {
+            text-align: center;
+            padding: 4rem 2rem 2rem;
+            background: linear-gradient(135deg, #1a1f4e, #0f1444);
+        }
+
+        .page-header h1 {
+            font-size: 3rem;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+        }
+
+        .page-header p {
+            color: #a0aec0;
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .services-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .search-filter {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 200px;
+            padding: 0.8rem 1rem;
+            border-radius: 10px;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            background: #1a1f4e;
+            color: white;
+            font-size: 1rem;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        .service-card {
+            background: linear-gradient(135deg, #1a1f4e, #0f1444);
+            border-radius: 15px;
+            padding: 2rem;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .service-card:hover {
+            transform: translateY(-5px);
+            border-color: #667eea;
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.2);
+        }
+
+        .service-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .service-title {
+            font-size: 1.5rem;
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+
+        .service-description {
+            color: #a0aec0;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .service-price {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #f093fb;
+            margin-bottom: 1rem;
+        }
+
+        .service-department {
+            display: inline-block;
+            background: rgba(102, 126, 234, 0.2);
+            color: #667eea;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 3rem;
+            color: #a0aec0;
+            grid-column: 1 / -1;
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+                position: fixed;
+                top: 0;
+                right: -100%;
+                width: 300px;
+                height: 100vh;
+                background: #0f1444;
+                flex-direction: column;
+                padding: 2rem;
+                transition: right 0.3s ease;
+            }
+
+            .nav-links.active { right: 0; }
+            .hamburger { display: flex; }
+
+            .services-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .page-header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="index.html" class="nav-logo">ASCENDA</a>
+        <div class="nav-links" id="navLinks">
+            <a href="index.html">Home</a>
+            <a href="about.html">About</a>
+            <a href="services.html" class="active">Services</a>
+            <a href="marketplace.html">Marketplace</a>
+            <a href="jobs.html">Jobs</a>
+            <a href="news.html">News</a>
+            <a href="contact.html">Contact</a>
+            <a href="profile.html" id="profileLink">Profile</a>
+            <a href="#" id="logoutBtn">Logout</a>
+        </div>
+        <div class="hamburger" id="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </nav>
+
+    <div class="page-header">
+        <h1>Our Services</h1>
+        <p>Professional services tailored to elevate your success</p>
+    </div>
+
+    <div class="services-container">
+        <div class="search-filter">
+            <input type="text" class="search-input" id="searchInput" placeholder="Search services...">
+        </div>
+        <div class="services-grid" id="servicesGrid">
+            <div class="no-results">Loading services...</div>
+        </div>
+    </div>
+
+    <script src="supabase.js"></script>
+    <script>
+        let allServices = [];
+
+        async function loadServices() {
+            const { data, error } = await supabase
+                .from('services')
+                .select('*, departments(name)')
+                .eq('is_active', true)
+                .order('created_at', { ascending: false });
+
+            const grid = document.getElementById('servicesGrid');
+            
+            if (error) {
+                grid.innerHTML = '<div class="no-results">Error loading services. Please try again.</div>';
+                console.error('Error:', error);
+                return;
+            }
+
+            if (!data || data.length === 0) {
+                grid.innerHTML = '<div class="no-results">No services available yet. Check back soon!</div>';
+                return;
+            }
+
+            allServices = data;
+            displayServices(data);
+        }
+
+        function displayServices(services) {
+            const grid = document.getElementById('servicesGrid');
+            
+            if (services.length === 0) {
+                grid.innerHTML = '<div class="no-results">No services match your search.</div>';
+                return;
+            }
+
+            grid.innerHTML = services.map(service => `
+                <div class="service-card">
+                    <span class="service-icon">🛠️</span>
+                    <h3 class="service-title">${service.title}</h3>
+                    <p class="service-description">${service.description || 'No description available'}</p>
+                    ${service.price ? `<div class="service-price">${service.price}</div>` : ''}
+                    ${service.departments ? `<span class="service-department">${service.departments.name}</span>` : ''}
+                </div>
+            `).join('');
+        }
+
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const filtered = allServices.filter(service => 
+                service.title.toLowerCase().includes(searchTerm) ||
+                (service.description && service.description.toLowerCase().includes(searchTerm))
+            );
+            displayServices(filtered);
+        });
+
+        // Mobile navigation
+        document.getElementById('hamburger').addEventListener('click', () => {
+            document.getElementById('navLinks').classList.toggle('active');
+        });
+
+        document.querySelectorAll('#navLinks a').forEach(link => {
+            link.addEventListener('click', () => {
+                document.getElementById('navLinks').classList.remove('active');
+            });
+        });
+
+        // Auth check
+        async function init() {
+            const user = await checkAuth();
+            if (!user) {
+                document.getElementById('profileLink').href = 'login.html';
+                document.getElementById('profileLink').textContent = 'Login';
+                document.getElementById('logoutBtn').style.display = 'none';
+            } else {
+                document.getElementById('logoutBtn').addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    await supabase.auth.signOut();
+                    window.location.href = 'landing.html';
+                });
+            }
+            loadServices();
+        }
+
+        init();
+    </script>
+</body>
+</html>
