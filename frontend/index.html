@@ -3,186 +3,78 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ascenda Groups – Home</title>
+  <title>Welcome – Ascenda Groups</title>
   <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    .landing-hero { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 40px 20px; background: linear-gradient(160deg, #030712 0%, #0f1729 40%, #1e3a5f 100%); }
+    .landing-hero h1 { font-size: clamp(2.5rem, 6vw, 4rem); font-weight: 800; margin-bottom: 16px; }
+    .landing-hero .subtitle { color: var(--text-muted); font-size: 1.2rem; max-width: 600px; margin-bottom: 32px; }
+    .landing-buttons { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; }
+    .landing-section { padding: 80px 20px; text-align: center; max-width: 800px; margin: 0 auto; }
+    .landing-section h2 { font-size: 2rem; margin-bottom: 16px; }
+    .landing-section p { color: var(--text-muted); font-size: 1.05rem; line-height: 1.8; }
+    .landing-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 24px; margin-top: 40px; }
+    .landing-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 30px; text-align: center; }
+    .landing-card .icon { font-size: 2.5rem; margin-bottom: 12px; }
+    .landing-footer { text-align: center; padding: 30px; border-top: 1px solid var(--border); color: var(--text-muted); }
+    .navbar-landing { display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; background: transparent; position: absolute; top: 0; left: 0; right: 0; z-index: 10; }
+    .navbar-landing img { height: 36px; }
+  </style>
 </head>
 <body>
-  <!-- ========== UNIVERSAL NAVBAR ========== -->
-  <nav class="navbar">
-    <div class="nav-container">
-      <a href="index.html" class="logo"><img src="https://rfogomnbicceentrhymy.supabase.co/storage/v1/object/public/Ascenda%20pics/logo.png" alt="Ascenda" style="height:36px;"></a>
-      <div class="nav-links">
-        <a href="index.html">Home</a>
-        <a href="about.html">About</a>
-        <a href="services.html">Services</a>
-        <a href="marketplace.html">Marketplace</a>
-        <a href="jobs.html">Jobs</a>
-        <a href="news.html">News</a>
-        <a href="contact.html">Contact</a>
-        <a href="login.html" class="btn btn-outline nav-login">Login</a>
-        <a href="register.html" class="btn btn-primary nav-register">Sign Up</a>
-        <a href="profile.html" class="btn btn-outline nav-profile" style="display:none;">👤 <span class="nav-username"></span></a>
-        <a href="admin.html" class="btn btn-outline nav-admin" style="display:none;color:#f59e0b;border-color:#f59e0b;">⚡ Admin</a>
-        <a href="#" class="btn btn-outline nav-logout" style="display:none;" onclick="logout()">Logout</a>
-      </div>
-      <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+  <div class="navbar-landing">
+    <a href="index.html"><img src="https://rfogomnbicceentrhymy.supabase.co/storage/v1/object/public/Ascenda%20pics/logo.png" alt="Ascenda"></a>
+    <div>
+      <a href="login.html" class="btn btn-outline btn-sm">Login</a>
+      <a href="register.html" class="btn btn-primary btn-sm">Sign Up</a>
     </div>
-  </nav>
-  <div class="mobile-nav" id="mobileNav">
-    <a href="index.html">🏠 Home</a><a href="about.html">📖 About</a><a href="services.html">🔧 Services</a>
-    <a href="marketplace.html">🏪 Marketplace</a><a href="jobs.html">💼 Jobs</a><a href="news.html">📰 News</a>
-    <a href="contact.html">✉️ Contact</a>
-    <a href="login.html" class="mob-login">🔑 Login</a><a href="register.html" class="mob-register">🚀 Sign Up</a>
-    <a href="profile.html" class="mob-profile" style="display:none;">👤 Profile</a>
-    <a href="admin.html" class="mob-admin" style="display:none;color:#f59e0b;">⚡ Admin</a>
-    <a href="#" class="mob-logout" style="display:none;" onclick="logout()">🚪 Logout</a>
   </div>
 
-  <!-- ========== ANNOUNCEMENTS BAR ========== -->
-  <div id="announcements-bar" style="display:none;background:var(--bg-card);padding:10px 16px;text-align:center;border-bottom:1px solid var(--border);font-size:0.9rem;overflow:hidden;white-space:nowrap;"></div>
-
-  <!-- ========== HERO ========== -->
-  <section class="hero">
-    <img src="https://rfogomnbicceentrhymy.supabase.co/storage/v1/object/public/Ascenda%20pics/banner.png" style="max-width:500px;border-radius:16px;margin-bottom:20px;">
-    <h1 data-setting="site_name">Ascenda Groups</h1>
-    <p data-setting="site_description">Forex, Web Development, Marketplace & Jobs</p>
-    <div style="margin-top:20px;">
-      <a href="register.html" class="btn btn-primary btn-lg">Get Started</a>
-      <a href="services.html" class="btn btn-outline btn-lg">Services</a>
+  <section class="landing-hero">
+    <img src="https://rfogomnbicceentrhymy.supabase.co/storage/v1/object/public/Ascenda%20pics/banner.png" style="max-width:450px; border-radius:16px; margin-bottom:24px;">
+    <h1>Ascenda Groups</h1>
+    <p class="subtitle">Your all-in-one platform for forex trading, website development, marketplace, agent partnerships & youth jobs.</p>
+    <div class="landing-buttons">
+      <a href="register.html" class="btn btn-primary btn-xl">Get Started Free</a>
+      <a href="home.html" class="btn btn-outline btn-xl">Continue as Guest</a>
     </div>
   </section>
 
-  <!-- ========== FEATURED JOBS ========== -->
-  <section class="container" style="padding:40px 20px;">
-    <h2>Latest Jobs</h2>
-    <div id="featured-jobs" class="cards-grid">
-      <p style="text-align:center;color:var(--text-muted);">Loading jobs...</p>
+  <section class="landing-section">
+    <h2>Our Vision</h2>
+    <p>To become the leading multi-service digital platform connecting traders, businesses, agents, and job seekers worldwide.</p>
+  </section>
+
+  <section class="landing-section" style="background: var(--bg-secondary);">
+    <h2>About Ascenda Groups</h2>
+    <p>Founded by <strong>Eyakem Takele Kebede</strong>, Ascenda Groups bridges the gap between talent and opportunity.</p>
+  </section>
+
+  <section class="landing-section">
+    <h2>What We Offer</h2>
+    <div class="landing-cards">
+      <div class="landing-card"><div class="icon">💻</div><h3>Website Development</h3><p>Custom websites for businesses.</p></div>
+      <div class="landing-card"><div class="icon">📈</div><h3>Forex Trading</h3><p>Education, signals & courses.</p></div>
+      <div class="landing-card"><div class="icon">🤝</div><h3>Agent Program</h3><p>Earn commissions with us.</p></div>
+      <div class="landing-card"><div class="icon">🏪</div><h3>Marketplace</h3><p>Buy & sell anything.</p></div>
+      <div class="landing-card"><div class="icon">💼</div><h3>Job Board</h3><p>Find your next opportunity.</p></div>
+      <div class="landing-card"><div class="icon">📢</div><h3>Advertising</h3><p>Promote your business.</p></div>
     </div>
   </section>
 
-  <!-- ========== FEATURED SERVICES ========== -->
-  <section class="container" style="padding:40px 20px;">
-    <h2>Our Services</h2>
-    <div id="featured-services" class="cards-grid">
-      <p style="text-align:center;color:var(--text-muted);">Loading services...</p>
+  <section class="landing-section" style="background: var(--bg-secondary);">
+    <h2>Ready to Join?</h2>
+    <p>Create your free account and unlock all features.</p>
+    <div style="margin-top:24px;">
+      <a href="register.html" class="btn btn-primary btn-xl">Create Account</a>
+      <a href="home.html" class="btn btn-outline btn-xl" style="margin-left:12px;">Explore as Guest</a>
     </div>
   </section>
 
-  <!-- ========== FOOTER ========== -->
-  <footer class="footer">
-    <p>© <span data-setting="copyright_year">2026</span> Ascenda Groups. CEO: <span data-setting="ceo_name">Eyakem Takele Kebede</span></p>
+  <div class="landing-footer">
+    <p>© 2026 Ascenda Groups. CEO: Eyakem Takele Kebede</p>
     <p><a href="https://t.me/ascendagroups" target="_blank">Telegram</a></p>
-  </footer>
-
-  <!-- ========== SCRIPTS ========== -->
-  <script src="supabase.js"></script>
-  <script src="script.js"></script>
-  <script>
-    // Override loadHome and loadAnnouncements to run only once
-    window.originalLoadHome = window.loadHome || function(){};
-    window.originalLoadAnnouncements = window.loadAnnouncements || function(){};
-
-    window.loadHome = async function() {
-      if (window.homeLoaded) return;
-      window.homeLoaded = true;
-
-      const jobsContainer = document.getElementById('featured-jobs');
-      const servicesContainer = document.getElementById('featured-services');
-
-      try {
-        const sb = window.supabaseClient || supabase.createClient(
-          window.SUPABASE_URL,
-          window.SUPABASE_ANON_KEY,
-          { auth: { persistSession: true } }
-        );
-
-        const [jobsRes, servicesRes] = await Promise.all([
-          sb.from('jobs').select('*').eq('is_active', true).limit(4),
-          sb.from('services').select('*').eq('is_active', true).limit(4)
-        ]);
-
-        // Jobs
-        if (jobsContainer) {
-          const jobs = jobsRes.data;
-          if (jobsRes.error) throw jobsRes.error;
-          if (!jobs || jobs.length === 0) {
-            jobsContainer.innerHTML = '<p style="text-align:center;color:var(--text-muted);">No jobs yet.</p>';
-          } else {
-            jobsContainer.innerHTML = jobs.map(j => `
-              <div class="card">
-                <span class="badge badge-blue">Job</span>
-                <h3>${j.title}</h3>
-                <p>${j.location || 'Remote'}</p>
-              </div>
-            `).join('');
-          }
-        }
-
-        // Services
-        if (servicesContainer) {
-          const services = servicesRes.data;
-          if (servicesRes.error) throw servicesRes.error;
-          if (!services || services.length === 0) {
-            servicesContainer.innerHTML = '<p style="text-align:center;color:var(--text-muted);">No services yet.</p>';
-          } else {
-            servicesContainer.innerHTML = services.map(s => `
-              <div class="card">
-                <span class="badge badge-purple">Service</span>
-                <h3>${s.title}</h3>
-              </div>
-            `).join('');
-          }
-        }
-      } catch (err) {
-        if (jobsContainer) jobsContainer.innerHTML = `<p style="color:red;">Error: ${err.message}</p>`;
-        if (servicesContainer) servicesContainer.innerHTML = `<p style="color:red;">Error: ${err.message}</p>`;
-      }
-    };
-
-    window.loadAnnouncements = async function() {
-      if (window.announcementsLoaded) return;
-      window.announcementsLoaded = true;
-
-      const bar = document.getElementById('announcements-bar');
-      if (!bar) return;
-
-      try {
-        const sb = window.supabaseClient || supabase.createClient(
-          window.SUPABASE_URL,
-          window.SUPABASE_ANON_KEY,
-          { auth: { persistSession: true } }
-        );
-        const { data, error } = await sb
-          .from('announcements')
-          .select('*')
-          .eq('is_active', true)
-          .order('created_at', { ascending: false })
-          .limit(3);
-
-        if (error) throw error;
-
-        if (!data || data.length === 0) {
-          bar.style.display = 'none';
-          return;
-        }
-
-        bar.innerHTML = data.map(a => 
-          `<span style="color:${a.type==='urgent'?'#ef4444':a.type==='warning'?'#f59e0b':'#60a5fa'};margin:0 16px;">📢 ${a.message}</span>`
-        ).join('');
-        bar.style.display = 'block';
-      } catch (err) {
-        console.error('Announcements error:', err);
-      }
-    };
-
-    // Trigger after DOM ready
-    document.addEventListener('DOMContentLoaded', () => {
-      setTimeout(() => {
-        if (typeof loadAnnouncements === 'function') loadAnnouncements();
-        if (typeof loadHome === 'function') loadHome();
-      }, 100);
-    });
-  </script>
+  </div>
 </body>
 </html>
