@@ -42,7 +42,7 @@
   <div style="max-width:500px; margin:40px auto; text-align:center; padding:20px;">
     
     <!-- Avatar -->
-    <img id="avatar" src="https://via.placeholder.com/120" style="width:120px;height:120px;border-radius:50%;object-fit:cover;cursor:pointer;border:3px solid var(--border);" onclick="document.getElementById('avatarInput').click()">
+    <img id="avatar" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Crect fill='%231a2332' width='120' height='120'/%3E%3Ctext fill='%2394a3b8' x='50%25' y='50%25' text-anchor='middle' dy='.3em' font-size='40'%3E👤%3C/text%3E%3C/svg%3E" style="width:120px;height:120px;border-radius:50%;object-fit:cover;cursor:pointer;border:3px solid var(--border);" onclick="document.getElementById('avatarInput').click()">
     <input type="file" id="avatarInput" accept="image/*" onchange="uploadAvatar()" style="display:none;">
     
     <!-- User Info -->
@@ -50,6 +50,9 @@
     <p id="displayEmail" style="color:var(--text-muted);"></p>
     <span id="displayRole" style="background:var(--blue);color:white;padding:4px 12px;border-radius:20px;font-size:0.8rem;">USER</span>
     <p id="displayBio" style="color:var(--text-muted);margin-top:8px;"></p>
+    
+    <!-- Social Links -->
+    <div id="socialLinks" style="display:flex;gap:10px;justify-content:center;margin-top:8px;"></div>
     
     <!-- Edit Button -->
     <button class="btn btn-primary" onclick="toggleEdit()" style="margin-top:16px;">✏️ Edit Profile</button>
@@ -72,91 +75,104 @@
   <script src="supabase.js"></script>
   <script src="script.js"></script>
   <script>
-    // ========== PROFILE LOGIC ==========
-    const sb = window.supabaseClient || supabase.createClient(
-      'https://rfogomnbicceentrhymy.supabase.co',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmb2dvbW5iaWNjZWVudHJoeW15Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyNDQwOTEsImV4cCI6MjA5NTgyMDA5MX0.wke5a7GEdU2oepfKfSD-rthLTEmpk3GqVfFRM_MjZ9c',
-      { auth: { persistSession: true, autoRefreshToken: true, storage: localStorage } }
-    );
-
-    let currentUser = null;
-    let profile = null;
-
-    async function init() {
-      const { data: { user } } = await sb.auth.getUser();
-      if (!user) { window.location.href = 'login.html'; return; }
-      currentUser = user;
+    // ========== USE GLOBAL SUPABASE CLIENT ==========
+    (async function() {
+      // Wait for supabase.js to create the client
+      if (!window.supabaseClient) {
+        window.supabaseClient = window.supabase.createClient(
+          window.SUPABASE_URL,
+          window.SUPABASE_ANON_KEY,
+          { auth: { persistSession: true, autoRefreshToken: true, storage: localStorage } }
+        );
+      }
       
-      const { data: p } = await sb.from('profiles').select('*').eq('id', user.id).single();
-      profile = p || {};
+      const supabase = window.supabaseClient;
+      
+      // Get user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { window.location.href = 'login.html'; return; }
+      
+      // Get profile
+      const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single();
+      const p = profile || {};
       
       // Display
-      document.getElementById('displayName').textContent = profile.full_name || user.email?.split('@')[0] || 'User';
+      document.getElementById('displayName').textContent = p.full_name || user.email?.split('@')[0] || 'User';
       document.getElementById('displayEmail').textContent = user.email;
-      document.getElementById('displayRole').textContent = (profile.role || 'user').toUpperCase();
-      document.getElementById('displayBio').textContent = profile.bio || '';
+      document.getElementById('displayRole').textContent = (p.role || 'user').toUpperCase();
+      document.getElementById('displayBio').textContent = p.bio || '';
       
-      if (profile.avatar_url) {
-        document.getElementById('avatar').src = profile.avatar_url;
+      if (p.avatar_url) {
+        document.getElementById('avatar').src = p.avatar_url;
       }
+      
+      // Social links
+      const socialDiv = document.getElementById('socialLinks');
+      let socialHTML = '';
+      if (p.instagram) socialHTML += `<a href="${p.instagram}" target="_blank" style="font-size:1.5rem;">📷</a>`;
+      if (p.tiktok) socialHTML += `<a href="${p.tiktok}" target="_blank" style="font-size:1.5rem;">🎵</a>`;
+      if (p.telegram) socialHTML += `<a href="${p.telegram}" target="_blank" style="font-size:1.5rem;">📱</a>`;
+      socialDiv.innerHTML = socialHTML;
       
       // Fill form
-      document.getElementById('editName').value = profile.full_name || '';
-      document.getElementById('editBio').value = profile.bio || '';
-      document.getElementById('editPhone').value = profile.phone || '';
-      document.getElementById('editPosition').value = profile.position || '';
-      document.getElementById('editInstagram').value = profile.instagram || '';
-      document.getElementById('editTiktok').value = profile.tiktok || '';
-      document.getElementById('editTelegram').value = profile.telegram || '';
-    }
-
-    function toggleEdit() {
-      const form = document.getElementById('editForm');
-      form.style.display = form.style.display === 'none' ? 'block' : 'none';
-    }
-
-    async function uploadAvatar() {
-      const file = document.getElementById('avatarInput').files[0];
-      if (!file) return;
-      const path = `avatars/${currentUser.id}.jpg`;
-      const { error } = await sb.storage.from('Ascenda pics').upload(path, file, { upsert: true, contentType: file.type });
-      if (error) { alert('Upload failed: ' + error.message); return; }
-      const url = `https://rfogomnbicceentrhymy.supabase.co/storage/v1/object/public/Ascenda%20pics/${path}`;
-      await sb.from('profiles').update({ avatar_url: url }).eq('id', currentUser.id);
-      document.getElementById('avatar').src = url;
-    }
-
-    async function saveProfile() {
-      const updates = {
-        full_name: document.getElementById('editName').value.trim(),
-        bio: document.getElementById('editBio').value.trim(),
-        phone: document.getElementById('editPhone').value.trim(),
-        position: document.getElementById('editPosition').value.trim(),
-        instagram: document.getElementById('editInstagram').value.trim(),
-        tiktok: document.getElementById('editTiktok').value.trim(),
-        telegram: document.getElementById('editTelegram').value.trim()
+      document.getElementById('editName').value = p.full_name || '';
+      document.getElementById('editBio').value = p.bio || '';
+      document.getElementById('editPhone').value = p.phone || '';
+      document.getElementById('editPosition').value = p.position || '';
+      document.getElementById('editInstagram').value = p.instagram || '';
+      document.getElementById('editTiktok').value = p.tiktok || '';
+      document.getElementById('editTelegram').value = p.telegram || '';
+      
+      // Upload avatar
+      window.uploadAvatar = async function() {
+        const file = document.getElementById('avatarInput').files[0];
+        if (!file) return;
+        const path = `avatars/${user.id}.jpg`;
+        const { error } = await supabase.storage.from('Ascenda pics').upload(path, file, { upsert: true, contentType: file.type });
+        if (error) { alert('Upload failed: ' + error.message); return; }
+        const url = `https://rfogomnbicceentrhymy.supabase.co/storage/v1/object/public/Ascenda%20pics/${path}`;
+        await supabase.from('profiles').update({ avatar_url: url }).eq('id', user.id);
+        document.getElementById('avatar').src = url;
       };
       
-      const { error } = await sb.from('profiles').update(updates).eq('id', currentUser.id);
-      const msg = document.getElementById('saveMsg');
+      // Toggle edit form
+      window.toggleEdit = function() {
+        const form = document.getElementById('editForm');
+        form.style.display = form.style.display === 'none' ? 'block' : 'none';
+      };
       
-      if (error) {
-        msg.textContent = '❌ Error: ' + error.message;
-        msg.style.color = '#ef4444';
-      } else {
-        msg.textContent = '✅ Profile saved!';
-        msg.style.color = '#10b981';
-        setTimeout(() => location.reload(), 1000);
-      }
-    }
-
-    async function logout() {
-      await sb.auth.signOut();
-      window.location.href = 'landing.html';
-    }
-
-    // Start
-    init();
+      // Save profile
+      window.saveProfile = async function() {
+        const updates = {
+          full_name: document.getElementById('editName').value.trim(),
+          bio: document.getElementById('editBio').value.trim(),
+          phone: document.getElementById('editPhone').value.trim(),
+          position: document.getElementById('editPosition').value.trim(),
+          instagram: document.getElementById('editInstagram').value.trim(),
+          tiktok: document.getElementById('editTiktok').value.trim(),
+          telegram: document.getElementById('editTelegram').value.trim()
+        };
+        
+        const { error } = await supabase.from('profiles').update(updates).eq('id', user.id);
+        const msg = document.getElementById('saveMsg');
+        
+        if (error) {
+          msg.textContent = '❌ Error: ' + error.message;
+          msg.style.color = '#ef4444';
+        } else {
+          msg.textContent = '✅ Profile saved!';
+          msg.style.color = '#10b981';
+          setTimeout(() => location.reload(), 1000);
+        }
+      };
+      
+      // Logout
+      window.logout = async function() {
+        await supabase.auth.signOut();
+        window.location.href = 'landing.html';
+      };
+      
+    })();
   </script>
 </body>
 </html>
