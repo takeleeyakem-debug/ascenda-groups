@@ -8,12 +8,45 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-  <!-- Universal Navbar -->
-  <nav class="navbar">...</nav>
-  <div class="mobile-nav" id="mobileNav">...</div>
+  <!-- UNIVERSAL NAVBAR -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="logo"><img src="https://rfogomnbicceentrhymy.supabase.co/storage/v1/object/public/Ascenda%20pics/logo.png" alt="Ascenda" style="height:36px;"></a>
+      <div class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="services.html">Services</a>
+        <a href="marketplace.html">Marketplace</a>
+        <a href="jobs.html">Jobs</a>
+        <a href="news.html">News</a>
+        <a href="contact.html">Contact</a>
+        <a href="login.html" class="btn btn-outline nav-login">Login</a>
+        <a href="register.html" class="btn btn-primary nav-register">Sign Up</a>
+        <a href="profile.html" class="btn btn-outline nav-profile" style="display:none;">👤 <span class="nav-username"></span></a>
+        <a href="admin.html" class="btn btn-outline nav-admin" style="display:none;color:#f59e0b;border-color:#f59e0b;">⚡ Admin</a>
+        <a href="#" class="btn btn-outline nav-logout" style="display:none;" onclick="logout()">Logout</a>
+      </div>
+      <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+    </div>
+  </nav>
+  <div class="mobile-nav" id="mobileNav">
+    <a href="index.html">🏠 Home</a>
+    <a href="about.html">📖 About</a>
+    <a href="services.html">🔧 Services</a>
+    <a href="marketplace.html">🏪 Marketplace</a>
+    <a href="jobs.html">💼 Jobs</a>
+    <a href="news.html">📰 News</a>
+    <a href="contact.html">✉️ Contact</a>
+    <a href="login.html" class="mob-login">🔑 Login</a>
+    <a href="register.html" class="mob-register">🚀 Sign Up</a>
+    <a href="profile.html" class="mob-profile" style="display:none;">👤 Profile</a>
+    <a href="admin.html" class="mob-admin" style="display:none;color:#f59e0b;">⚡ Admin</a>
+    <a href="#" class="mob-logout" style="display:none;" onclick="logout()">🚪 Logout</a>
+  </div>
 
+  <!-- NEWS LIST -->
   <section class="container" style="padding:40px 20px;">
-    <h2 style="text-align:center;margin-bottom:24px;">News & Updates</h2>
+    <h2>News & Updates</h2>
     <div id="news-list" class="cards-grid"></div>
   </section>
 
