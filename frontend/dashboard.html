@@ -1,148 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard - Ascenda Groups</title>
   <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
-  <nav class="navbar">
-    <div class="nav-container">
-      <a href="index.html" class="logo"><img src="https://rfogomnbicceentrhymy.supabase.co/storage/v1/object/public/Ascenda%20pics/logo.png" alt="Ascenda Groups"></a>
-      <div class="nav-links">
-        <a href="index.html">Home</a>
-        <a href="about.html">About</a>
-        <a href="services.html">Services</a>
-        <a href="marketplace.html">Marketplace</a>
-        <a href="jobs.html">Jobs</a>
-        <a href="contact.html">Contact</a>
-        <span class="auth-user-name" style="color:var(--accent-blue);font-weight:600;"></span>
-        <a href="#" class="btn btn-outline" onclick="logout()">Logout</a>
-      </div>
-      <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
-    </div>
-  </nav>
-  <div class="mobile-nav" id="mobileNav">
-    <a href="index.html">Home</a><a href="about.html">About</a><a href="services.html">Services</a><a href="marketplace.html">Marketplace</a><a href="jobs.html">Jobs</a><a href="contact.html">Contact</a><a href="#" onclick="logout()">Logout</a>
+<nav class="navbar"><div class="nav-container">
+  <a href="index.html" class="logo"><img src="https://rfogomnbicceentrhymy.supabase.co/storage/v1/object/public/Ascenda%20pics/logo.png" alt="Ascenda"></a>
+  <div class="nav-links">
+    <a href="index.html">Home</a><a href="profile.html">Profile</a>
+    <span class="auth-user-name" style="color:var(--blue);font-weight:600;"></span>
+    <a href="#" class="btn btn-outline" onclick="logout()">Logout</a>
   </div>
+  <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+</div></nav>
+<div class="mobile-nav" id="mobileNav"><a href="index.html">Home</a><a href="profile.html">Profile</a></div>
 
-  <section class="section">
-    <div class="container">
-      <div class="section-header">
-        <span class="section-badge">Dashboard</span>
-        <h2>Welcome, <span id="dashboard-name">User</span></h2>
-        <p>Role: <strong id="dashboard-role">USER</strong></p>
-      </div>
+<section class="section">
+  <div class="container" style="max-width:800px;">
+    <h1>Welcome, <span id="dash-name">User</span>!</h1>
+    <p>Role: <strong id="dash-role">USER</strong></p>
 
-      <!-- USER PROFILE SECTION -->
-      <div class="card" style="max-width:600px;margin:0 auto 32px;">
-        <h3>👤 Profile</h3>
-        <p>You are logged in as <span class="auth-user-name"></span></p>
-        <button class="btn btn-primary" onclick="applyAsAgent()" style="margin-top:12px;">Apply as Agent 🤝</button>
-        <p style="font-size:0.8rem;color:var(--text-muted);margin-top:8px;">Agent applications are reviewed by admin.</p>
-      </div>
+    <div class="card" style="margin:20px 0;">
+      <h3>👤 Quick Actions</h3>
+      <a href="profile.html" class="btn btn-outline">Edit Profile</a>
+      <button class="btn btn-primary mt-4" onclick="applyAsAgent()">Apply as Agent 🤝</button>
+      <button class="btn btn-outline mt-4" onclick="window.location.href='jobs.html'">Browse Jobs</button>
+    </div>
 
-      <!-- ADMIN PANEL (hidden by default, shown only for admin) -->
-      <div id="admin-panel" style="display:none;">
-        <div style="background:linear-gradient(135deg,rgba(239,68,68,0.1),rgba(245,158,11,0.1));padding:16px;border-radius:12px;margin-bottom:24px;border:1px solid var(--accent-gold);">
-          <h3 style="color:var(--accent-gold);">⚡ Admin Panel Active</h3>
-          <p style="font-size:0.85rem;color:var(--text-muted);">This panel is invisible to regular users.</p>
-        </div>
-
-        <div class="cards-grid">
-          <!-- Pending Agents -->
-          <div class="card">
-            <h3>🔍 Pending Agent Approvals</h3>
-            <div id="admin-agents"></div>
-          </div>
-
-          <!-- Messages -->
-          <div class="card">
-            <h3>📬 Recent Messages</h3>
-            <div id="admin-messages"></div>
-          </div>
-
-          <!-- Quick Actions -->
-          <div class="card">
-            <h3>⚡ Quick Actions</h3>
-            <button class="btn btn-primary btn-block" onclick="showJobForm()" style="margin-bottom:8px;">+ Add Job</button>
-            <button class="btn btn-outline btn-block" onclick="showMarketplaceForm()" style="margin-bottom:8px;">+ Add Marketplace Item</button>
-            <button class="btn btn-outline btn-block" onclick="window.location.href='contact.html'">View All Messages</button>
-          </div>
-        </div>
-
-        <!-- Add Job Modal -->
-        <div id="job-modal" class="modal-overlay">
-          <div class="modal">
-            <h3>Add New Job</h3>
-            <div class="form-group"><label>Job Title</label><input type="text" id="job-title"></div>
-            <div class="form-group"><label>Description</label><textarea id="job-desc"></textarea></div>
-            <div class="form-group"><label>Category</label><input type="text" id="job-category" placeholder="e.g., Technology, Finance"></div>
-            <div class="form-group"><label>Location</label><input type="text" id="job-location" placeholder="e.g., Remote, New York"></div>
-            <button class="btn btn-primary" onclick="createJob()">Create Job</button>
-            <button class="btn btn-outline" onclick="closeJobForm()" style="margin-left:8px;">Cancel</button>
-          </div>
-        </div>
-
-        <!-- Add Marketplace Modal -->
-        <div id="marketplace-modal" class="modal-overlay">
-          <div class="modal">
-            <h3>Add Marketplace Item</h3>
-            <div class="form-group"><label>Title</label><input type="text" id="item-title"></div>
-            <div class="form-group"><label>Description</label><textarea id="item-desc"></textarea></div>
-            <div class="form-group"><label>Category</label><select id="item-category"><option>house</option><option>car</option><option>value_item</option><option>e_service</option><option>digital_product</option></select></div>
-            <div class="form-group"><label>Price ($)</label><input type="number" id="item-price"></div>
-            <div class="form-group"><label>Contact</label><input type="text" id="item-contact"></div>
-            <button class="btn btn-primary" onclick="createMarketplaceItem()">Create Item</button>
-            <button class="btn btn-outline" onclick="closeMarketplaceForm()" style="margin-left:8px;">Cancel</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- AGENT PANEL (shown for approved agents) -->
-      <div id="agent-panel" style="display:none;">
-        <div style="background:rgba(16,185,129,0.1);padding:16px;border-radius:12px;margin-bottom:24px;border:1px solid var(--accent-green);">
-          <h3 style="color:var(--accent-green);">🤝 Agent Dashboard</h3>
-          <p>Status: <strong id="agent-status"></strong></p>
-          <p>Commission Rate: <strong id="agent-rate"></strong>%</p>
-          <p>Total Earnings: <strong style="color:var(--accent-green);">$<span id="agent-earnings">0</span></strong></p>
-        </div>
-        <div class="card">
-          <h3>💰 Transaction History</h3>
-          <table class="data-table">
-            <thead><tr><th>Date</th><th>Amount</th><th>Description</th></tr></thead>
-            <tbody id="agent-transactions"></tbody>
-          </table>
-        </div>
+    <div id="admin-quick-links" style="display:none;">
+      <div class="card" style="border-color:var(--gold);">
+        <h3 style="color:var(--gold);">⚡ Admin Quick Links</h3>
+        <a href="admin.html" class="btn btn-gold">Admin Panel</a>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <footer class="footer">
-    <div class="footer-content">
-      <p>© 2024 Ascenda Groups. All rights reserved.</p>
-      <p>CEO: Eyakem Takele Kbede</p>
-    </div>
-  </footer>
-
-  <script src="supabase.js"></script>
-  <script src="script.js"></script>
-  <script>
-    async function applyAsAgent() {
-      if (!currentUser) { showToast('Login first', 'error'); return; }
-      const { data: existing } = await supabase.from('agents').select('*').eq('profile_id', currentUser.id).single();
-      if (existing) { showToast('You already applied!', 'error'); return; }
-      const { error } = await supabase.from('agents').insert({ profile_id: currentUser.id });
-      if (error) showToast('Error applying', 'error');
-      else showToast('Application submitted! ✅');
-    }
-    function showJobForm() { document.getElementById('job-modal').classList.add('active'); }
-    function closeJobForm() { document.getElementById('job-modal').classList.remove('active'); }
-    function showMarketplaceForm() { document.getElementById('marketplace-modal').classList.add('active'); }
-    function closeMarketplaceForm() { document.getElementById('marketplace-modal').classList.remove('active'); }
-  </script>
+<footer class="footer"><div class="footer-content"><p>© 2026 Ascenda Groups</p></div></footer>
+<script src="supabase.js"></script><script src="script.js"></script>
 </body>
 </html>

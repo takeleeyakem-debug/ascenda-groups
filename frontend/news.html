@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Marketplace - Ascenda Groups</title>
+  <title>News - Ascenda Groups</title>
   <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -11,7 +11,7 @@
 <nav class="navbar"><div class="nav-container">
   <a href="index.html" class="logo"><img src="https://rfogomnbicceentrhymy.supabase.co/storage/v1/object/public/Ascenda%20pics/logo.png" alt="Ascenda"></a>
   <div class="nav-links">
-    <a href="index.html">Home</a><a href="about.html">About</a><a href="services.html">Services</a><a href="marketplace.html" class="active">Marketplace</a><a href="jobs.html">Jobs</a><a href="news.html">News</a><a href="contact.html">Contact</a>
+    <a href="index.html">Home</a><a href="about.html">About</a><a href="services.html">Services</a><a href="marketplace.html">Marketplace</a><a href="jobs.html">Jobs</a><a href="news.html" class="active">News</a><a href="contact.html">Contact</a>
     <a href="login.html" class="btn btn-outline auth-login-btn">Login</a><a href="register.html" class="btn btn-primary auth-register-btn">Sign Up</a>
     <span class="auth-user-name" style="display:none;color:var(--blue);font-weight:600;"></span>
     <a href="#" class="btn btn-outline auth-logout-btn" style="display:none;">Logout</a>
@@ -25,27 +25,18 @@
 <section class="section">
   <div class="container">
     <div class="section-header">
-      <span class="section-badge">Buy & Sell</span>
-      <h2>Marketplace</h2>
-      <p>Houses, cars, valuables, e-services & digital products</p>
+      <span class="section-badge">Updates</span>
+      <h2>News & Announcements</h2>
+      <p>Latest updates, articles, videos & documents</p>
     </div>
     <div class="filter-buttons">
-      <button class="filter-btn active" data-category="all">All</button>
-      <button class="filter-btn" data-category="house">🏠 Houses</button>
-      <button class="filter-btn" data-category="car">🚗 Cars</button>
-      <button class="filter-btn" data-category="value_item">💎 Valuables</button>
-      <button class="filter-btn" data-category="e_service">🔧 E-Services</button>
-      <button class="filter-btn" data-category="digital_product">📱 Digital</button>
+      <button class="filter-btn active" data-type="all">All</button>
+      <button class="filter-btn" data-type="article">📄 Articles</button>
+      <button class="filter-btn" data-type="video">🎬 Videos</button>
+      <button class="filter-btn" data-type="image">🖼️ Images</button>
+      <button class="filter-btn" data-type="document">📁 Documents</button>
     </div>
-    <div id="marketplace-list" class="cards-grid"></div>
-  </div>
-</section>
-
-<section class="section section-dark">
-  <div class="container" style="text-align:center;">
-    <h2>Want to Sell?</h2>
-    <p style="color:var(--text-muted);margin-bottom:20px;">Register and apply to become a marketplace poster</p>
-    <a href="register.html" class="btn btn-primary btn-lg">Get Started</a>
+    <div id="news-list" class="cards-grid"></div>
   </div>
 </section>
 

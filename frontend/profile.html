@@ -8,37 +8,67 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
-  <nav class="navbar"><div class="nav-container">
-    <a href="index.html" class="logo"><img src="https://rfogomnbicceentrhymy.supabase.co/storage/v1/object/public/Ascenda%20pics/logo.png" alt="Ascenda"></a>
-    <div class="nav-links">
-      <a href="index.html">Home</a><a href="about.html">About</a><a href="services.html">Services</a><a href="marketplace.html">Marketplace</a><a href="jobs.html">Jobs</a><a href="contact.html">Contact</a>
-      <span class="auth-user-name" style="display:none;color:var(--blue);font-weight:600;"></span>
-      <a href="#" class="btn btn-outline auth-logout-btn" style="display:none;">Logout</a>
-      <a href="login.html" class="btn btn-outline auth-login-btn">Login</a>
-    </div>
-    <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
-  </div></nav>
-  <div class="mobile-nav" id="mobileNav">
-    <a href="index.html">Home</a><a href="about.html">About</a><a href="services.html">Services</a><a href="marketplace.html">Marketplace</a><a href="jobs.html">Jobs</a><a href="contact.html">Contact</a><a href="dashboard.html">Dashboard</a>
+<nav class="navbar"><div class="nav-container">
+  <a href="index.html" class="logo"><img src="https://rfogomnbicceentrhymy.supabase.co/storage/v1/object/public/Ascenda%20pics/logo.png" alt="Ascenda"></a>
+  <div class="nav-links">
+    <a href="index.html">Home</a><a href="dashboard.html">Dashboard</a>
+    <span class="auth-user-name" style="color:var(--blue);font-weight:600;"></span>
+    <a href="#" class="btn btn-outline" onclick="logout()">Logout</a>
   </div>
+  <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+</div></nav>
+<div class="mobile-nav" id="mobileNav"><a href="index.html">Home</a><a href="dashboard.html">Dashboard</a></div>
 
-  <section class="section">
-    <div class="container" style="max-width:600px;">
-      <div class="form-container">
-        <h2>👤 My Profile</h2>
-        <div class="card" style="margin-bottom:16px;">
-          <p><strong>Name:</strong> <span id="profile-name">-</span></p>
-          <p><strong>Email:</strong> <span id="profile-email">-</span></p>
-          <p><strong>Role:</strong> <span id="profile-role">-</span></p>
-        </div>
-        <a href="dashboard.html" class="btn btn-primary btn-block">Go to Dashboard</a>
-        <button class="btn btn-outline btn-block mt-4" onclick="applyAsAgent()">Apply as Agent 🤝</button>
+<section class="section">
+  <div class="container" style="max-width:600px;">
+    <!-- Cover Photo -->
+    <div id="profile-cover" style="height:180px;background:var(--gradient-hero);border-radius:var(--radius-lg);background-size:cover;background-position:center;"></div>
+    
+    <!-- Avatar -->
+    <div style="text-align:center;margin-top:-50px;">
+      <img id="profile-avatar" src="https://via.placeholder.com/120" style="width:100px;height:100px;border-radius:50%;border:3px solid var(--blue);object-fit:cover;">
+    </div>
+
+    <!-- Info -->
+    <div class="card text-center" style="margin-top:16px;">
+      <h2 id="profile-name">User</h2>
+      <span class="badge badge-blue" id="profile-role">USER</span>
+      <p id="profile-bio" style="margin-top:12px;">No bio yet</p>
+      
+      <div style="display:flex;gap:12px;justify-content:center;margin-top:16px;">
+        <a id="profile-instagram" href="#" class="btn btn-outline btn-icon">📷</a>
+        <a id="profile-tiktok" href="#" class="btn btn-outline btn-icon">🎵</a>
+        <a id="profile-telegram" href="#" class="btn btn-outline btn-icon">📱</a>
       </div>
     </div>
-  </section>
 
-  <footer class="footer"><div class="footer-content"><p>© 2024 Ascenda Groups. CEO: Eyakem Takele Kbede</p></div></footer>
-  <script src="supabase.js"></script>
-  <script src="script.js"></script>
+    <!-- Edit Bio -->
+    <div class="card" style="margin-top:16px;">
+      <h3>Edit Profile</h3>
+      <div class="form-group"><label>Bio</label><textarea id="edit-bio" rows="3"></textarea></div>
+      <div class="form-group"><label>Instagram URL</label><input type="text" id="edit-instagram"></div>
+      <div class="form-group"><label>TikTok URL</label><input type="text" id="edit-tiktok"></div>
+      <div class="form-group"><label>Telegram URL</label><input type="text" id="edit-telegram"></div>
+      <button class="btn btn-primary btn-block" onclick="saveProfile()">Save Changes</button>
+    </div>
+  </div>
+</section>
+
+<footer class="footer"><div class="footer-content"><p>© 2026 Ascenda Groups</p></div></footer>
+<script src="supabase.js"></script>
+<script>
+async function saveProfile() {
+  const bio = document.getElementById('edit-bio').value;
+  const instagram = document.getElementById('edit-instagram').value;
+  const tiktok = document.getElementById('edit-tiktok').value;
+  const telegram = document.getElementById('edit-telegram').value;
+  const { data: { user } } = await window.supabaseClient.auth.getUser();
+  if(user) {
+    await window.supabaseClient.from('profiles').update({bio, instagram, tiktok, telegram}).eq('id', user.id);
+    showToast('Profile updated!'); location.reload();
+  }
+}
+</script>
+<script src="script.js"></script>
 </body>
 </html>

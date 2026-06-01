@@ -8,46 +8,39 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
-  <nav class="navbar"><div class="nav-container">
-    <a href="index.html" class="logo"><img src="https://rfogomnbicceentrhymy.supabase.co/storage/v1/object/public/Ascenda%20pics/logo.png" alt="Ascenda"></a>
-    <div class="nav-links"><a href="index.html">Home</a><a href="register.html" class="btn btn-primary">Sign Up</a></div>
-  </div></nav>
+<nav class="navbar"><div class="nav-container">
+  <a href="index.html" class="logo"><img src="https://rfogomnbicceentrhymy.supabase.co/storage/v1/object/public/Ascenda%20pics/logo.png" alt="Ascenda"></a>
+  <div class="nav-links"><a href="index.html">Home</a><a href="register.html" class="btn btn-primary">Sign Up</a></div>
+</div></nav>
 
-  <div class="form-container">
-    <h2>Welcome Back 👋</h2>
-    <div id="error-msg" style="color:red;text-align:center;display:none;"></div>
-    <div class="form-group"><label>Email</label><input type="email" id="login-email" required></div>
-    <div class="form-group"><label>Password</label><input type="password" id="login-password" required></div>
-    <button id="login-btn" class="btn btn-primary btn-block btn-lg">Login</button>
-    <div class="form-divider">or</div>
-    <button id="google-btn" class="btn btn-outline btn-block btn-lg">🔵 Login with Google</button>
-    <p style="text-align:center;margin-top:16px;color:var(--text-muted);">No account? <a href="register.html">Sign Up</a></p>
-  </div>
+<div class="form-container">
+  <h2>Welcome Back 👋</h2>
+  <div id="error-msg" style="color:red;text-align:center;display:none;"></div>
+  <div class="form-group"><label>Email</label><input type="email" id="login-email" required></div>
+  <div class="form-group"><label>Password</label><input type="password" id="login-password" required></div>
+  <button id="login-btn" class="btn btn-primary btn-block btn-lg">Login</button>
+  <div class="form-divider">or</div>
+  <button id="google-btn" class="btn btn-outline btn-block btn-lg">🔵 Login with Google</button>
+  <p style="text-align:center;margin-top:16px;">No account? <a href="register.html">Sign Up</a></p>
+</div>
 
-  <script src="supabase.js"></script>
-  <script>
-    (function() {
-      if (!window.supabaseClient && window.supabase) {
-        window.supabaseClient = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
-      }
-      const sb = window.supabaseClient;
-
-      document.getElementById('login-btn').addEventListener('click', async () => {
-        const email = document.getElementById('login-email').value;
-        const password = document.getElementById('login-password').value;
-        const btn = document.getElementById('login-btn');
-        const errEl = document.getElementById('error-msg');
-        if (!email || !password) { errEl.textContent = 'Fill all fields'; errEl.style.display='block'; return; }
-        btn.disabled = true; btn.textContent = 'Logging in...';
-        const { error } = await sb.auth.signInWithPassword({ email, password });
-        if (error) { errEl.textContent = error.message; errEl.style.display='block'; btn.disabled = false; btn.textContent = 'Login'; }
-        else window.location.href = 'dashboard.html';
-      });
-
-      document.getElementById('google-btn').addEventListener('click', async () => {
-        await sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin + '/dashboard.html' } });
-      });
-    })();
-  </script>
+<script src="supabase.js"></script>
+<script>
+(function(){
+  if(!window.supabaseClient) window.supabaseClient = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY, {auth:{persistSession:true,autoRefreshToken:true,storage:localStorage}});
+  const sb = window.supabaseClient;
+  document.getElementById('login-btn').addEventListener('click', async () => {
+    const e=document.getElementById('login-email').value, p=document.getElementById('login-password').value;
+    const btn=document.getElementById('login-btn'), err=document.getElementById('error-msg');
+    btn.disabled=true; btn.textContent='Logging in...';
+    const {error} = await sb.auth.signInWithPassword({email:e,password:p});
+    if(error){err.textContent=error.message;err.style.display='block';btn.disabled=false;btn.textContent='Login';}
+    else window.location.href='dashboard.html';
+  });
+  document.getElementById('google-btn').addEventListener('click', async ()=>{
+    await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:window.location.origin+'/dashboard.html'}});
+  });
+})();
+</script>
 </body>
 </html>
