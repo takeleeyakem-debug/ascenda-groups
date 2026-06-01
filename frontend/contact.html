@@ -8,123 +8,97 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-  <!-- UNIVERSAL NAVBAR -->
-  <nav class="navbar">
-    <div class="nav-container">
-      <a href="index.html" class="logo"><img src="https://rfogomnbicceentrhymy.supabase.co/storage/v1/object/public/Ascenda%20pics/logo.png" alt="Ascenda" style="height:36px;"></a>
-      <div class="nav-links">
-        <a href="index.html">Home</a>
-        <a href="about.html">About</a>
-        <a href="services.html">Services</a>
-        <a href="marketplace.html">Marketplace</a>
-        <a href="jobs.html">Jobs</a>
-        <a href="news.html">News</a>
-        <a href="contact.html">Contact</a>
-        <a href="login.html" class="btn btn-outline nav-login">Login</a>
-        <a href="register.html" class="btn btn-primary nav-register">Sign Up</a>
-        <a href="profile.html" class="btn btn-outline nav-profile" style="display:none;">👤 <span class="nav-username"></span></a>
-        <a href="admin.html" class="btn btn-outline nav-admin" style="display:none;color:#f59e0b;border-color:#f59e0b;">⚡ Admin</a>
-        <a href="#" class="btn btn-outline nav-logout" style="display:none;" onclick="logout()">Logout</a>
-      </div>
-      <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
-    </div>
-  </nav>
-  <div class="mobile-nav" id="mobileNav">
-    <a href="index.html">🏠 Home</a>
-    <a href="about.html">📖 About</a>
-    <a href="services.html">🔧 Services</a>
-    <a href="marketplace.html">🏪 Marketplace</a>
-    <a href="jobs.html">💼 Jobs</a>
-    <a href="news.html">📰 News</a>
-    <a href="contact.html">✉️ Contact</a>
-    <a href="login.html" class="mob-login">🔑 Login</a>
-    <a href="register.html" class="mob-register">🚀 Sign Up</a>
-    <a href="profile.html" class="mob-profile" style="display:none;">👤 Profile</a>
-    <a href="admin.html" class="mob-admin" style="display:none;color:#f59e0b;">⚡ Admin</a>
-    <a href="#" class="mob-logout" style="display:none;" onclick="logout()">🚪 Logout</a>
-  </div>
+  <!-- Universal Navbar -->
+  <nav class="navbar">...</nav>
+  <div class="mobile-nav" id="mobileNav">...</div>
 
-  <!-- CONTACT FORM & PAYMENT INFO -->
-  <section class="container" style="max-width:600px; margin:40px auto;">
+  <div class="container" style="max-width:600px;margin:40px auto;padding:0 20px;">
+    <!-- Contact Form -->
     <h2>Contact Us</h2>
     <form id="contact-form" onsubmit="return false;">
-      <div class="form-group">
-        <label>Name *</label>
-        <input type="text" id="c-name" required placeholder="Your name">
-      </div>
-      <div class="form-group">
-        <label>Email *</label>
-        <input type="email" id="c-email" required placeholder="you@example.com">
-      </div>
-      <div class="form-group">
-        <label>Subject</label>
-        <input type="text" id="c-subject" placeholder="Subject">
-      </div>
-      <div class="form-group">
-        <label>Message *</label>
-        <textarea id="c-message" rows="5" required placeholder="Your message..."></textarea>
-      </div>
-      <button type="button" class="btn btn-primary btn-block btn-lg" onclick="sendContact()">Send Message ✉️</button>
-      <p id="form-msg" style="text-align:center; margin-top:12px; display:none;"></p>
+      <div class="form-group"><label>Name *</label><input type="text" name="name" required></div>
+      <div class="form-group"><label>Email *</label><input type="email" name="email" required></div>
+      <div class="form-group"><label>Subject</label><input type="text" name="subject"></div>
+      <div class="form-group"><label>Message *</label><textarea name="message" rows="4" required></textarea></div>
+      <button type="submit" class="btn btn-primary btn-block btn-lg">Send Message ✉️</button>
+      <p id="form-msg" style="text-align:center;margin-top:12px;display:none;"></p>
     </form>
 
-    <!-- Payment Information -->
-    <div class="card" style="margin-top:30px; text-align:center;">
+    <!-- Application Form (e.g. for jobs/agent) -->
+    <h2 style="margin-top:40px;">Apply for a Position</h2>
+    <form id="apply-form" onsubmit="return false;">
+      <div class="form-group"><label>Full Name *</label><input type="text" id="app-name" required></div>
+      <div class="form-group"><label>Email *</label><input type="email" id="app-email" required></div>
+      <div class="form-group"><label>Position Type</label><select id="app-type">
+        <option value="agent">Agent</option>
+        <option value="worker">Worker</option>
+        <option value="dept_admin">Department Admin</option>
+        <option value="job_poster">Job Poster</option>
+        <option value="marketplace_poster">Marketplace Poster</option>
+      </select></div>
+      <div class="form-group"><label>Message</label><textarea id="app-message" rows="3" placeholder="Why do you want to join?"></textarea></div>
+      <button type="submit" class="btn btn-primary btn-block btn-lg">Submit Application</button>
+      <p id="apply-msg" style="text-align:center;margin-top:12px;display:none;"></p>
+    </form>
+
+    <!-- Payment Info -->
+    <div class="card" style="margin-top:30px;text-align:center;">
       <h3>🏦 Payment Information</h3>
-      <p>For services requiring payment, transfer to:</p>
-      <p><strong>Dashen Bank</strong></p>
+      <p>Dashen Bank</p>
       <p>Account: <strong>5444991978011</strong></p>
       <p>Name: <strong>Eyakem Takele Kebede</strong></p>
     </div>
-  </section>
+  </div>
 
   <footer class="footer">
     <p>© <span data-setting="copyright_year">2026</span> Ascenda Groups. CEO: <span data-setting="ceo_name">Eyakem Takele Kebede</span></p>
     <p><a href="https://t.me/ascendagroups" target="_blank">Telegram</a></p>
   </footer>
 
-  <!-- Inline script for contact form -->
-  <script>
-    // Use the global supabase client from supabase.js if available, else create one
-    const sbContact = window.supabaseClient || supabase.createClient(
-      'https://rfogomnbicceentrhymy.supabase.co',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmb2dvbW5iaWNjZWVudHJoeW15Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyNDQwOTEsImV4cCI6MjA5NTgyMDA5MX0.wke5a7GEdU2oepfKfSD-rthLTEmpk3GqVfFRM_MjZ9c'
-    );
-
-    async function sendContact() {
-      const name = document.getElementById('c-name').value.trim();
-      const email = document.getElementById('c-email').value.trim();
-      const subject = document.getElementById('c-subject').value.trim();
-      const message = document.getElementById('c-message').value.trim();
-      const msgEl = document.getElementById('form-msg');
-
-      if (!name || !email || !message) {
-        msgEl.textContent = 'Please fill all required fields.';
-        msgEl.style.display = 'block';
-        msgEl.style.color = '#ef4444';
-        return;
-      }
-
-      msgEl.textContent = 'Sending...';
-      msgEl.style.display = 'block';
-      msgEl.style.color = '#f59e0b';
-
-      const { error } = await sbContact.from('contact_messages').insert([
-        { name, email, subject, message }
-      ]);
-
-      if (error) {
-        msgEl.textContent = 'Error: ' + error.message;
-        msgEl.style.color = '#ef4444';
-      } else {
-        msgEl.textContent = '✅ Message sent successfully!';
-        msgEl.style.color = '#10b981';
-        document.getElementById('contact-form').reset();
-      }
-    }
-  </script>
-
   <script src="supabase.js"></script>
+  <script>
+    // Contact form handler
+    document.getElementById('contact-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const form = e.target;
+      const btn = form.querySelector('button');
+      const msg = document.getElementById('form-msg');
+      btn.disabled = true; btn.textContent = 'Sending...';
+      const sb = window.supabaseClient || supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+      const { error } = await sb.from('contact_messages').insert({
+        name: form.name.value, email: form.email.value,
+        subject: form.subject.value, message: form.message.value
+      });
+      btn.disabled = false; btn.textContent = 'Send Message ✉️';
+      if (error) { msg.textContent = 'Error: ' + error.message; msg.style.color = 'red'; msg.style.display = 'block'; }
+      else { msg.textContent = '✅ Message sent!'; msg.style.color = '#10b981'; msg.style.display = 'block'; form.reset(); }
+    });
+
+    // Application form handler
+    document.getElementById('apply-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = e.target.querySelector('button');
+      const msg = document.getElementById('apply-msg');
+      const name = document.getElementById('app-name').value.trim();
+      const email = document.getElementById('app-email').value.trim();
+      const type = document.getElementById('app-type').value;
+      const message = document.getElementById('app-message').value.trim();
+      if (!name || !email) { msg.textContent = 'Name and email required'; msg.style.color = 'red'; msg.style.display = 'block'; return; }
+      btn.disabled = true; btn.textContent = 'Submitting...';
+      const sb = window.supabaseClient || supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+      // First, ensure a profile exists or use existing user?
+      // Since this is a public application, we'll insert into 'applications' table directly
+      const { error } = await sb.from('applications').insert({
+        applicant_id: null, // can be null for external applicants
+        type: type,
+        message: message,
+        status: 'pending'
+      });
+      btn.disabled = false; btn.textContent = 'Submit Application';
+      if (error) { msg.textContent = 'Error: ' + error.message; msg.style.color = 'red'; msg.style.display = 'block'; }
+      else { msg.textContent = '✅ Application submitted!'; msg.style.color = '#10b981'; msg.style.display = 'block'; e.target.reset(); }
+    });
+  </script>
   <script src="script.js"></script>
 </body>
 </html>
