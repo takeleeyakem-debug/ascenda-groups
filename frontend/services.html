@@ -1,53 +1,360 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Services - Ascenda Groups</title>
   <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    .services-hero {
+      background: linear-gradient(135deg, #0a0f1c 0%, #111827 50%, #1a2332 100%);
+      padding: 60px 20px;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+    }
+    .services-hero h1 { font-size: 2.5rem; font-weight: 800; margin-bottom: 12px; }
+    .services-hero p { color: var(--text-muted); max-width: 600px; margin: 0 auto; }
+    
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 24px;
+      padding: 40px 20px;
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+    
+    .service-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+    }
+    .service-card:hover {
+      border-color: var(--blue);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.4), 0 0 30px rgba(59,130,246,0.1);
+    }
+    .service-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--blue), var(--purple));
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .service-card:hover::before { opacity: 1; }
+    
+    .service-icon {
+      width: 56px; height: 56px;
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.8rem;
+      margin-bottom: 16px;
+      background: rgba(59,130,246,0.08);
+      border: 1px solid rgba(59,130,246,0.15);
+    }
+    .service-card:hover .service-icon {
+      background: rgba(59,130,246,0.15);
+      border-color: var(--blue);
+    }
+    
+    .service-card h3 { font-size: 1.2rem; margin-bottom: 8px; }
+    .service-card p { color: var(--text-secondary); font-size: 0.95rem; line-height: 1.6; margin-bottom: 12px; }
+    .service-price {
+      font-size: 1.3rem; font-weight: 700;
+      background: linear-gradient(135deg, var(--green), #34d399);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .service-dept {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      background: rgba(139,92,246,0.1);
+      color: var(--purple);
+      margin-top: 8px;
+    }
+    
+    .service-modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(8px);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .service-modal-overlay.active { display: flex; }
+    .service-modal {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      max-width: 600px;
+      width: 100%;
+      max-height: 85vh;
+      overflow-y: auto;
+      padding: 32px;
+      position: relative;
+      animation: modalIn 0.3s ease;
+    }
+    @keyframes modalIn {
+      from { opacity: 0; transform: scale(0.95) translateY(10px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .modal-close {
+      position: absolute;
+      top: 12px; right: 12px;
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: var(--bg-hover);
+      border: none;
+      color: white;
+      font-size: 1.2rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-close:hover { background: var(--red); }
+    
+    .skeleton-card {
+      height: 220px;
+      background: linear-gradient(90deg, var(--bg-card) 25%, var(--border) 50%, var(--bg-card) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: 16px;
+    }
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-muted);
+    }
+    .empty-state h3 { font-size: 1.5rem; margin-bottom: 8px; }
+    
+    .cta-section {
+      text-align: center;
+      padding: 60px 20px;
+      background: var(--bg-secondary);
+    }
+    .cta-section h2 { margin-bottom: 12px; }
+    .cta-section p { color: var(--text-muted); margin-bottom: 24px; }
+  </style>
 </head>
 <body>
+
 <nav class="navbar"><div class="nav-container">
   <a href="index.html" class="logo"><img src="https://rfogomnbicceentrhymy.supabase.co/storage/v1/object/public/Ascenda%20pics/logo.png" alt="Ascenda"></a>
   <div class="nav-links">
-    <a href="index.html">Home</a><a href="about.html">About</a><a href="services.html" class="active">Services</a><a href="marketplace.html">Marketplace</a><a href="jobs.html">Jobs</a><a href="news.html">News</a><a href="contact.html">Contact</a>
-    <a href="login.html" class="btn btn-outline auth-login-btn">Login</a><a href="register.html" class="btn btn-primary auth-register-btn">Sign Up</a>
+    <a href="index.html">Home</a>
+    <a href="about.html">About</a>
+    <a href="services.html" class="active">Services</a>
+    <a href="marketplace.html">Marketplace</a>
+    <a href="jobs.html">Jobs</a>
+    <a href="news.html">News</a>
+    <a href="contact.html">Contact</a>
+    <a href="login.html" class="btn btn-outline auth-login-btn">Login</a>
+    <a href="register.html" class="btn btn-primary auth-register-btn">Sign Up</a>
     <span class="auth-user-name" style="display:none;color:var(--blue);font-weight:600;"></span>
     <a href="#" class="btn btn-outline auth-logout-btn" style="display:none;">Logout</a>
   </div>
   <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
 </div></nav>
+
 <div class="mobile-nav" id="mobileNav">
-  <a href="index.html">Home</a><a href="about.html">About</a><a href="services.html">Services</a><a href="marketplace.html">Marketplace</a><a href="jobs.html">Jobs</a><a href="news.html">News</a><a href="contact.html">Contact</a><a href="login.html">Login</a><a href="register.html">Sign Up</a>
+  <a href="index.html">Home</a><a href="about.html">About</a><a href="services.html">Services</a>
+  <a href="marketplace.html">Marketplace</a><a href="jobs.html">Jobs</a><a href="news.html">News</a>
+  <a href="contact.html">Contact</a><a href="login.html">Login</a><a href="register.html">Sign Up</a>
 </div>
 
-<section class="section">
-  <div class="container">
-    <div class="section-header">
-      <span class="section-badge">What We Offer</span>
-      <h2>Our Services</h2>
-      <p>Comprehensive digital solutions administered by our expert team</p>
-    </div>
-    <div id="services-list" class="cards-grid">
-      <div class="skeleton" style="height:200px;"></div>
-    </div>
-  </div>
+<!-- Hero -->
+<section class="services-hero">
+  <h1>Our Services</h1>
+  <p>Professional solutions tailored for your needs. All services managed by Ascenda Groups.</p>
 </section>
 
-<section class="section section-dark">
-  <div class="container" style="text-align:center;">
-    <h2>Want to Apply for a Service?</h2>
-    <p style="color:var(--text-muted);margin-bottom:20px;">Register and submit your application. Our admin team will review it.</p>
-    <a href="register.html" class="btn btn-primary btn-xl">Register Now</a>
-  </div>
+<!-- Services Grid -->
+<div class="services-grid" id="services-container">
+  <div class="skeleton-card"></div>
+  <div class="skeleton-card"></div>
+  <div class="skeleton-card"></div>
+</div>
+
+<!-- CTA -->
+<section class="cta-section">
+  <h2>Interested in a Service?</h2>
+  <p>Register and apply to get started with any of our services.</p>
+  <a href="register.html" class="btn btn-primary btn-xl">Create Account</a>
+  <a href="contact.html" class="btn btn-outline btn-xl" style="margin-left:12px;">Contact Us</a>
 </section>
+
+<!-- Service Detail Modal -->
+<div class="service-modal-overlay" id="service-modal">
+  <div class="service-modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div id="modal-content"></div>
+  </div>
+</div>
 
 <footer class="footer"><div class="footer-content">
-  <div class="footer-links"><a href="index.html">Home</a><a href="about.html">About</a><a href="services.html">Services</a><a href="contact.html">Contact</a></div>
-  <p>© <span data-setting="copyright_year">2026</span> Ascenda Groups. CEO: <span data-setting="ceo_name">Eyakem Takele Kebede</span></p>
+  <div class="footer-links">
+    <a href="index.html">Home</a><a href="about.html">About</a><a href="services.html">Services</a><a href="contact.html">Contact</a>
+  </div>
+  <p>© 2026 Ascenda Groups. CEO: Eyakem Takele Kebede</p>
   <p><a href="https://t.me/ascendagroups" target="_blank">Telegram</a></p>
 </div></footer>
-<script src="supabase.js"></script><script src="script.js"></script>
+
+<script src="supabase.js"></script>
+<script src="script.js"></script>
+<script>
+// ========== INIT SUPABASE ==========
+if (!window.supabaseClient) {
+  window.supabaseClient = window.supabase.createClient(
+    window.SUPABASE_URL, 
+    window.SUPABASE_ANON_KEY, 
+    { auth: { persistSession: true, autoRefreshToken: true, storage: window.localStorage } }
+  );
+}
+const sb = window.supabaseClient;
+
+let allServices = [];
+
+// ========== LOAD ON PAGE READY ==========
+document.addEventListener('DOMContentLoaded', () => {
+  loadServices();
+});
+
+// ========== LOAD SERVICES ==========
+async function loadServices() {
+  const container = document.getElementById('services-container');
+  
+  // Show skeletons
+  container.innerHTML = '<div class="skeleton-card"></div><div class="skeleton-card"></div><div class="skeleton-card"></div>';
+  
+  try {
+    const { data, error } = await sb
+      .from('services')
+      .select('*, departments(name)')
+      .eq('is_active', true)
+      .order('created_at', { ascending: false });
+    
+    if (error) throw error;
+    
+    allServices = data || [];
+    renderServices(allServices);
+    
+  } catch (err) {
+    console.error('Error loading services:', err);
+    container.innerHTML = `
+      <div class="empty-state" style="grid-column:1/-1;">
+        <h3>⚠️ Error Loading Services</h3>
+        <p>Please try again later.</p>
+      </div>`;
+  }
+}
+
+// ========== RENDER SERVICES ==========
+function renderServices(services) {
+  const container = document.getElementById('services-container');
+  
+  if (!services || services.length === 0) {
+    container.innerHTML = `
+      <div class="empty-state" style="grid-column:1/-1;">
+        <h3>📦 No Services Available</h3>
+        <p>Check back soon for new services from Ascenda Groups.</p>
+      </div>`;
+    return;
+  }
+  
+  container.innerHTML = services.map(service => {
+    const icon = getServiceIcon(service.title);
+    return `
+      <div class="service-card" onclick="openServiceDetail('${service.id}')">
+        <div class="service-icon">${icon}</div>
+        <h3>${service.title}</h3>
+        <p>${(service.description || 'No description available.').substring(0, 120)}${service.description && service.description.length > 120 ? '...' : ''}</p>
+        ${service.price ? `<div class="service-price">${service.price}</div>` : ''}
+        ${service.departments?.name ? `<span class="service-dept">${service.departments.name}</span>` : ''}
+      </div>
+    `;
+  }).join('');
+}
+
+// ========== GET SERVICE ICON ==========
+function getServiceIcon(title) {
+  const t = (title || '').toLowerCase();
+  if (t.includes('web') || t.includes('website')) return '💻';
+  if (t.includes('forex') || t.includes('trading')) return '📈';
+  if (t.includes('market') || t.includes('sell')) return '🏪';
+  if (t.includes('agent') || t.includes('partner')) return '🤝';
+  if (t.includes('job') || t.includes('career')) return '💼';
+  if (t.includes('design') || t.includes('graphic')) return '🎨';
+  if (t.includes('mobile') || t.includes('app')) return '📱';
+  if (t.includes('consult') || t.includes('advice')) return '💡';
+  if (t.includes('support') || t.includes('help')) return '🛟';
+  if (t.includes('education') || t.includes('course')) return '📚';
+  if (t.includes('advertise') || t.includes('promo')) return '📢';
+  return '🔧';
+}
+
+// ========== OPEN SERVICE DETAIL MODAL ==========
+function openServiceDetail(serviceId) {
+  const service = allServices.find(s => s.id === serviceId);
+  if (!service) return;
+  
+  const modalContent = document.getElementById('modal-content');
+  modalContent.innerHTML = `
+    <div style="font-size:3rem;margin-bottom:12px;">${getServiceIcon(service.title)}</div>
+    <span class="badge badge-purple" style="margin-bottom:8px;">Service</span>
+    <h2 style="font-size:1.6rem;margin-bottom:8px;">${service.title}</h2>
+    ${service.departments?.name ? `<span class="service-dept" style="margin-bottom:16px;">${service.departments.name}</span>` : ''}
+    ${service.price ? `<div class="service-price" style="font-size:1.8rem;margin:12px 0;">${service.price}</div>` : ''}
+    <div style="color:var(--text-secondary);line-height:1.8;margin:16px 0;">
+      ${service.description || 'No description available.'}
+    </div>
+    <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border);">
+      <p style="color:var(--text-muted);font-size:0.9rem;">📅 Posted: ${new Date(service.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+    </div>
+    <a href="contact.html" class="btn btn-primary btn-block" style="margin-top:16px;">Inquire About This Service</a>
+  `;
+  
+  document.getElementById('service-modal').classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+// ========== CLOSE MODAL ==========
+function closeModal() {
+  document.getElementById('service-modal').classList.remove('active');
+  document.body.style.overflow = '';
+  document.getElementById('modal-content').innerHTML = '';
+}
+
+// Close on overlay click
+document.getElementById('service-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+// Close on Escape key
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeModal();
+});
+</script>
 </body>
 </html>
