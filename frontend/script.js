@@ -39,45 +39,161 @@ async function logout() {
   window.location.href = 'index.html';
 }
 
-// ========== MOBILE NAV ==========
+// ========== MOBILE NAV (Right Sidebar - Half Screen) ==========
 function initMobileNav() {
   const hamburger = document.getElementById('hamburger');
   const mobileNav = document.getElementById('mobileNav');
   if (!hamburger || !mobileNav) return;
   
-  mobileNav.style.display = 'none';
-  mobileNav.style.cssText = 'display:none;position:fixed;top:72px;left:0;right:0;height:calc(100vh-72px);background:rgba(3,7,18,0.98);backdrop-filter:blur(24px);z-index:998;overflow-y:auto;padding:20px;';
-  hamburger.style.cssText = 'display:none;flex-direction:column;gap:5px;cursor:pointer;padding:12px;z-index:1000;background:none;border:none;border-radius:8px;';
+  // Style the mobile nav - slides from right, half screen
+  mobileNav.style.cssText = `
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 70%;
+    max-width: 320px;
+    height: 100vh;
+    background: rgba(10, 15, 28, 0.98);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border-left: 1px solid #1e293b;
+    z-index: 998;
+    display: flex;
+    flex-direction: column;
+    padding: 80px 20px 40px;
+    overflow-y: auto;
+    transform: translateX(100%);
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: -10px 0 40px rgba(0,0,0,0.5);
+  `;
   
-  hamburger.querySelectorAll('span').forEach(s => s.style.cssText = 'display:block;width:26px;height:2.5px;background:#f1f5f9;border-radius:2px;transition:all 0.3s ease;');
+  // Overlay background
+  const overlay = document.createElement('div');
+  overlay.id = 'nav-overlay';
+  overlay.style.cssText = `
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 997;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.35s ease;
+  `;
+  document.body.appendChild(overlay);
   
+  // Hamburger button
+  hamburger.style.cssText = `
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    cursor: pointer;
+    padding: 12px;
+    z-index: 1000;
+    background: none;
+    border: none;
+    border-radius: 8px;
+  `;
+  
+  hamburger.querySelectorAll('span').forEach(s => {
+    s.style.cssText = `
+      display: block;
+      width: 26px;
+      height: 2.5px;
+      background: #f1f5f9;
+      border-radius: 2px;
+      transition: all 0.3s ease;
+    `;
+  });
+  
+  // Style mobile nav links
+  mobileNav.querySelectorAll('a').forEach(link => {
+    link.style.cssText = `
+      display: block;
+      width: 100%;
+      color: #f1f5f9;
+      text-decoration: none;
+      padding: 14px 18px;
+      font-size: 1rem;
+      font-weight: 500;
+      border-radius: 10px;
+      margin-bottom: 4px;
+      background: rgba(26, 35, 50, 0.6);
+      border: 1px solid transparent;
+      transition: all 0.2s ease;
+    `;
+    link.addEventListener('mouseenter', () => {
+      link.style.background = 'rgba(31, 42, 61, 0.8)';
+      link.style.borderColor = '#3b82f6';
+    });
+    link.addEventListener('mouseleave', () => {
+      link.style.background = 'rgba(26, 35, 50, 0.6)';
+      link.style.borderColor = 'transparent';
+    });
+  });
+  
+  // Open menu
   function open() {
     hamburger.classList.add('active');
-    mobileNav.style.display = 'flex';
-    mobileNav.style.flexDirection = 'column';
-    mobileNav.style.gap = '8px';
+    mobileNav.style.transform = 'translateX(0)';
+    overlay.style.opacity = '1';
+    overlay.style.pointerEvents = 'all';
     document.body.style.overflow = 'hidden';
+    
     const sp = hamburger.querySelectorAll('span');
-    sp[0].style.transform = 'rotate(45deg) translate(5px,6px)'; sp[0].style.background = '#3b82f6';
+    sp[0].style.transform = 'rotate(45deg) translate(5px, 6px)';
+    sp[0].style.background = '#3b82f6';
     sp[1].style.opacity = '0';
-    sp[2].style.transform = 'rotate(-45deg) translate(5px,-6px)'; sp[2].style.background = '#3b82f6';
+    sp[2].style.transform = 'rotate(-45deg) translate(5px, -6px)';
+    sp[2].style.background = '#3b82f6';
   }
   
+  // Close menu
   function close() {
     hamburger.classList.remove('active');
-    mobileNav.style.display = 'none';
+    mobileNav.style.transform = 'translateX(100%)';
+    overlay.style.opacity = '0';
+    overlay.style.pointerEvents = 'none';
     document.body.style.overflow = '';
+    
     const sp = hamburger.querySelectorAll('span');
-    sp[0].style.transform = 'rotate(0)'; sp[0].style.background = '#f1f5f9';
+    sp[0].style.transform = 'rotate(0)';
+    sp[0].style.background = '#f1f5f9';
     sp[1].style.opacity = '1';
-    sp[2].style.transform = 'rotate(0)'; sp[2].style.background = '#f1f5f9';
+    sp[2].style.transform = 'rotate(0)';
+    sp[2].style.background = '#f1f5f9';
   }
   
-  hamburger.addEventListener('click', (e) => { e.stopPropagation(); hamburger.classList.contains('active') ? close() : open(); });
-  mobileNav.querySelectorAll('a').forEach(l => { l.style.cssText = 'display:block;width:100%;color:#f1f5f9;text-decoration:none;padding:16px 20px;font-size:1.1rem;font-weight:500;border-radius:12px;background:rgba(26,35,50,0.7);border:1px solid #1e293b;'; l.addEventListener('click', close); });
+  // Events
+  hamburger.addEventListener('click', (e) => {
+    e.stopPropagation();
+    hamburger.classList.contains('active') ? close() : open();
+  });
   
-  function check() { hamburger.style.display = window.innerWidth <= 768 ? 'flex' : 'none'; if (window.innerWidth > 768) close(); }
-  window.addEventListener('resize', check); check();
+  overlay.addEventListener('click', close);
+  
+  mobileNav.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', close);
+  });
+  
+  // Responsive check
+  function check() {
+    if (window.innerWidth <= 768) {
+      hamburger.style.display = 'flex';
+    } else {
+      hamburger.style.display = 'none';
+      close();
+    }
+  }
+  
+  window.addEventListener('resize', check);
+  check();
+  
+  // Close on Escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && hamburger.classList.contains('active')) {
+      close();
+    }
+  });
 }
 
 // ========== SESSION ==========
