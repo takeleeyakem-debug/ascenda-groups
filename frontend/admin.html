@@ -6,6 +6,47 @@
   <title>Admin Panel – Ascenda Groups</title>
   <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  // ===== USERS (FIXED - Gets email from auth) =====
+async function loadUsers() {
+  // Get profiles
+  const { data: profiles, error } = await sb.from('profiles').select('*');
+  
+  if (error) {
+    console.error('Error:', error);
+    document.querySelector('#users-table tbody').innerHTML = '<tr><td colspan="4">Error loading users</td></tr>';
+    return;
+  }
+  
+  if (!profiles || profiles.length === 0) {
+    document.querySelector('#users-table tbody').innerHTML = '<tr><td colspan="4">No users found</td></tr>';
+    return;
+  }
+  
+  // For each profile, get the email from the profiles table (if exists) or show ID
+  document.querySelector('#users-table tbody').innerHTML = profiles.map(u => `
+    <tr>
+      <td>${u.full_name || '-'}</td>
+      <td>${u.email || u.id?.substring(0,8) + '...' || '-'}</td>
+      <td>${u.role || 'user'}</td>
+      <td>
+        <select onchange="updateRole('${u.id}', this.value)" style="padding:4px 8px;background:var(--bg);color:white;border:1px solid var(--border);border-radius:6px;">
+          <option ${u.role === 'user' ? 'selected' : ''}>user</option>
+          <option ${u.role === 'agent' ? 'selected' : ''}>agent</option>
+          <option ${u.role === 'worker' ? 'selected' : ''}>worker</option>
+          <option ${u.role === 'dept_admin' ? 'selected' : ''}>dept_admin</option>
+          <option ${u.role === 'admin' ? 'selected' : ''}>admin</option>
+        </select>
+        <button class="btn btn-danger btn-sm" onclick="deleteUser('${u.id}')">Del</button>
+      </td>
+    </tr>
+  `).join('');
+  
+  // Populate selects
+  const sel = document.getElementById('auth-user');
+  if (sel) sel.innerHTML = '<option value="">Select User</option>' + profiles.map(u => 
+    `<option value="${u.id}">${u.full_name || u.id?.substring(0,8)}</option>`
+  ).join('');
+}
   <style>
     .admin-wrapper { display: flex; min-height: 100vh; }
     .sidebar { width: 260px; background: var(--bg-card); border-right: 1px solid var(--border); padding: 20px; position: fixed; top: 0; left: 0; bottom: 0; overflow-y: auto; z-index: 90; transition: transform 0.3s; }
