@@ -1,366 +1,178 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ascenda Groups - My Profile</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link rel="stylesheet" href="style.css">
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #0a0e27;
-            color: #ffffff;
-        }
-
-        nav {
-            background: #0f1444;
-            padding: 1rem 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            border-bottom: 1px solid rgba(102, 126, 234, 0.2);
-        }
-
-        .nav-logo {
-            font-size: 1.5rem;
-            font-weight: 700;
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-decoration: none;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 2rem;
-            align-items: center;
-        }
-
-        .nav-links a {
-            color: #a0aec0;
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-
-        .nav-links a:hover {
-            color: #667eea;
-        }
-
-        .profile-container {
-            max-width: 800px;
-            margin: 2rem auto;
-            padding: 0 2rem;
-        }
-
-        .profile-header {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        .avatar-section {
-            position: relative;
-            display: inline-block;
-            margin-bottom: 1rem;
-        }
-
-        .avatar {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 3px solid #667eea;
-            cursor: pointer;
-            background: #1a1f4e;
-        }
-
-        .avatar-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            border-radius: 50%;
-            background: rgba(0,0,0,0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            transition: opacity 0.3s;
-            cursor: pointer;
-        }
-
-        .avatar-section:hover .avatar-overlay {
-            opacity: 1;
-        }
-
-        .profile-card {
-            background: linear-gradient(135deg, #1a1f4e, #0f1444);
-            border-radius: 15px;
-            padding: 2rem;
-            border: 1px solid rgba(102, 126, 234, 0.2);
-            margin-bottom: 2rem;
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: #667eea;
-            font-weight: 600;
-        }
-
-        .form-group input, .form-group textarea {
-            width: 100%;
-            padding: 0.8rem 1rem;
-            border-radius: 10px;
-            border: 1px solid rgba(102, 126, 234, 0.3);
-            background: #0a0e27;
-            color: white;
-            font-size: 1rem;
-        }
-
-        .form-group textarea {
-            min-height: 100px;
-            resize: vertical;
-        }
-
-        .form-group input:focus, .form-group textarea:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        .btn-save {
-            width: 100%;
-            padding: 1rem;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 1.1rem;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .btn-save:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
-        }
-
-        .success-message {
-            background: rgba(72, 187, 120, 0.2);
-            color: #48bb78;
-            padding: 1rem;
-            border-radius: 10px;
-            margin-top: 1rem;
-            text-align: center;
-            display: none;
-        }
-
-        @media (max-width: 768px) {
-            .nav-links {
-                display: none;
-                position: fixed;
-                top: 0;
-                right: -100%;
-                width: 300px;
-                height: 100vh;
-                background: #0f1444;
-                flex-direction: column;
-                padding: 2rem;
-                transition: right 0.3s ease;
-            }
-
-            .nav-links.active { right: 0; }
-            .hamburger { display: flex; }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profile – Ascenda Groups</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-    <nav>
-        <a href="index.html" class="nav-logo">ASCENDA</a>
-        <div class="nav-links" id="navLinks">
-            <a href="index.html">Home</a>
-            <a href="about.html">About</a>
-            <a href="services.html">Services</a>
-            <a href="marketplace.html">Marketplace</a>
-            <a href="jobs.html">Jobs</a>
-            <a href="news.html">News</a>
-            <a href="contact.html">Contact</a>
-            <a href="profile.html">Profile</a>
-            <a href="#" id="logoutBtn">Logout</a>
-        </div>
-    </nav>
 
-    <div class="profile-container">
-        <div class="profile-header">
-            <div class="avatar-section">
-                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150'%3E%3Crect fill='%231a1f4e' width='150' height='150'/%3E%3Ctext fill='%23667eea' x='50%25' y='50%25' text-anchor='middle' dy='.3em' font-size='60'%3E👤%3C/text%3E%3C/svg%3E" 
-                     alt="Avatar" class="avatar" id="avatarImg">
-                <div class="avatar-overlay" id="avatarOverlay">
-                    <span>Change Photo</span>
-                </div>
-            </div>
-            <h2 id="profileName">Loading...</h2>
-            <p id="profileEmail" style="color:#a0aec0;"></p>
-            <span id="profileRole" style="background:rgba(102,126,234,0.2);color:#667eea;padding:0.3rem 1rem;border-radius:20px;display:inline-block;margin-top:0.5rem;"></span>
-        </div>
-
-        <div class="profile-card">
-            <form id="profileForm">
-                <div class="form-group">
-                    <label>Full Name</label>
-                    <input type="text" id="fullName" required>
-                </div>
-                <div class="form-group">
-                    <label>Phone</label>
-                    <input type="tel" id="phone">
-                </div>
-                <div class="form-group">
-                    <label>Bio</label>
-                    <textarea id="bio" placeholder="Tell us about yourself..."></textarea>
-                </div>
-                <div class="form-group">
-                    <label>Position</label>
-                    <input type="text" id="position" placeholder="Your job title or role">
-                </div>
-                <div class="form-group">
-                    <label>Instagram</label>
-                    <input type="text" id="instagram" placeholder="@username">
-                </div>
-                <div class="form-group">
-                    <label>TikTok</label>
-                    <input type="text" id="tiktok" placeholder="@username">
-                </div>
-                <div class="form-group">
-                    <label>Telegram</label>
-                    <input type="text" id="telegram" placeholder="@username">
-                </div>
-                <button type="submit" class="btn-save">Save Changes</button>
-            </form>
-            <div class="success-message" id="successMessage">Profile updated successfully!</div>
-        </div>
+  <!-- UNIVERSAL NAVBAR -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="logo"><img src="https://rfogomnbicceentrhymy.supabase.co/storage/v1/object/public/Ascenda%20pics/logo.png" alt="Ascenda" style="height:36px;"></a>
+      <div class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="services.html">Services</a>
+        <a href="marketplace.html">Marketplace</a>
+        <a href="jobs.html">Jobs</a>
+        <a href="news.html">News</a>
+        <a href="contact.html">Contact</a>
+        <a href="login.html" class="btn btn-outline nav-login">Login</a>
+        <a href="register.html" class="btn btn-primary nav-register">Sign Up</a>
+        <a href="profile.html" class="btn btn-outline nav-profile" style="display:none;">👤 <span class="nav-username"></span></a>
+        <a href="admin.html" class="btn btn-outline nav-admin" style="display:none;color:#f59e0b;border-color:#f59e0b;">⚡ Admin</a>
+        <a href="#" class="btn btn-outline nav-logout" style="display:none;" onclick="logout()">Logout</a>
+      </div>
+      <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
     </div>
+  </nav>
+  <div class="mobile-nav" id="mobileNav">
+    <a href="index.html">🏠 Home</a><a href="about.html">📖 About</a><a href="services.html">🔧 Services</a><a href="marketplace.html">🏪 Marketplace</a><a href="jobs.html">💼 Jobs</a><a href="news.html">📰 News</a><a href="contact.html">✉️ Contact</a>
+    <a href="login.html" class="mob-login">🔑 Login</a><a href="register.html" class="mob-register">🚀 Sign Up</a>
+    <a href="profile.html" class="mob-profile" style="display:none;">👤 Profile</a>
+    <a href="admin.html" class="mob-admin" style="display:none;color:#f59e0b;">⚡ Admin</a>
+    <a href="#" class="mob-logout" style="display:none;" onclick="logout()">🚪 Logout</a>
+  </div>
 
-    <script src="supabase.js"></script>
-    <script>
-        let currentProfile = null;
-        let currentUser = null;
+  <!-- PROFILE CONTENT -->
+  <div style="max-width:500px; margin:40px auto; text-align:center; padding:20px;">
+    
+    <!-- Avatar -->
+    <img id="avatar" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Crect fill='%231a2332' width='120' height='120'/%3E%3Ctext fill='%2394a3b8' x='50%25' y='50%25' text-anchor='middle' dy='.3em' font-size='40'%3E👤%3C/text%3E%3C/svg%3E" style="width:120px;height:120px;border-radius:50%;object-fit:cover;cursor:pointer;border:3px solid var(--border);" onclick="document.getElementById('avatarInput').click()">
+    <input type="file" id="avatarInput" accept="image/*" onchange="uploadAvatar()" style="display:none;">
+    
+    <!-- User Info -->
+    <h2 id="displayName" style="margin-top:12px;">Loading...</h2>
+    <p id="displayEmail" style="color:var(--text-muted);"></p>
+    <span id="displayRole" style="background:var(--blue);color:white;padding:4px 12px;border-radius:20px;font-size:0.8rem;">USER</span>
+    <p id="displayBio" style="color:var(--text-muted);margin-top:8px;"></p>
+    
+    <!-- Social Links -->
+    <div id="socialLinks" style="display:flex;gap:10px;justify-content:center;margin-top:8px;"></div>
+    
+    <!-- Edit Button -->
+    <button class="btn btn-primary" onclick="toggleEdit()" style="margin-top:16px;">✏️ Edit Profile</button>
+    
+    <!-- Edit Form -->
+    <div id="editForm" style="display:none; text-align:left; margin-top:20px; background:var(--bg-card); padding:20px; border-radius:16px; border:1px solid var(--border);">
+      <div class="form-group"><label>Full Name</label><input id="editName" placeholder="Your name"></div>
+      <div class="form-group"><label>Bio</label><textarea id="editBio" rows="2" placeholder="About yourself..."></textarea></div>
+      <div class="form-group"><label>Phone</label><input id="editPhone" placeholder="Phone number"></div>
+      <div class="form-group"><label>Position</label><input id="editPosition" placeholder="Job title"></div>
+      <div class="form-group"><label>Instagram URL</label><input id="editInstagram" placeholder="https://instagram.com/..."></div>
+      <div class="form-group"><label>TikTok URL</label><input id="editTiktok" placeholder="https://tiktok.com/@..."></div>
+      <div class="form-group"><label>Telegram URL</label><input id="editTelegram" placeholder="https://t.me/..."></div>
+      <button class="btn btn-primary" onclick="saveProfile()">💾 Save</button>
+      <button class="btn btn-outline" onclick="toggleEdit()" style="margin-left:8px;">Cancel</button>
+      <p id="saveMsg" style="text-align:center;margin-top:8px;"></p>
+    </div>
+  </div>
 
-        async function loadProfile() {
-            currentUser = await checkAuth();
-            if (!currentUser) {
-                window.location.href = 'login.html';
-                return;
-            }
-
-            currentProfile = await getUserProfile(currentUser.id);
-            if (!currentProfile) {
-                console.error('Profile not found');
-                return;
-            }
-
-            // Populate form
-            document.getElementById('profileName').textContent = currentProfile.full_name || 'User';
-            document.getElementById('profileEmail').textContent = currentUser.email;
-            document.getElementById('profileRole').textContent = currentProfile.role || 'user';
-            
-            document.getElementById('fullName').value = currentProfile.full_name || '';
-            document.getElementById('phone').value = currentProfile.phone || '';
-            document.getElementById('bio').value = currentProfile.bio || '';
-            document.getElementById('position').value = currentProfile.position || '';
-            document.getElementById('instagram').value = currentProfile.instagram || '';
-            document.getElementById('tiktok').value = currentProfile.tiktok || '';
-            document.getElementById('telegram').value = currentProfile.telegram || '';
-
-            // Load avatar
-            if (currentProfile.avatar_url) {
-                document.getElementById('avatarImg').src = currentProfile.avatar_url;
-            }
+  <script src="supabase.js"></script>
+  <script src="script.js"></script>
+  <script>
+    // ========== USE GLOBAL SUPABASE CLIENT ==========
+    (async function() {
+      // Wait for supabase.js to create the client
+      if (!window.supabaseClient) {
+        window.supabaseClient = window.supabase.createClient(
+          window.SUPABASE_URL,
+          window.SUPABASE_ANON_KEY,
+          { auth: { persistSession: true, autoRefreshToken: true, storage: localStorage } }
+        );
+      }
+      
+      const supabase = window.supabaseClient;
+      
+      // Get user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { window.location.href = 'login.html'; return; }
+      
+      // Get profile
+      const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single();
+      const p = profile || {};
+      
+      // Display
+      document.getElementById('displayName').textContent = p.full_name || user.email?.split('@')[0] || 'User';
+      document.getElementById('displayEmail').textContent = user.email;
+      document.getElementById('displayRole').textContent = (p.role || 'user').toUpperCase();
+      document.getElementById('displayBio').textContent = p.bio || '';
+      
+      if (p.avatar_url) {
+        document.getElementById('avatar').src = p.avatar_url;
+      }
+      
+      // Social links
+      const socialDiv = document.getElementById('socialLinks');
+      let socialHTML = '';
+      if (p.instagram) socialHTML += `<a href="${p.instagram}" target="_blank" style="font-size:1.5rem;">📷</a>`;
+      if (p.tiktok) socialHTML += `<a href="${p.tiktok}" target="_blank" style="font-size:1.5rem;">🎵</a>`;
+      if (p.telegram) socialHTML += `<a href="${p.telegram}" target="_blank" style="font-size:1.5rem;">📱</a>`;
+      socialDiv.innerHTML = socialHTML;
+      
+      // Fill form
+      document.getElementById('editName').value = p.full_name || '';
+      document.getElementById('editBio').value = p.bio || '';
+      document.getElementById('editPhone').value = p.phone || '';
+      document.getElementById('editPosition').value = p.position || '';
+      document.getElementById('editInstagram').value = p.instagram || '';
+      document.getElementById('editTiktok').value = p.tiktok || '';
+      document.getElementById('editTelegram').value = p.telegram || '';
+      
+      // Upload avatar
+      window.uploadAvatar = async function() {
+        const file = document.getElementById('avatarInput').files[0];
+        if (!file) return;
+        const path = `avatars/${user.id}.jpg`;
+        const { error } = await supabase.storage.from('Ascenda pics').upload(path, file, { upsert: true, contentType: file.type });
+        if (error) { alert('Upload failed: ' + error.message); return; }
+        const url = `https://rfogomnbicceentrhymy.supabase.co/storage/v1/object/public/Ascenda%20pics/${path}`;
+        await supabase.from('profiles').update({ avatar_url: url }).eq('id', user.id);
+        document.getElementById('avatar').src = url;
+      };
+      
+      // Toggle edit form
+      window.toggleEdit = function() {
+        const form = document.getElementById('editForm');
+        form.style.display = form.style.display === 'none' ? 'block' : 'none';
+      };
+      
+      // Save profile
+      window.saveProfile = async function() {
+        const updates = {
+          full_name: document.getElementById('editName').value.trim(),
+          bio: document.getElementById('editBio').value.trim(),
+          phone: document.getElementById('editPhone').value.trim(),
+          position: document.getElementById('editPosition').value.trim(),
+          instagram: document.getElementById('editInstagram').value.trim(),
+          tiktok: document.getElementById('editTiktok').value.trim(),
+          telegram: document.getElementById('editTelegram').value.trim()
+        };
+        
+        const { error } = await supabase.from('profiles').update(updates).eq('id', user.id);
+        const msg = document.getElementById('saveMsg');
+        
+        if (error) {
+          msg.textContent = '❌ Error: ' + error.message;
+          msg.style.color = '#ef4444';
+        } else {
+          msg.textContent = '✅ Profile saved!';
+          msg.style.color = '#10b981';
+          setTimeout(() => location.reload(), 1000);
         }
-
-        // Update profile
-        document.getElementById('profileForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const updates = {
-                full_name: document.getElementById('fullName').value,
-                phone: document.getElementById('phone').value,
-                bio: document.getElementById('bio').value,
-                position: document.getElementById('position').value,
-                instagram: document.getElementById('instagram').value,
-                tiktok: document.getElementById('tiktok').value,
-                telegram: document.getElementById('telegram').value,
-            };
-
-            const { error } = await supabase
-                .from('profiles')
-                .update(updates)
-                .eq('id', currentUser.id);
-
-            if (error) {
-                alert('Error updating profile: ' + error.message);
-            } else {
-                const success = document.getElementById('successMessage');
-                success.style.display = 'block';
-                setTimeout(() => {
-                    success.style.display = 'none';
-                }, 3000);
-            }
-        });
-
-        // Avatar upload
-        document.getElementById('avatarOverlay').addEventListener('click', () => {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = 'image/*';
-            input.onchange = async (e) => {
-                const file = e.target.files[0];
-                if (!file) return;
-
-                const fileExt = file.name.split('.').pop();
-                const fileName = `${currentUser.id}-${Date.now()}.${fileExt}`;
-
-                const { error: uploadError } = await supabase.storage
-                    .from('Ascenda pics')
-                    .upload(fileName, file);
-
-                if (uploadError) {
-                    alert('Error uploading avatar: ' + uploadError.message);
-                    return;
-                }
-
-                const { data: { publicUrl } } = supabase.storage
-                    .from('Ascenda pics')
-                    .getPublicUrl(fileName);
-
-                // Update profile
-                await supabase
-                    .from('profiles')
-                    .update({ avatar_url: publicUrl })
-                    .eq('id', currentUser.id);
-
-                document.getElementById('avatarImg').src = publicUrl;
-            };
-            input.click();
-        });
-
-        // Logout
-        document.getElementById('logoutBtn').addEventListener('click', async (e) => {
-            e.preventDefault();
-            await supabase.auth.signOut();
-            window.location.href = 'landing.html';
-        });
-
-        loadProfile();
-    </script>
+      };
+      
+      // Logout
+      window.logout = async function() {
+        await supabase.auth.signOut();
+        window.location.href = 'landing.html';
+      };
+      
+    })();
+  </script>
 </body>
 </html>

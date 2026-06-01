@@ -1,207 +1,132 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ascenda Groups - Register</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0a0e27 0%, #1a1f4e 50%, #0f1444 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        .register-container {
-            background: rgba(26, 31, 78, 0.8);
-            backdrop-filter: blur(10px);
-            padding: 3rem;
-            border-radius: 20px;
-            border: 1px solid rgba(102, 126, 234, 0.3);
-            width: 100%;
-            max-width: 450px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-        }
-
-        .logo {
-            text-align: center;
-            font-size: 2rem;
-            font-weight: 700;
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 2rem;
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: #667eea;
-            font-weight: 600;
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 1rem;
-            border-radius: 10px;
-            border: 1px solid rgba(102, 126, 234, 0.3);
-            background: #0a0e27;
-            color: white;
-            font-size: 1rem;
-        }
-
-        .form-group input:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        .btn-register {
-            width: 100%;
-            padding: 1rem;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .btn-register:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
-        }
-
-        .error-message {
-            background: rgba(245, 101, 101, 0.2);
-            color: #f56565;
-            padding: 1rem;
-            border-radius: 10px;
-            margin-bottom: 1rem;
-            display: none;
-        }
-
-        .success-message {
-            background: rgba(72, 187, 120, 0.2);
-            color: #48bb78;
-            padding: 1rem;
-            border-radius: 10px;
-            margin-bottom: 1rem;
-            display: none;
-        }
-
-        .links {
-            text-align: center;
-            margin-top: 1.5rem;
-        }
-
-        .links a {
-            color: #667eea;
-            text-decoration: none;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register – Ascenda Groups</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-    <div class="register-container">
-        <div class="logo">ASCENDA</div>
-        <h2 style="text-align:center;margin-bottom:2rem;color:#a0aec0;">Create Account</h2>
-        
-        <div class="error-message" id="errorMessage"></div>
-        <div class="success-message" id="successMessage"></div>
-        
-        <form id="registerForm">
-            <div class="form-group">
-                <label>Full Name</label>
-                <input type="text" id="fullName" placeholder="Your full name" required>
-            </div>
-            <div class="form-group">
-                <label>Email</label>
-                <input type="email" id="email" placeholder="your@email.com" required>
-            </div>
-            <div class="form-group">
-                <label>Password</label>
-                <input type="password" id="password" placeholder="Min 6 characters" required minlength="6">
-            </div>
-            <button type="submit" class="btn-register">Create Account</button>
-        </form>
-        
-        <div class="links">
-            <p style="color:#a0aec0;">Already have an account? <a href="login.html">Sign In</a></p>
-            <p style="color:#a0aec0;margin-top:0.5rem;"><a href="landing.html">← Back to Home</a></p>
-        </div>
+  <!-- UNIVERSAL NAVBAR -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="logo"><img src="https://rfogomnbicceentrhymy.supabase.co/storage/v1/object/public/Ascenda%20pics/logo.png" alt="Ascenda" style="height:36px;"></a>
+      <div class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="services.html">Services</a>
+        <a href="marketplace.html">Marketplace</a>
+        <a href="jobs.html">Jobs</a>
+        <a href="news.html">News</a>
+        <a href="contact.html">Contact</a>
+        <a href="login.html" class="btn btn-outline nav-login">Login</a>
+        <a href="register.html" class="btn btn-primary nav-register">Sign Up</a>
+        <a href="profile.html" class="btn btn-outline nav-profile" style="display:none;">👤 <span class="nav-username"></span></a>
+        <a href="admin.html" class="btn btn-outline nav-admin" style="display:none;color:#f59e0b;border-color:#f59e0b;">⚡ Admin</a>
+        <a href="#" class="btn btn-outline nav-logout" style="display:none;" onclick="logout()">Logout</a>
+      </div>
+      <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
     </div>
+  </nav>
+  <div class="mobile-nav" id="mobileNav">
+    <a href="index.html">🏠 Home</a>
+    <a href="about.html">📖 About</a>
+    <a href="services.html">🔧 Services</a>
+    <a href="marketplace.html">🏪 Marketplace</a>
+    <a href="jobs.html">💼 Jobs</a>
+    <a href="news.html">📰 News</a>
+    <a href="contact.html">✉️ Contact</a>
+    <a href="login.html" class="mob-login">🔑 Login</a>
+    <a href="register.html" class="mob-register">🚀 Sign Up</a>
+    <a href="profile.html" class="mob-profile" style="display:none;">👤 Profile</a>
+    <a href="admin.html" class="mob-admin" style="display:none;color:#f59e0b;">⚡ Admin</a>
+    <a href="#" class="mob-logout" style="display:none;" onclick="logout()">🚪 Logout</a>
+  </div>
 
-    <script src="supabase.js"></script>
-    <script>
-        document.getElementById('registerForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const fullName = document.getElementById('fullName').value;
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const errorDiv = document.getElementById('errorMessage');
-            const successDiv = document.getElementById('successMessage');
-            
-            errorDiv.style.display = 'none';
-            successDiv.style.display = 'none';
-            
-            // Sign up
-            const { data, error } = await supabase.auth.signUp({
-                email,
-                password,
-                options: {
-                    data: { full_name: fullName }
-                }
-            });
-            
-            if (error) {
-                errorDiv.textContent = error.message;
-                errorDiv.style.display = 'block';
-                return;
-            }
-            
-            if (data.user) {
-                // Create profile
-                const { error: profileError } = await supabase
-                    .from('profiles')
-                    .insert({
-                        id: data.user.id,
-                        full_name: fullName,
-                        email: email,
-                        role: 'user'
-                    });
-                
-                if (profileError) {
-                    console.error('Profile creation error:', profileError);
-                }
-                
-                successDiv.textContent = 'Account created successfully! Redirecting...';
-                successDiv.style.display = 'block';
-                
-                setTimeout(() => {
-                    window.location.href = 'index.html';
-                }, 1500);
-            }
+  <!-- REGISTER FORM -->
+  <div class="form-container">
+    <h2>Create Account 🚀</h2>
+    <div id="reg-msg" style="display:none; padding:10px; border-radius:8px; margin-bottom:12px;"></div>
+    <div class="form-group">
+      <label>Full Name</label>
+      <input type="text" id="reg-name" required placeholder="Your full name">
+    </div>
+    <div class="form-group">
+      <label>Email</label>
+      <input type="email" id="reg-email" required placeholder="you@example.com">
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" id="reg-password" required placeholder="Min 6 characters" minlength="6">
+    </div>
+    <button class="btn btn-primary btn-block btn-lg" id="register-btn">Create Account</button>
+    <p style="text-align:center; margin-top:16px;">Already have an account? <a href="login.html">Login</a></p>
+  </div>
+
+  <footer class="footer">
+    <p>© <span data-setting="copyright_year">2026</span> Ascenda Groups. CEO: <span data-setting="ceo_name">Eyakem Takele Kebede</span></p>
+    <p><a href="https://t.me/ascendagroups" target="_blank">Telegram</a></p>
+  </footer>
+
+  <script src="supabase.js"></script>
+  <script>
+    const sbReg = window.supabaseClient || supabase.createClient(
+      'https://rfogomnbicceentrhymy.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmb2dvbW5iaWNjZWVudHJoeW15Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyNDQwOTEsImV4cCI6MjA5NTgyMDA5MX0.wke5a7GEdU2oepfKfSD-rthLTEmpk3GqVfFRM_MjZ9c'
+    );
+
+    document.getElementById('register-btn').addEventListener('click', async () => {
+      const name = document.getElementById('reg-name').value.trim();
+      const email = document.getElementById('reg-email').value.trim();
+      const password = document.getElementById('reg-password').value;
+      const msgEl = document.getElementById('reg-msg');
+
+      if (!name || !email || !password) {
+        msgEl.textContent = 'Please fill all fields.';
+        msgEl.style.display = 'block';
+        msgEl.style.color = '#ef4444';
+        return;
+      }
+
+      msgEl.textContent = 'Creating account...';
+      msgEl.style.display = 'block';
+      msgEl.style.color = '#f59e0b';
+
+      const { data, error } = await sbReg.auth.signUp({
+        email,
+        password,
+        options: { data: { full_name: name } }
+      });
+
+      if (error) {
+        msgEl.textContent = error.message;
+        msgEl.style.color = '#ef4444';
+        return;
+      }
+
+      // Ensure profile is created (trigger may have done it, but we upsert to be safe)
+      if (data.user) {
+        await sbReg.from('profiles').upsert({
+          id: data.user.id,
+          role: 'user',
+          full_name: name,
+          email: email
         });
-        
-        // Check if already logged in
-        (async () => {
-            const user = await checkAuth();
-            if (user) {
-                window.location.href = 'index.html';
-            }
-        })();
-    </script>
+      }
+
+      // Auto sign in after signup (email confirmation is disabled in Supabase)
+      const { error: signInError } = await sbReg.auth.signInWithPassword({ email, password });
+      if (signInError) {
+        msgEl.textContent = 'Account created but could not log in automatically. Please login.';
+        msgEl.style.color = '#ef4444';
+        setTimeout(() => window.location.href = 'login.html', 2000);
+        return;
+      }
+
+      window.location.href = 'index.html';
+    });
+  </script>
+  <script src="script.js"></script>
 </body>
 </html>

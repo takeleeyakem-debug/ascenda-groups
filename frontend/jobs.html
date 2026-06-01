@@ -1,443 +1,61 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ascenda Groups - Jobs</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link rel="stylesheet" href="style.css">
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #0a0e27;
-            color: #ffffff;
-        }
-
-        nav {
-            background: #0f1444;
-            padding: 1rem 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            border-bottom: 1px solid rgba(102, 126, 234, 0.2);
-        }
-
-        .nav-logo {
-            font-size: 1.5rem;
-            font-weight: 700;
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-decoration: none;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 2rem;
-            align-items: center;
-        }
-
-        .nav-links a {
-            color: #a0aec0;
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-
-        .nav-links a:hover, .nav-links a.active {
-            color: #667eea;
-        }
-
-        .hamburger {
-            display: none;
-            flex-direction: column;
-            gap: 5px;
-            cursor: pointer;
-        }
-
-        .hamburger span {
-            width: 25px;
-            height: 3px;
-            background: white;
-            border-radius: 3px;
-        }
-
-        .page-header {
-            text-align: center;
-            padding: 4rem 2rem 2rem;
-            background: linear-gradient(135deg, #1a1f4e, #0f1444);
-        }
-
-        .page-header h1 {
-            font-size: 3rem;
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 1rem;
-        }
-
-        .jobs-container {
-            max-width: 1200px;
-            margin: 2rem auto;
-            padding: 0 2rem;
-        }
-
-        .filters {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 2rem;
-            flex-wrap: wrap;
-        }
-
-        .filter-select {
-            padding: 0.8rem 1rem;
-            border-radius: 10px;
-            border: 1px solid rgba(102, 126, 234, 0.3);
-            background: #1a1f4e;
-            color: white;
-            font-size: 0.9rem;
-            cursor: pointer;
-        }
-
-        .filter-select:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        .jobs-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 2rem;
-        }
-
-        .job-card {
-            background: linear-gradient(135deg, #1a1f4e, #0f1444);
-            border-radius: 15px;
-            padding: 2rem;
-            border: 1px solid rgba(102, 126, 234, 0.2);
-            transition: all 0.3s;
-            cursor: pointer;
-            position: relative;
-        }
-
-        .job-card:hover {
-            transform: translateY(-5px);
-            border-color: #667eea;
-            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.2);
-        }
-
-        .job-type-badge {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-            padding: 0.3rem 0.8rem;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
-
-        .type-full-time { background: rgba(72, 187, 120, 0.2); color: #48bb78; }
-        .type-part-time { background: rgba(237, 137, 54, 0.2); color: #ed8936; }
-        .type-contract { background: rgba(159, 122, 234, 0.2); color: #9f7aea; }
-        .type-remote { background: rgba(56, 178, 172, 0.2); color: #38b2ac; }
-        .type-freelance { background: rgba(246, 173, 85, 0.2); color: #f6ad55; }
-
-        .job-title {
-            font-size: 1.3rem;
-            color: #667eea;
-            margin-bottom: 1rem;
-            padding-right: 80px;
-        }
-
-        .job-details {
-            color: #a0aec0;
-            margin-bottom: 1rem;
-            line-height: 1.6;
-        }
-
-        .job-meta {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-            margin-top: 1rem;
-            font-size: 0.9rem;
-            color: #718096;
-        }
-
-        .job-meta span {
-            display: flex;
-            align-items: center;
-            gap: 0.3rem;
-        }
-
-        .job-salary {
-            color: #f093fb;
-            font-weight: 600;
-            margin-top: 0.5rem;
-        }
-
-        .apply-btn {
-            display: inline-block;
-            margin-top: 1rem;
-            padding: 0.8rem 2rem;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            border-radius: 25px;
-            text-decoration: none;
-            transition: all 0.3s;
-            border: none;
-            cursor: pointer;
-            font-size: 0.9rem;
-        }
-
-        .apply-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
-        }
-
-        .no-jobs {
-            text-align: center;
-            padding: 3rem;
-            color: #a0aec0;
-            grid-column: 1 / -1;
-        }
-
-        @media (max-width: 768px) {
-            .nav-links {
-                display: none;
-                position: fixed;
-                top: 0;
-                right: -100%;
-                width: 300px;
-                height: 100vh;
-                background: #0f1444;
-                flex-direction: column;
-                padding: 2rem;
-                transition: right 0.3s ease;
-            }
-
-            .nav-links.active { right: 0; }
-            .hamburger { display: flex; }
-
-            .jobs-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .page-header h1 {
-                font-size: 2rem;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jobs – Ascenda Groups</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-    <nav>
-        <a href="index.html" class="nav-logo">ASCENDA</a>
-        <div class="nav-links" id="navLinks">
-            <a href="index.html">Home</a>
-            <a href="about.html">About</a>
-            <a href="services.html">Services</a>
-            <a href="marketplace.html">Marketplace</a>
-            <a href="jobs.html" class="active">Jobs</a>
-            <a href="news.html">News</a>
-            <a href="contact.html">Contact</a>
-            <a href="profile.html" id="profileLink">Profile</a>
-            <a href="#" id="logoutBtn">Logout</a>
-        </div>
-        <div class="hamburger" id="hamburger">
-            <span></span>
-            <span></span>
-            <span></span>
-        </div>
-    </nav>
-
-    <div class="page-header">
-        <h1>Job Opportunities</h1>
-        <p>Find your next career opportunity with Ascenda Groups</p>
+  <!-- UNIVERSAL NAVBAR -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="logo"><img src="https://rfogomnbicceentrhymy.supabase.co/storage/v1/object/public/Ascenda%20pics/logo.png" alt="Ascenda" style="height:36px;"></a>
+      <div class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="services.html">Services</a>
+        <a href="marketplace.html">Marketplace</a>
+        <a href="jobs.html">Jobs</a>
+        <a href="news.html">News</a>
+        <a href="contact.html">Contact</a>
+        <a href="login.html" class="btn btn-outline nav-login">Login</a>
+        <a href="register.html" class="btn btn-primary nav-register">Sign Up</a>
+        <a href="profile.html" class="btn btn-outline nav-profile" style="display:none;">👤 <span class="nav-username"></span></a>
+        <a href="admin.html" class="btn btn-outline nav-admin" style="display:none;color:#f59e0b;border-color:#f59e0b;">⚡ Admin</a>
+        <a href="#" class="btn btn-outline nav-logout" style="display:none;" onclick="logout()">Logout</a>
+      </div>
+      <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
     </div>
+  </nav>
+  <div class="mobile-nav" id="mobileNav">
+    <a href="index.html">🏠 Home</a>
+    <a href="about.html">📖 About</a>
+    <a href="services.html">🔧 Services</a>
+    <a href="marketplace.html">🏪 Marketplace</a>
+    <a href="jobs.html">💼 Jobs</a>
+    <a href="news.html">📰 News</a>
+    <a href="contact.html">✉️ Contact</a>
+    <a href="login.html" class="mob-login">🔑 Login</a>
+    <a href="register.html" class="mob-register">🚀 Sign Up</a>
+    <a href="profile.html" class="mob-profile" style="display:none;">👤 Profile</a>
+    <a href="admin.html" class="mob-admin" style="display:none;color:#f59e0b;">⚡ Admin</a>
+    <a href="#" class="mob-logout" style="display:none;" onclick="logout()">🚪 Logout</a>
+  </div>
 
-    <div class="jobs-container">
-        <div class="filters">
-            <select class="filter-select" id="typeFilter">
-                <option value="all">All Types</option>
-                <option value="Full-time">Full-time</option>
-                <option value="Part-time">Part-time</option>
-                <option value="Contract">Contract</option>
-                <option value="Remote">Remote</option>
-                <option value="Freelance">Freelance</option>
-            </select>
-            <select class="filter-select" id="departmentFilter">
-                <option value="all">All Departments</option>
-            </select>
-        </div>
+  <!-- JOB BOARD -->
+  <section class="container" style="padding:40px 20px;">
+    <h2>Job Board</h2>
+    <div id="jobs-list" class="cards-grid"></div>
+  </section>
 
-        <div class="jobs-grid" id="jobsGrid">
-            <div class="no-jobs">Loading jobs...</div>
-        </div>
-    </div>
+  <footer class="footer">
+    <p>© <span data-setting="copyright_year">2026</span> Ascenda Groups. CEO: <span data-setting="ceo_name">Eyakem Takele Kebede</span></p>
+    <p><a href="https://t.me/ascendagroups" target="_blank">Telegram</a></p>
+  </footer>
 
-    <script src="supabase.js"></script>
-    <script>
-        let allJobs = [];
-        let departments = [];
-
-        async function loadDepartments() {
-            const { data, error } = await supabase
-                .from('departments')
-                .select('*')
-                .eq('is_active', true);
-
-            if (!error && data) {
-                departments = data;
-                const select = document.getElementById('departmentFilter');
-                data.forEach(dept => {
-                    const option = document.createElement('option');
-                    option.value = dept.id;
-                    option.textContent = dept.name;
-                    select.appendChild(option);
-                });
-            }
-        }
-
-        async function loadJobs() {
-            const { data, error } = await supabase
-                .from('jobs')
-                .select('*, departments(name)')
-                .eq('is_active', true)
-                .order('created_at', { ascending: false });
-
-            const grid = document.getElementById('jobsGrid');
-            
-            if (error) {
-                grid.innerHTML = '<div class="no-jobs">Error loading jobs. Please try again.</div>';
-                console.error('Error:', error);
-                return;
-            }
-
-            if (!data || data.length === 0) {
-                grid.innerHTML = '<div class="no-jobs">No job openings at the moment. Check back later!</div>';
-                return;
-            }
-
-            allJobs = data;
-            applyFilters();
-        }
-
-        function applyFilters() {
-            const typeFilter = document.getElementById('typeFilter').value;
-            const deptFilter = document.getElementById('departmentFilter').value;
-
-            let filtered = allJobs;
-
-            if (typeFilter !== 'all') {
-                filtered = filtered.filter(job => job.type === typeFilter);
-            }
-
-            if (deptFilter !== 'all') {
-                filtered = filtered.filter(job => job.department_id === deptFilter);
-            }
-
-            displayJobs(filtered);
-        }
-
-        function displayJobs(jobs) {
-            const grid = document.getElementById('jobsGrid');
-            
-            if (jobs.length === 0) {
-                grid.innerHTML = '<div class="no-jobs">No jobs match your filters.</div>';
-                return;
-            }
-
-            grid.innerHTML = jobs.map(job => `
-                <div class="job-card">
-                    <span class="job-type-badge type-${(job.type || '').toLowerCase().replace(' ', '-')}">${job.type || 'N/A'}</span>
-                    <h3 class="job-title">${job.title}</h3>
-                    <p class="job-details">${job.description ? job.description.substring(0, 150) + '...' : 'No description'}</p>
-                    ${job.salary ? `<p class="job-salary">💰 ${job.salary}</p>` : ''}
-                    <div class="job-meta">
-                        ${job.location ? `<span>📍 ${job.location}</span>` : ''}
-                        ${job.departments ? `<span>🏢 ${job.departments.name}</span>` : ''}
-                        <span>📅 ${new Date(job.created_at).toLocaleDateString()}</span>
-                    </div>
-                    <button class="apply-btn" onclick="applyForJob('${job.id}')">Apply Now</button>
-                </div>
-            `).join('');
-        }
-
-        async function applyForJob(jobId) {
-            const user = await checkAuth();
-            if (!user) {
-                window.location.href = 'login.html';
-                return;
-            }
-
-            // Check if already applied
-            const { data: existing } = await supabase
-                .from('applications')
-                .select('*')
-                .eq('applicant_id', user.id)
-                .eq('type', 'job')
-                .single();
-
-            if (existing) {
-                alert('You have already applied for this position.');
-                return;
-            }
-
-            // Submit application
-            const { error } = await supabase
-                .from('applications')
-                .insert({
-                    applicant_id: user.id,
-                    type: 'job',
-                    message: `Applied for job: ${jobId}`,
-                    status: 'pending'
-                });
-
-            if (error) {
-                alert('Error submitting application. Please try again.');
-                console.error('Error:', error);
-            } else {
-                alert('Application submitted successfully! We will review it soon.');
-            }
-        }
-
-        document.getElementById('typeFilter').addEventListener('change', applyFilters);
-        document.getElementById('departmentFilter').addEventListener('change', applyFilters);
-
-        // Mobile navigation
-        document.getElementById('hamburger').addEventListener('click', () => {
-            document.getElementById('navLinks').classList.toggle('active');
-        });
-
-        document.querySelectorAll('#navLinks a').forEach(link => {
-            link.addEventListener('click', () => {
-                document.getElementById('navLinks').classList.remove('active');
-            });
-        });
-
-        // Auth check
-        async function init() {
-            const user = await checkAuth();
-            if (!user) {
-                document.getElementById('profileLink').href = 'login.html';
-                document.getElementById('profileLink').textContent = 'Login';
-                document.getElementById('logoutBtn').style.display = 'none';
-            } else {
-                document.getElementById('logoutBtn').addEventListener('click', async (e) => {
-                    e.preventDefault();
-                    await supabase.auth.signOut();
-                    window.location.href = 'landing.html';
-                });
-            }
-            await loadDepartments();
-            loadJobs();
-        }
-
-        init();
-    </script>
+  <script src="supabase.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
