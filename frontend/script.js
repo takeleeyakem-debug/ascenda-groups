@@ -1,4 +1,4 @@
-// Ascenda Groups - Final Script v6
+// Ascenda Groups - Script v7 FIXED
 const sb = window.supabaseClient || window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY, {
   auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, storage: window.localStorage }
 });
@@ -62,9 +62,10 @@ async function restoreSession() {
     currentUser = session.user;
     const { data: profile } = await sb.from('profiles').select('*').eq('id', currentUser.id).single();
     currentProfile = profile || { id: currentUser.id, role: 'user', full_name: currentUser.user_metadata?.full_name || currentUser.email };
-    isAdmin = currentProfile.role === 'admin' || currentProfile.role === 'ceo' || currentProfile.email === 'takeleeyakem@gmail.com';
+    isAdmin = currentProfile.role === 'admin' || currentProfile.role === 'ceo' || session.user.email === 'takeleeyakem@gmail.com';
     updateUIForRole();
-    // If on login/register/landing page while logged in, redirect
+    
+    // Only redirect if on auth pages while logged in
     const path = window.location.pathname;
     if (path.includes('login.html') || path.includes('register.html') || path.includes('landing.html')) {
       window.location.href = isAdmin ? 'admin.html' : 'index.html';
@@ -78,7 +79,7 @@ async function restoreSession() {
       currentUser = session.user;
       const { data: profile } = await sb.from('profiles').select('*').eq('id', currentUser.id).single();
       currentProfile = profile || { id: currentUser.id, role: 'user' };
-      isAdmin = currentProfile.role === 'admin' || currentProfile.role === 'ceo' || currentProfile.email === 'takeleeyakem@gmail.com';
+      isAdmin = currentProfile.role === 'admin' || currentProfile.role === 'ceo' || session.user.email === 'takeleeyakem@gmail.com';
       updateUIForRole();
     }
     if (event === 'SIGNED_OUT') {
@@ -117,23 +118,30 @@ function showToast(msg, isError = false) {
   setTimeout(() => t.remove(), 3000);
 }
 
-// ========== PAGE ROUTER ==========
+// ========== PAGE ROUTER (FIXED - No redirect for guests) ==========
 function initPageLogic() {
   const path = window.location.pathname;
+  
+  // index.html works for everyone (guest or logged in)
   if (path.includes('index.html') || path === '/' || path.endsWith('/frontend/')) {
-    if (!currentUser) { window.location.href = 'landing.html'; return; }
     loadHome();
+    return;
   }
-  else if (path.includes('about.html')) loadAbout();
+  
+  // Profile and dashboard require login
+  if (path.includes('profile.html') || path.includes('dashboard.html')) {
+    if (!currentUser) { window.location.href = 'login.html'; return; }
+  }
+  
+  if (path.includes('about.html')) loadAbout();
   else if (path.includes('services.html')) loadServices();
   else if (path.includes('marketplace.html')) loadMarketplace();
   else if (path.includes('jobs.html')) loadJobs();
   else if (path.includes('news.html')) loadNews();
   else if (path.includes('dashboard.html')) loadDashboard();
-  else if (path.includes('profile.html')) { if (!currentUser) window.location.href = 'login.html'; }
 }
 
-// ========== HOME (index.html) ==========
+// ========== PAGE LOADERS ==========
 async function loadHome() {
   const [jobs, services] = await Promise.all([
     sb.from('jobs').select('*').eq('is_active', true).limit(4),
