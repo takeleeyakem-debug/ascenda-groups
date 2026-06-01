@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Ascenda Groups Services - Web Dev, Forex, Agent Program, Marketplace, Jobs">
+  <title>Services - Ascenda Groups</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="logo"><img src="https://rfogomnbicceentrhymy.supabase.co/storage/v1/object/public/Ascenda%20pics/logo.png" alt="Ascenda Groups"></a>
+      <div class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="services.html" class="active">Services</a>
+        <a href="marketplace.html">Marketplace</a>
+        <a href="jobs.html">Jobs</a>
+        <a href="contact.html">Contact</a>
+        <a href="login.html" class="btn btn-outline auth-login-btn">Login</a>
+        <a href="register.html" class="btn btn-primary auth-register-btn">Sign Up</a>
+        <span class="auth-user-name" style="display:none;color:var(--accent-blue);font-weight:600;"></span>
+        <a href="#" class="btn btn-outline auth-logout-btn" style="display:none;" onclick="logout()">Logout</a>
+      </div>
+      <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+    </div>
+  </nav>
+  <div class="mobile-nav" id="mobileNav">
+    <a href="index.html">Home</a>
+    <a href="about.html">About</a>
+    <a href="services.html">Services</a>
+    <a href="marketplace.html">Marketplace</a>
+    <a href="jobs.html">Jobs</a>
+    <a href="contact.html">Contact</a>
+    <a href="login.html">Login</a>
+    <a href="register.html">Sign Up</a>
+  </div>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-badge">What We Offer</span>
+        <h2>Our Services</h2>
+        <p>Comprehensive digital solutions for everyone</p>
+      </div>
+
+      <div class="cards-grid">
+        <div class="card" id="web-dev">
+          <div class="card-icon">💻</div>
+          <span class="badge badge-blue">Development</span>
+          <h3>Website Development</h3>
+          <p>Custom full-stack websites for small businesses and entrepreneurs. Modern design, fast performance, mobile responsive.</p>
+          <ul style="color:var(--text-secondary);font-size:0.9rem;margin:12px 0;padding-left:20px;">
+            <li>Business Websites</li>
+            <li>E-commerce Stores</li>
+            <li>Portfolio Sites</li>
+            <li>Landing Pages</li>
+          </ul>
+          <a href="contact.html" class="card-link">Request a Website →</a>
+        </div>
+
+        <div class="card" id="forex">
+          <div class="card-icon">📈</div>
+          <span class="badge badge-green">Trading</span>
+          <h3>Forex Trading Hub</h3>
+          <p>Master the forex market with our comprehensive resources, signals, and educational materials.</p>
+          <ul style="color:var(--text-secondary);font-size:0.9rem;margin:12px 0;padding-left:20px;">
+            <li>Trading Education</li>
+            <li>Live Signals</li>
+            <li>Books & Courses</li>
+            <li>Telegram Community</li>
+          </ul>
+          <a href="#" class="card-link" onclick="alert('Join our Telegram channel!')">Join Community →</a>
+        </div>
+
+        <div class="card">
+          <div class="card-icon">🤝</div>
+          <span class="badge badge-gold">Partnership</span>
+          <h3>Agent Program</h3>
+          <p>Register as an agent, promote Ascenda services, and earn commissions on every successful referral.</p>
+          <ul style="color:var(--text-secondary);font-size:0.9rem;margin:12px 0;padding-left:20px;">
+            <li>Commission up to 10%</li>
+            <li>Real-time tracking</li>
+            <li>Dedicated dashboard</li>
+            <li>Admin support</li>
+          </ul>
+          <a href="register.html" class="card-link">Become an Agent →</a>
+        </div>
+
+        <div class="card">
+          <div class="card-icon">🏪</div>
+          <span class="badge badge-purple">Marketplace</span>
+          <h3>Multi-Category Marketplace</h3>
+          <p>Buy and sell anything: houses, cars, valuables, e-services, and digital products. Direct seller contact.</p>
+          <ul style="color:var(--text-secondary);font-size:0.9rem;margin:12px 0;padding-left:20px;">
+            <li>Houses & Properties</li>
+            <li>Cars & Vehicles</li>
+            <li>Value Items</li>
+            <li>E-Services & Digital Products</li>
+          </ul>
+          <a href="marketplace.html" class="card-link">Browse Marketplace →</a>
+        </div>
+
+        <div class="card">
+          <div class="card-icon">💼</div>
+          <span class="badge badge-blue">Careers</span>
+          <h3>Job Board</h3>
+          <p>Find jobs, business opportunities, and career paths. Apply directly and get connected with employers.</p>
+          <ul style="color:var(--text-secondary);font-size:0.9rem;margin:12px 0;padding-left:20px;">
+            <li>Full-time Jobs</li>
+            <li>Part-time Gigs</li>
+            <li>Business Opportunities</li>
+            <li>Youth Programs</li>
+          </ul>
+          <a href="jobs.html" class="card-link">View Jobs →</a>
+        </div>
+
+        <div class="card">
+          <div class="card-icon">📢</div>
+          <span class="badge badge-purple">Advertising</span>
+          <h3>Advertisement Center</h3>
+          <p>Promote your business, products, or services through our platform. Reach thousands of active users.</p>
+          <ul style="color:var(--text-secondary);font-size:0.9rem;margin:12px 0;padding-left:20px;">
+            <li>Banner Ads</li>
+            <li>Featured Listings</li>
+            <li>Sponsored Posts</li>
+            <li>Targeted Reach</li>
+          </ul>
+          <a href="contact.html" class="card-link">Advertise With Us →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-dark">
+    <div class="container" style="text-align:center;">
+      <h2 style="font-size:2rem;margin-bottom:16px;">Ready to Get Started?</h2>
+      <p style="color:var(--text-secondary);margin-bottom:24px;">Join Ascenda Groups today and unlock endless opportunities.</p>
+      <a href="register.html" class="btn btn-primary btn-xl">Create Free Account</a>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-links"><a href="index.html">Home</a><a href="about.html">About</a><a href="services.html">Services</a><a href="contact.html">Contact</a></div>
+      <p>© 2024 Ascenda Groups. All rights reserved.</p>
+      <p>CEO: Eyakem Takele Kbede | Empowering communities worldwide</p>
+    </div>
+  </footer>
+
+  <script src="supabase.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

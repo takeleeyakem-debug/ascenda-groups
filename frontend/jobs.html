@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Ascenda Jobs - Find Jobs, Business Opportunities, Youth Programs">
+  <title>Jobs - Ascenda Groups</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="logo"><img src="https://rfogomnbicceentrhymy.supabase.co/storage/v1/object/public/Ascenda%20pics/logo.png" alt="Ascenda Groups"></a>
+      <div class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="services.html">Services</a>
+        <a href="marketplace.html">Marketplace</a>
+        <a href="jobs.html" class="active">Jobs</a>
+        <a href="contact.html">Contact</a>
+        <a href="login.html" class="btn btn-outline auth-login-btn">Login</a>
+        <a href="register.html" class="btn btn-primary auth-register-btn">Sign Up</a>
+        <span class="auth-user-name" style="display:none;color:var(--accent-blue);font-weight:600;"></span>
+        <a href="#" class="btn btn-outline auth-logout-btn" style="display:none;" onclick="logout()">Logout</a>
+      </div>
+      <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+    </div>
+  </nav>
+  <div class="mobile-nav" id="mobileNav">
+    <a href="index.html">Home</a><a href="about.html">About</a><a href="services.html">Services</a><a href="marketplace.html">Marketplace</a><a href="jobs.html">Jobs</a><a href="contact.html">Contact</a><a href="login.html">Login</a><a href="register.html">Sign Up</a>
+  </div>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-badge">Careers</span>
+        <h2>Job Board</h2>
+        <p>Find jobs, business opportunities, and career paths tailored for you</p>
+      </div>
+      <div id="jobs-list" class="cards-grid"></div>
+    </div>
+  </section>
+
+  <section class="section section-dark">
+    <div class="container" style="text-align:center;">
+      <h2 style="margin-bottom:12px;">Don't See Your Fit?</h2>
+      <p style="color:var(--text-secondary);margin-bottom:20px;">Register and get notified when new opportunities arrive.</p>
+      <a href="register.html" class="btn btn-primary btn-lg">Create Account</a>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-links"><a href="index.html">Home</a><a href="about.html">About</a><a href="services.html">Services</a><a href="contact.html">Contact</a></div>
+      <p>© 2024 Ascenda Groups. All rights reserved.</p>
+      <p>CEO: Eyakem Takele Kbede | Empowering communities worldwide</p>
+    </div>
+  </footer>
+
+  <script src="supabase.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="About Ascenda Groups - CEO Eyakem Takele Kbede">
+  <title>About - Ascenda Groups</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="logo"><img src="https://rfogomnbicceentrhymy.supabase.co/storage/v1/object/public/Ascenda%20pics/logo.png" alt="Ascenda Groups"></a>
+      <div class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="about.html" class="active">About</a>
+        <a href="services.html">Services</a>
+        <a href="marketplace.html">Marketplace</a>
+        <a href="jobs.html">Jobs</a>
+        <a href="contact.html">Contact</a>
+        <a href="login.html" class="btn btn-outline auth-login-btn">Login</a>
+        <a href="register.html" class="btn btn-primary auth-register-btn">Sign Up</a>
+        <span class="auth-user-name" style="display:none;color:var(--accent-blue);font-weight:600;"></span>
+        <a href="#" class="btn btn-outline auth-logout-btn" style="display:none;" onclick="logout()">Logout</a>
+      </div>
+      <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+    </div>
+  </nav>
+  <div class="mobile-nav" id="mobileNav">
+    <a href="index.html">Home</a>
+    <a href="about.html">About</a>
+    <a href="services.html">Services</a>
+    <a href="marketplace.html">Marketplace</a>
+    <a href="jobs.html">Jobs</a>
+    <a href="contact.html">Contact</a>
+    <a href="login.html">Login</a>
+    <a href="register.html">Sign Up</a>
+  </div>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-badge">Our Story</span>
+        <h2>About Ascenda Groups</h2>
+        <p>Building bridges between opportunity and talent</p>
+      </div>
+
+      <div class="card" style="max-width:800px;margin:0 auto 32px;">
+        <h3 style="color:var(--accent-blue);">📜 Message from the CEO</h3>
+        <p style="font-size:1.1rem;line-height:1.8;margin:16px 0;">"Welcome to Ascenda Groups. My name is <strong>Eyakem Takele Kbede</strong>, and I founded this platform with one mission: to bridge the gap between opportunity and talent. We empower forex traders, support businesses with modern websites, create a marketplace where anyone can thrive, and provide jobs for the youth. Our agent program reflects my commitment to community growth. Join us and be part of something bigger."</p>
+        <p style="color:var(--text-muted);font-style:italic;">— Eyakem Takele Kbede, CEO & Founder</p>
+      </div>
+
+      <div class="cards-grid" style="max-width:800px;margin:0 auto;">
+        <div class="card">
+          <div class="card-icon">🎯</div>
+          <h3>Our Mission</h3>
+          <p>To provide accessible digital services, forex education, and economic opportunities for communities worldwide.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">👁️</div>
+          <h3>Our Vision</h3>
+          <p>To become the leading multi-service digital platform connecting traders, businesses, agents, and job seekers.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">💎</div>
+          <h3>Our Values</h3>
+          <p>Integrity, Innovation, Community, Excellence, and Empowerment in everything we do.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-dark">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-badge">Leadership</span>
+        <h2>Leadership Ladder</h2>
+      </div>
+      <div style="max-width:500px;margin:0 auto;">
+        <div class="card" style="text-align:center;border-color:var(--accent-gold);">
+          <h3 style="color:var(--accent-gold);">⭐ CEO</h3>
+          <p style="font-size:1.2rem;font-weight:700;">Eyakem Takele Kbede</p>
+        </div>
+        <div style="text-align:center;color:var(--text-muted);margin-top:8px;">▼</div>
+        <div class="card" style="text-align:center;">
+          <h3>Executive Team</h3>
+          <p style="color:var(--text-muted);">Coming Soon</p>
+        </div>
+        <div style="text-align:center;color:var(--text-muted);margin-top:8px;">▼</div>
+        <div class="card" style="text-align:center;">
+          <h3>Department Heads</h3>
+          <p style="color:var(--text-muted);">Coming Soon</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-links"><a href="index.html">Home</a><a href="about.html">About</a><a href="services.html">Services</a><a href="contact.html">Contact</a></div>
+      <p>© 2024 Ascenda Groups. All rights reserved.</p>
+      <p>CEO: Eyakem Takele Kbede | Empowering communities worldwide</p>
+    </div>
+  </footer>
+
+  <script src="supabase.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
