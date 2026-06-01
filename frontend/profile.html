@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profile - Ascenda Groups</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <nav class="navbar"><div class="nav-container">
+    <a href="index.html" class="logo"><img src="https://rfogomnbicceentrhymy.supabase.co/storage/v1/object/public/Ascenda%20pics/logo.png" alt="Ascenda"></a>
+    <div class="nav-links">
+      <a href="index.html">Home</a><a href="about.html">About</a><a href="services.html">Services</a><a href="marketplace.html">Marketplace</a><a href="jobs.html">Jobs</a><a href="contact.html">Contact</a>
+      <span class="auth-user-name" style="display:none;color:var(--blue);font-weight:600;"></span>
+      <a href="#" class="btn btn-outline auth-logout-btn" style="display:none;">Logout</a>
+      <a href="login.html" class="btn btn-outline auth-login-btn">Login</a>
+    </div>
+    <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+  </div></nav>
+  <div class="mobile-nav" id="mobileNav">
+    <a href="index.html">Home</a><a href="about.html">About</a><a href="services.html">Services</a><a href="marketplace.html">Marketplace</a><a href="jobs.html">Jobs</a><a href="contact.html">Contact</a><a href="dashboard.html">Dashboard</a>
+  </div>
+
+  <section class="section">
+    <div class="container" style="max-width:600px;">
+      <div class="form-container">
+        <h2>👤 My Profile</h2>
+        <div class="card" style="margin-bottom:16px;">
+          <p><strong>Name:</strong> <span id="profile-name">-</span></p>
+          <p><strong>Email:</strong> <span id="profile-email">-</span></p>
+          <p><strong>Role:</strong> <span id="profile-role">-</span></p>
+        </div>
+        <a href="dashboard.html" class="btn btn-primary btn-block">Go to Dashboard</a>
+        <button class="btn btn-outline btn-block mt-4" onclick="applyAsAgent()">Apply as Agent 🤝</button>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer"><div class="footer-content"><p>© 2024 Ascenda Groups. CEO: Eyakem Takele Kbede</p></div></footer>
+  <script src="supabase.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
