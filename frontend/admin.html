@@ -6,47 +6,6 @@
   <title>Admin Panel – Ascenda Groups</title>
   <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  // ===== USERS (FIXED - Gets email from auth) =====
-async function loadUsers() {
-  // Get profiles
-  const { data: profiles, error } = await sb.from('profiles').select('*');
-  
-  if (error) {
-    console.error('Error:', error);
-    document.querySelector('#users-table tbody').innerHTML = '<tr><td colspan="4">Error loading users</td></tr>';
-    return;
-  }
-  
-  if (!profiles || profiles.length === 0) {
-    document.querySelector('#users-table tbody').innerHTML = '<tr><td colspan="4">No users found</td></tr>';
-    return;
-  }
-  
-  // For each profile, get the email from the profiles table (if exists) or show ID
-  document.querySelector('#users-table tbody').innerHTML = profiles.map(u => `
-    <tr>
-      <td>${u.full_name || '-'}</td>
-      <td>${u.email || u.id?.substring(0,8) + '...' || '-'}</td>
-      <td>${u.role || 'user'}</td>
-      <td>
-        <select onchange="updateRole('${u.id}', this.value)" style="padding:4px 8px;background:var(--bg);color:white;border:1px solid var(--border);border-radius:6px;">
-          <option ${u.role === 'user' ? 'selected' : ''}>user</option>
-          <option ${u.role === 'agent' ? 'selected' : ''}>agent</option>
-          <option ${u.role === 'worker' ? 'selected' : ''}>worker</option>
-          <option ${u.role === 'dept_admin' ? 'selected' : ''}>dept_admin</option>
-          <option ${u.role === 'admin' ? 'selected' : ''}>admin</option>
-        </select>
-        <button class="btn btn-danger btn-sm" onclick="deleteUser('${u.id}')">Del</button>
-      </td>
-    </tr>
-  `).join('');
-  
-  // Populate selects
-  const sel = document.getElementById('auth-user');
-  if (sel) sel.innerHTML = '<option value="">Select User</option>' + profiles.map(u => 
-    `<option value="${u.id}">${u.full_name || u.id?.substring(0,8)}</option>`
-  ).join('');
-}
   <style>
     .admin-wrapper { display: flex; min-height: 100vh; }
     .sidebar { width: 260px; background: var(--bg-card); border-right: 1px solid var(--border); padding: 20px; position: fixed; top: 0; left: 0; bottom: 0; overflow-y: auto; z-index: 90; transition: transform 0.3s; }
@@ -104,7 +63,7 @@ async function loadUsers() {
 
     <main class="main-content">
       <div id="tab-users" class="tab-content active">
-        <div class="card"><h3>All Users</h3><table id="users-table"><thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Actions</th></tr></thead><tbody></tbody></table></div>
+        <div class="card"><h3>All Users</h3><table id="users-table"><thead><tr><th>Name</th><th>User ID</th><th>Role</th><th>Actions</th></tr></thead><tbody></tbody></table></div>
       </div>
       <div id="tab-departments" class="tab-content">
         <div class="card"><h3>Create Department</h3><div class="form-grid"><input id="dept-name" placeholder="Name"><input id="dept-desc" placeholder="Description"></div><button class="btn btn-primary" onclick="addDepartment()">Create</button></div>
@@ -197,15 +156,15 @@ async function loadUsers() {
       else if (tab === 'settings') await loadSettings();
     }
 
-    // ===== USERS =====
+    // ===== USERS (NO email column needed) =====
     async function loadUsers() {
       const { data } = await sb.from('profiles').select('*');
       document.querySelector('#users-table tbody').innerHTML = (data || []).map(u => `
-        <tr><td>${u.full_name||'-'}</td><td>${u.email||'-'}</td><td>${u.role}</td>
+        <tr><td>${u.full_name||'-'}</td><td style="font-size:0.8rem;color:var(--text-muted);">${u.id?.substring(0,12)}...</td><td>${u.role||'user'}</td>
         <td><select onchange="updateRole('${u.id}',this.value)" style="padding:4px 8px;background:var(--bg);color:white;border:1px solid var(--border);border-radius:6px;">
         <option ${u.role==='user'?'selected':''}>user</option><option ${u.role==='agent'?'selected':''}>agent</option><option ${u.role==='worker'?'selected':''}>worker</option><option ${u.role==='dept_admin'?'selected':''}>dept_admin</option><option ${u.role==='admin'?'selected':''}>admin</option></select>
-        <button class="btn btn-danger btn-sm" onclick="deleteUser('${u.id}')">Del</button></td></tr>`).join('') || '<tr><td colspan="4">No users</td></tr>';
-      document.getElementById('auth-user').innerHTML = '<option value="">Select</option>' + (data||[]).map(u => `<option value="${u.id}">${u.full_name||u.email||u.id}</option>`).join('');
+        <button class="btn btn-danger btn-sm" onclick="deleteUser('${u.id}')">Del</button></td></tr>`).join('') || '<tr><td colspan="4">No users found</td></tr>';
+      document.getElementById('auth-user').innerHTML = '<option value="">Select</option>' + (data||[]).map(u => `<option value="${u.id}">${u.full_name||u.id?.substring(0,8)}</option>`).join('');
     }
 
     window.updateRole = async function(id, role) { await sb.from('profiles').update({role}).eq('id',id); showToast('Updated'); loadUsers(); };
