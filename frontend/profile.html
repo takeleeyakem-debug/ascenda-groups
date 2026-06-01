@@ -1,74 +1,343 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Profile - Ascenda Groups</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Profile - Ascenda Groups</title>
   <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    .profile-wrapper { max-width: 650px; margin: 0 auto; padding: 30px 20px; }
+    
+    /* Cover */
+    .profile-cover { height: 180px; border-radius: 16px; background: linear-gradient(135deg, #1e3a5f, #0f172a); position: relative; overflow: hidden; background-size: cover; background-position: center; cursor: pointer; transition: all 0.3s; }
+    .profile-cover:hover { filter: brightness(1.1); }
+    .profile-cover .cover-upload { position: absolute; bottom: 10px; right: 10px; background: rgba(0,0,0,0.6); color: white; padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; cursor: pointer; border: none; }
+    .profile-cover input { display: none; }
+    
+    /* Avatar */
+    .profile-avatar-section { text-align: center; margin-top: -60px; position: relative; z-index: 2; }
+    .profile-avatar { width: 120px; height: 120px; border-radius: 50%; border: 4px solid var(--bg-card); object-fit: cover; cursor: pointer; transition: all 0.3s; box-shadow: 0 8px 30px rgba(0,0,0,0.5); }
+    .profile-avatar:hover { transform: scale(1.05); border-color: var(--blue); }
+    .avatar-upload { display: none; }
+    
+    /* Card */
+    .profile-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 30px; margin-top: 20px; }
+    .profile-card h3 { margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
+    
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+    .form-group input, .form-group textarea { width: 100%; padding: 12px; background: var(--bg-primary); border: 1px solid var(--border); color: white; border-radius: 10px; font-family: inherit; font-size: 0.95rem; }
+    .form-group textarea { resize: vertical; min-height: 80px; }
+    
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    
+    .btn { padding: 12px 24px; border-radius: 10px; font-weight: 600; cursor: pointer; border: none; transition: all 0.2s; }
+    .btn-primary { background: var(--blue); color: white; width: 100%; }
+    .btn-primary:hover { background: #2563eb; transform: translateY(-1px); }
+    .btn-outline { background: transparent; border: 1px solid var(--border); color: white; }
+    
+    .info-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border); }
+    .info-row .info-label { color: var(--text-muted); font-size: 0.85rem; }
+    .info-row .info-value { color: var(--text-primary); font-weight: 500; }
+    
+    .badge-role { display: inline-block; padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; }
+    .badge-admin { background: rgba(245,158,11,0.15); color: #f59e0b; }
+    .badge-user { background: rgba(59,130,246,0.15); color: #3b82f6; }
+    .badge-agent { background: rgba(16,185,129,0.15); color: #10b981; }
+    .badge-worker { background: rgba(139,92,246,0.15); color: #8b5cf6; }
+    
+    .toast { position: fixed; top: 20px; right: 20px; padding: 14px 20px; background: var(--bg-card); border: 1px solid #10b981; border-radius: 12px; color: white; z-index: 9999; font-size: 0.9rem; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+    .toast.error { border-color: #ef4444; }
+    
+    .skeleton { height: 200px; background: linear-gradient(90deg, var(--bg-card) 25%, var(--border) 50%, var(--bg-card) 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 16px; }
+    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+    
+    @media (max-width: 500px) { .form-row { grid-template-columns: 1fr; } }
+  </style>
 </head>
 <body>
+
 <nav class="navbar"><div class="nav-container">
   <a href="index.html" class="logo"><img src="https://rfogomnbicceentrhymy.supabase.co/storage/v1/object/public/Ascenda%20pics/logo.png" alt="Ascenda"></a>
   <div class="nav-links">
     <a href="index.html">Home</a><a href="dashboard.html">Dashboard</a>
     <span class="auth-user-name" style="color:var(--blue);font-weight:600;"></span>
-    <a href="#" class="btn btn-outline" onclick="logout()">Logout</a>
+    <a href="#" class="btn btn-outline auth-logout-btn" onclick="logout()">Logout</a>
+    <a href="login.html" class="btn btn-outline auth-login-btn">Login</a>
   </div>
   <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
 </div></nav>
-<div class="mobile-nav" id="mobileNav"><a href="index.html">Home</a><a href="dashboard.html">Dashboard</a></div>
+<div class="mobile-nav" id="mobileNav">
+  <a href="index.html">Home</a><a href="dashboard.html">Dashboard</a><a href="#" class="mobile-auth-logout" onclick="logout()">Logout</a>
+</div>
 
-<section class="section">
-  <div class="container" style="max-width:600px;">
-    <!-- Cover Photo -->
-    <div id="profile-cover" style="height:180px;background:var(--gradient-hero);border-radius:var(--radius-lg);background-size:cover;background-position:center;"></div>
+<div class="profile-wrapper">
+  
+  <!-- Cover Photo -->
+  <div class="profile-cover" id="profile-cover" onclick="document.getElementById('cover-input').click()" style="background-image: url('');">
+    <button class="cover-upload">📷 Change Cover</button>
+    <input type="file" id="cover-input" accept="image/*" onchange="uploadCover(this)">
+  </div>
+  
+  <!-- Avatar -->
+  <div class="profile-avatar-section">
+    <img src="https://via.placeholder.com/120" class="profile-avatar" id="profile-avatar" alt="Avatar" onclick="document.getElementById('avatar-input').click()">
+    <input type="file" id="avatar-input" accept="image/*" onchange="uploadAvatar(this)" style="display:none;">
+  </div>
+  
+  <!-- User Info -->
+  <div class="profile-card" style="text-align:center;">
+    <h2 id="display-name">Loading...</h2>
+    <span class="badge-role badge-user" id="display-role">USER</span>
+    <p style="color:var(--text-muted);margin-top:8px;" id="display-email"></p>
+    <p style="color:var(--text-secondary);margin-top:12px;" id="display-bio"></p>
     
-    <!-- Avatar -->
-    <div style="text-align:center;margin-top:-50px;">
-      <img id="profile-avatar" src="https://via.placeholder.com/120" style="width:100px;height:100px;border-radius:50%;border:3px solid var(--blue);object-fit:cover;">
-    </div>
-
-    <!-- Info -->
-    <div class="card text-center" style="margin-top:16px;">
-      <h2 id="profile-name">User</h2>
-      <span class="badge badge-blue" id="profile-role">USER</span>
-      <p id="profile-bio" style="margin-top:12px;">No bio yet</p>
-      
-      <div style="display:flex;gap:12px;justify-content:center;margin-top:16px;">
-        <a id="profile-instagram" href="#" class="btn btn-outline btn-icon">📷</a>
-        <a id="profile-tiktok" href="#" class="btn btn-outline btn-icon">🎵</a>
-        <a id="profile-telegram" href="#" class="btn btn-outline btn-icon">📱</a>
-      </div>
-    </div>
-
-    <!-- Edit Bio -->
-    <div class="card" style="margin-top:16px;">
-      <h3>Edit Profile</h3>
-      <div class="form-group"><label>Bio</label><textarea id="edit-bio" rows="3"></textarea></div>
-      <div class="form-group"><label>Instagram URL</label><input type="text" id="edit-instagram"></div>
-      <div class="form-group"><label>TikTok URL</label><input type="text" id="edit-tiktok"></div>
-      <div class="form-group"><label>Telegram URL</label><input type="text" id="edit-telegram"></div>
-      <button class="btn btn-primary btn-block" onclick="saveProfile()">Save Changes</button>
+    <div style="display:flex;gap:10px;justify-content:center;margin-top:16px;" id="social-links">
+      <a id="link-instagram" href="#" target="_blank" style="color:var(--text-muted);font-size:1.5rem;display:none;">📷</a>
+      <a id="link-tiktok" href="#" target="_blank" style="color:var(--text-muted);font-size:1.5rem;display:none;">🎵</a>
+      <a id="link-telegram" href="#" target="_blank" style="color:var(--text-muted);font-size:1.5rem;display:none;">📱</a>
+      <a id="link-website" href="#" target="_blank" style="color:var(--text-muted);font-size:1.5rem;display:none;">🌐</a>
     </div>
   </div>
-</section>
+  
+  <!-- Edit Form -->
+  <div class="profile-card" style="margin-top:20px;">
+    <h3>✏️ Edit Profile</h3>
+    
+    <div class="form-row">
+      <div class="form-group"><label>Full Name</label><input type="text" id="edit-name" placeholder="Your full name"></div>
+      <div class="form-group"><label>Phone</label><input type="text" id="edit-phone" placeholder="Phone number"></div>
+    </div>
+    
+    <div class="form-group"><label>Bio</label><textarea id="edit-bio" placeholder="Tell us about yourself..."></textarea></div>
+    
+    <div class="form-group"><label>Position / Job Title</label><input type="text" id="edit-position" placeholder="e.g., Developer, Trader"></div>
+    
+    <h4 style="margin:16px 0 12px;color:var(--text-muted);">Social Links</h4>
+    <div class="form-row">
+      <div class="form-group"><label>Instagram URL</label><input type="text" id="edit-instagram" placeholder="https://instagram.com/..."></div>
+      <div class="form-group"><label>TikTok URL</label><input type="text" id="edit-tiktok" placeholder="https://tiktok.com/@..."></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Telegram URL</label><input type="text" id="edit-telegram" placeholder="https://t.me/..."></div>
+      <div class="form-group"><label>Website</label><input type="text" id="edit-website" placeholder="https://..."></div>
+    </div>
+    
+    <button class="btn btn-primary" onclick="saveProfile()">💾 Save Changes</button>
+    <p id="save-status" style="text-align:center;margin-top:10px;display:none;"></p>
+  </div>
+  
+  <!-- Account Info -->
+  <div class="profile-card" style="margin-top:20px;">
+    <h3>🔐 Account Info</h3>
+    <div class="info-row"><span class="info-label">Email</span><span class="info-value" id="info-email">-</span></div>
+    <div class="info-row"><span class="info-label">Role</span><span class="info-value" id="info-role">-</span></div>
+    <div class="info-row"><span class="info-label">Member Since</span><span class="info-value" id="info-joined">-</span></div>
+    <div class="info-row"><span class="info-label">Worker ID</span><span class="info-value" id="info-worker-id">-</span></div>
+  </div>
+</div>
 
-<footer class="footer"><div class="footer-content"><p>© 2026 Ascenda Groups</p></div></footer>
 <script src="supabase.js"></script>
 <script>
-async function saveProfile() {
-  const bio = document.getElementById('edit-bio').value;
-  const instagram = document.getElementById('edit-instagram').value;
-  const tiktok = document.getElementById('edit-tiktok').value;
-  const telegram = document.getElementById('edit-telegram').value;
-  const { data: { user } } = await window.supabaseClient.auth.getUser();
-  if(user) {
-    await window.supabaseClient.from('profiles').update({bio, instagram, tiktok, telegram}).eq('id', user.id);
-    showToast('Profile updated!'); location.reload();
-  }
+// ========== INIT ==========
+if (!window.supabaseClient) {
+  window.supabaseClient = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY, {
+    auth: { persistSession: true, autoRefreshToken: true, storage: window.localStorage }
+  });
 }
+const sb = window.supabaseClient;
+
+let userProfile = null;
+let currentUser = null;
+
+async function init() {
+  const { data: { user } } = await sb.auth.getUser();
+  if (!user) { window.location.href = 'login.html'; return; }
+  currentUser = user;
+  
+  const { data: profile } = await sb.from('profiles').select('*').eq('id', user.id).single();
+  userProfile = profile || {};
+  
+  displayProfile();
+  populateForm();
+}
+
+async function logout() {
+  await sb.auth.signOut();
+  window.location.href = 'index.html';
+}
+
+// ========== DISPLAY PROFILE ==========
+function displayProfile() {
+  const p = userProfile;
+  
+  // Cover
+  if (p.cover_url) {
+    document.getElementById('profile-cover').style.backgroundImage = `url(${p.cover_url})`;
+  }
+  
+  // Avatar
+  if (p.avatar_url) {
+    document.getElementById('profile-avatar').src = p.avatar_url;
+  }
+  
+  // Info
+  document.getElementById('display-name').textContent = p.full_name || currentUser.email?.split('@')[0] || 'User';
+  document.getElementById('display-email').textContent = p.email || currentUser.email;
+  document.getElementById('display-bio').textContent = p.bio || 'No bio yet';
+  
+  // Role badge
+  const roleBadge = document.getElementById('display-role');
+  roleBadge.textContent = (p.role || 'user').toUpperCase();
+  roleBadge.className = 'badge-role';
+  if (p.role === 'admin' || p.role === 'ceo') roleBadge.classList.add('badge-admin');
+  else if (p.role === 'agent') roleBadge.classList.add('badge-agent');
+  else if (p.role === 'worker' || p.role === 'dept_admin') roleBadge.classList.add('badge-worker');
+  else roleBadge.classList.add('badge-user');
+  
+  // Social links
+  if (p.instagram) { document.getElementById('link-instagram').href = p.instagram; document.getElementById('link-instagram').style.display = 'inline'; }
+  if (p.tiktok) { document.getElementById('link-tiktok').href = p.tiktok; document.getElementById('link-tiktok').style.display = 'inline'; }
+  if (p.telegram) { document.getElementById('link-telegram').href = p.telegram; document.getElementById('link-telegram').style.display = 'inline'; }
+  if (p.website) { document.getElementById('link-website').href = p.website; document.getElementById('link-website').style.display = 'inline'; }
+  
+  // Account info
+  document.getElementById('info-email').textContent = p.email || currentUser.email;
+  document.getElementById('info-role').textContent = (p.role || 'user').toUpperCase();
+  document.getElementById('info-joined').textContent = p.created_at ? new Date(p.created_at).toLocaleDateString() : 'N/A';
+  document.getElementById('info-worker-id').textContent = p.worker_id || 'N/A';
+}
+
+// ========== POPULATE FORM ==========
+function populateForm() {
+  const p = userProfile;
+  document.getElementById('edit-name').value = p.full_name || '';
+  document.getElementById('edit-phone').value = p.phone || '';
+  document.getElementById('edit-bio').value = p.bio || '';
+  document.getElementById('edit-position').value = p.position || '';
+  document.getElementById('edit-instagram').value = p.instagram || '';
+  document.getElementById('edit-tiktok').value = p.tiktok || '';
+  document.getElementById('edit-telegram').value = p.telegram || '';
+  document.getElementById('edit-website').value = p.website || '';
+}
+
+// ========== UPLOAD AVATAR ==========
+async function uploadAvatar(input) {
+  const file = input.files[0];
+  if (!file) return;
+  
+  // Show loading
+  document.getElementById('profile-avatar').style.opacity = '0.5';
+  
+  const fileName = `avatars/${currentUser.id}_${Date.now()}.${file.name.split('.').pop()}`;
+  
+  const { data, error } = await sb.storage
+    .from('Ascenda pics')
+    .upload(fileName, file, { upsert: true });
+  
+  if (error) {
+    showToast('Upload failed: ' + error.message, true);
+    document.getElementById('profile-avatar').style.opacity = '1';
+    return;
+  }
+  
+  const url = `https://rfogomnbicceentrhymy.supabase.co/storage/v1/object/public/Ascenda%20pics/${fileName}`;
+  
+  // Update profile
+  await sb.from('profiles').update({ avatar_url: url }).eq('id', currentUser.id);
+  userProfile.avatar_url = url;
+  
+  document.getElementById('profile-avatar').src = url;
+  document.getElementById('profile-avatar').style.opacity = '1';
+  showToast('Profile picture updated!');
+}
+
+// ========== UPLOAD COVER ==========
+async function uploadCover(input) {
+  const file = input.files[0];
+  if (!file) return;
+  
+  document.getElementById('profile-cover').style.opacity = '0.7';
+  
+  const fileName = `covers/${currentUser.id}_${Date.now()}.${file.name.split('.').pop()}`;
+  
+  const { data, error } = await sb.storage
+    .from('Ascenda pics')
+    .upload(fileName, file, { upsert: true });
+  
+  if (error) {
+    showToast('Upload failed: ' + error.message, true);
+    document.getElementById('profile-cover').style.opacity = '1';
+    return;
+  }
+  
+  const url = `https://rfogomnbicceentrhymy.supabase.co/storage/v1/object/public/Ascenda%20pics/${fileName}`;
+  
+  await sb.from('profiles').update({ cover_url: url }).eq('id', currentUser.id);
+  userProfile.cover_url = url;
+  
+  document.getElementById('profile-cover').style.backgroundImage = `url(${url})`;
+  document.getElementById('profile-cover').style.opacity = '1';
+  showToast('Cover photo updated!');
+}
+
+// ========== SAVE PROFILE ==========
+async function saveProfile() {
+  const btn = document.querySelector('.btn-primary');
+  const status = document.getElementById('save-status');
+  
+  btn.disabled = true;
+  btn.textContent = 'Saving...';
+  status.style.display = 'none';
+  
+  const updates = {
+    full_name: document.getElementById('edit-name').value.trim(),
+    phone: document.getElementById('edit-phone').value.trim(),
+    bio: document.getElementById('edit-bio').value.trim(),
+    position: document.getElementById('edit-position').value.trim(),
+    instagram: document.getElementById('edit-instagram').value.trim(),
+    tiktok: document.getElementById('edit-tiktok').value.trim(),
+    telegram: document.getElementById('edit-telegram').value.trim(),
+    website: document.getElementById('edit-website').value.trim()
+  };
+  
+  const { error } = await sb.from('profiles').update(updates).eq('id', currentUser.id);
+  
+  if (error) {
+    status.textContent = '❌ Error: ' + error.message;
+    status.style.color = '#ef4444';
+    status.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = 'Save Changes';
+    return;
+  }
+  
+  // Update local profile
+  userProfile = { ...userProfile, ...updates };
+  displayProfile();
+  
+  status.textContent = '✅ Profile saved successfully!';
+  status.style.color = '#10b981';
+  status.style.display = 'block';
+  btn.disabled = false;
+  btn.textContent = '💾 Save Changes';
+  
+  setTimeout(() => { status.style.display = 'none'; }, 3000);
+}
+
+// ========== TOAST ==========
+function showToast(msg, isError = false) {
+  const t = document.createElement('div');
+  t.className = 'toast' + (isError ? ' error' : '');
+  t.textContent = (isError ? '❌ ' : '✅ ') + msg;
+  document.body.appendChild(t);
+  setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateX(100%)'; t.style.transition = 'all 0.3s'; setTimeout(() => t.remove(), 300); }, 3000);
+}
+
+// ========== START ==========
+init();
 </script>
-<script src="script.js"></script>
 </body>
 </html>
