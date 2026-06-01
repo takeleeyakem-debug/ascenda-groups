@@ -8,7 +8,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-  <!-- UNIVERSAL NAVBAR -->
+  <!-- ========== UNIVERSAL NAVBAR ========== -->
   <nav class="navbar">
     <div class="nav-container">
       <a href="landing.html" class="logo"><img src="https://rfogomnbicceentrhymy.supabase.co/storage/v1/object/public/Ascenda%20pics/logo.png" alt="Ascenda" style="height:36px;"></a>
@@ -30,24 +30,19 @@
     </div>
   </nav>
   <div class="mobile-nav" id="mobileNav">
-    <a href="landing.html">🏠 Home</a>
-    <a href="about.html">📖 About</a>
-    <a href="services.html">🔧 Services</a>
-    <a href="marketplace.html">🏪 Marketplace</a>
-    <a href="jobs.html">💼 Jobs</a>
-    <a href="news.html">📰 News</a>
+    <a href="landing.html">🏠 Home</a><a href="about.html">📖 About</a><a href="services.html">🔧 Services</a>
+    <a href="marketplace.html">🏪 Marketplace</a><a href="jobs.html">💼 Jobs</a><a href="news.html">📰 News</a>
     <a href="contact.html">✉️ Contact</a>
-    <a href="login.html" class="mob-login">🔑 Login</a>
-    <a href="register.html" class="mob-register">🚀 Sign Up</a>
+    <a href="login.html" class="mob-login">🔑 Login</a><a href="register.html" class="mob-register">🚀 Sign Up</a>
     <a href="profile.html" class="mob-profile" style="display:none;">👤 Profile</a>
     <a href="admin.html" class="mob-admin" style="display:none;color:#f59e0b;">⚡ Admin</a>
     <a href="#" class="mob-logout" style="display:none;" onclick="logout()">🚪 Logout</a>
   </div>
 
-  <!-- LOGIN FORM -->
+  <!-- ========== LOGIN FORM ========== -->
   <div class="form-container">
     <h2>Welcome Back 👋</h2>
-    <div id="login-msg" style="display:none; padding:10px; border-radius:8px; margin-bottom:12px;"></div>
+    <div id="login-msg" style="display:none;padding:10px;border-radius:8px;margin-bottom:12px;"></div>
     <div class="form-group">
       <label>Email</label>
       <input type="email" id="login-email" required placeholder="you@example.com">
@@ -57,7 +52,7 @@
       <input type="password" id="login-password" required placeholder="••••••••">
     </div>
     <button class="btn btn-primary btn-block btn-lg" id="login-btn">Login</button>
-    <p style="text-align:center; margin-top:16px;">No account? <a href="register.html">Sign Up</a></p>
+    <p style="text-align:center;margin-top:16px;">No account? <a href="register.html">Sign Up</a></p>
   </div>
 
   <footer class="footer">
@@ -66,10 +61,10 @@
   </footer>
 
   <script>
-    // ========== SUPABASE CLIENT ==========
+    // ========== INIT SUPABASE ==========
     const SUPABASE_URL = 'https://rfogomnbicceentrhymy.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmb2dvbW5iaWNjZWVudHJoeW15Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyNDQwOTEsImV4cCI6MjA5NTgyMDA5MX0.wke5a7GEdU2oepfKfSD-rthLTEmpk3GqVfFRM_MjZ9c';
-    const sbLogin = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
       auth: { persistSession: true, autoRefreshToken: true, storage: localStorage }
     });
 
@@ -78,8 +73,9 @@
       const email = document.getElementById('login-email').value.trim();
       const password = document.getElementById('login-password').value;
       const msgEl = document.getElementById('login-msg');
+      const btn = document.getElementById('login-btn');
 
-      // Reset message
+      // Reset
       msgEl.style.display = 'none';
 
       // Validate
@@ -92,7 +88,6 @@
       }
 
       // Loading state
-      const btn = document.getElementById('login-btn');
       btn.disabled = true;
       btn.textContent = 'Logging in...';
       msgEl.textContent = 'Logging in...';
@@ -101,7 +96,7 @@
       msgEl.style.background = 'rgba(245,158,11,0.1)';
 
       // Sign in
-      const { data, error } = await sbLogin.auth.signInWithPassword({ email, password });
+      const { data, error } = await sb.auth.signInWithPassword({ email, password });
 
       if (error) {
         msgEl.textContent = error.message;
@@ -112,27 +107,27 @@
         return;
       }
 
-      // Check if admin
-      const { data: profile } = await sbLogin
+      // Success – check role for redirect
+      const { data: profile } = await sb
         .from('profiles')
         .select('role')
         .eq('id', data.user.id)
         .single();
 
-      const isAdminUser = 
-        profile?.role === 'admin' || 
-        profile?.role === 'ceo' || 
-        email === 'takeleeyakem@gmail.com';
+      const isAdminUser =
+        email === 'takeleeyakem@gmail.com' ||
+        profile?.role === 'admin' ||
+        profile?.role === 'ceo';
 
       // Ensure profile exists
-      const { data: existingProfile } = await sbLogin
+      const { data: existingProfile } = await sb
         .from('profiles')
         .select('id')
         .eq('id', data.user.id)
         .single();
 
       if (!existingProfile) {
-        await sbLogin.from('profiles').insert({
+        await sb.from('profiles').insert({
           id: data.user.id,
           role: 'user',
           full_name: data.user.user_metadata?.full_name || email.split('@')[0],
@@ -150,7 +145,7 @@
 
     // ========== LOGOUT (for navbar) ==========
     window.logout = async function() {
-      await sbLogin.auth.signOut();
+      await sb.auth.signOut();
       window.location.href = 'landing.html';
     };
   </script>

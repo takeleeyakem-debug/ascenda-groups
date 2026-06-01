@@ -8,12 +8,12 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-  <!-- UNIVERSAL NAVBAR -->
+  <!-- ========== UNIVERSAL NAVBAR ========== -->
   <nav class="navbar">
     <div class="nav-container">
-      <a href="index.html" class="logo"><img src="https://rfogomnbicceentrhymy.supabase.co/storage/v1/object/public/Ascenda%20pics/logo.png" alt="Ascenda" style="height:36px;"></a>
+      <a href="landing.html" class="logo"><img src="https://rfogomnbicceentrhymy.supabase.co/storage/v1/object/public/Ascenda%20pics/logo.png" alt="Ascenda" style="height:36px;"></a>
       <div class="nav-links">
-        <a href="index.html">Home</a>
+        <a href="landing.html">Home</a>
         <a href="about.html">About</a>
         <a href="services.html">Services</a>
         <a href="marketplace.html">Marketplace</a>
@@ -30,24 +30,19 @@
     </div>
   </nav>
   <div class="mobile-nav" id="mobileNav">
-    <a href="index.html">🏠 Home</a>
-    <a href="about.html">📖 About</a>
-    <a href="services.html">🔧 Services</a>
-    <a href="marketplace.html">🏪 Marketplace</a>
-    <a href="jobs.html">💼 Jobs</a>
-    <a href="news.html">📰 News</a>
+    <a href="landing.html">🏠 Home</a><a href="about.html">📖 About</a><a href="services.html">🔧 Services</a>
+    <a href="marketplace.html">🏪 Marketplace</a><a href="jobs.html">💼 Jobs</a><a href="news.html">📰 News</a>
     <a href="contact.html">✉️ Contact</a>
-    <a href="login.html" class="mob-login">🔑 Login</a>
-    <a href="register.html" class="mob-register">🚀 Sign Up</a>
+    <a href="login.html" class="mob-login">🔑 Login</a><a href="register.html" class="mob-register">🚀 Sign Up</a>
     <a href="profile.html" class="mob-profile" style="display:none;">👤 Profile</a>
     <a href="admin.html" class="mob-admin" style="display:none;color:#f59e0b;">⚡ Admin</a>
     <a href="#" class="mob-logout" style="display:none;" onclick="logout()">🚪 Logout</a>
   </div>
 
-  <!-- REGISTER FORM -->
+  <!-- ========== REGISTER FORM ========== -->
   <div class="form-container">
     <h2>Create Account 🚀</h2>
-    <div id="reg-msg" style="display:none; padding:10px; border-radius:8px; margin-bottom:12px;"></div>
+    <div id="reg-msg" style="display:none;padding:10px;border-radius:8px;margin-bottom:12px;"></div>
     <div class="form-group">
       <label>Full Name</label>
       <input type="text" id="reg-name" required placeholder="Your full name">
@@ -61,7 +56,7 @@
       <input type="password" id="reg-password" required placeholder="Min 6 characters" minlength="6">
     </div>
     <button class="btn btn-primary btn-block btn-lg" id="register-btn">Create Account</button>
-    <p style="text-align:center; margin-top:16px;">Already have an account? <a href="login.html">Login</a></p>
+    <p style="text-align:center;margin-top:16px;">Already have an account? <a href="login.html">Login</a></p>
   </div>
 
   <footer class="footer">
@@ -69,31 +64,50 @@
     <p><a href="https://t.me/ascendagroups" target="_blank">Telegram</a></p>
   </footer>
 
-  <script src="supabase.js"></script>
   <script>
-    const sbReg = window.supabaseClient || supabase.createClient(
-      'https://rfogomnbicceentrhymy.supabase.co',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmb2dvbW5iaWNjZWVudHJoeW15Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyNDQwOTEsImV4cCI6MjA5NTgyMDA5MX0.wke5a7GEdU2oepfKfSD-rthLTEmpk3GqVfFRM_MjZ9c'
-    );
+    // ========== INIT SUPABASE ==========
+    const SUPABASE_URL = 'https://rfogomnbicceentrhymy.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmb2dvbW5iaWNjZWVudHJoeW15Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyNDQwOTEsImV4cCI6MjA5NTgyMDA5MX0.wke5a7GEdU2oepfKfSD-rthLTEmpk3GqVfFRM_MjZ9c';
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+    // ========== REGISTER HANDLER ==========
     document.getElementById('register-btn').addEventListener('click', async () => {
       const name = document.getElementById('reg-name').value.trim();
       const email = document.getElementById('reg-email').value.trim();
       const password = document.getElementById('reg-password').value;
       const msgEl = document.getElementById('reg-msg');
+      const btn = document.getElementById('register-btn');
 
+      // Reset
+      msgEl.style.display = 'none';
+
+      // Validate
       if (!name || !email || !password) {
         msgEl.textContent = 'Please fill all fields.';
         msgEl.style.display = 'block';
         msgEl.style.color = '#ef4444';
+        msgEl.style.background = 'rgba(239,68,68,0.1)';
         return;
       }
 
+      if (password.length < 6) {
+        msgEl.textContent = 'Password must be at least 6 characters.';
+        msgEl.style.display = 'block';
+        msgEl.style.color = '#ef4444';
+        msgEl.style.background = 'rgba(239,68,68,0.1)';
+        return;
+      }
+
+      // Loading state
+      btn.disabled = true;
+      btn.textContent = 'Creating account...';
       msgEl.textContent = 'Creating account...';
       msgEl.style.display = 'block';
       msgEl.style.color = '#f59e0b';
+      msgEl.style.background = 'rgba(245,158,11,0.1)';
 
-      const { data, error } = await sbReg.auth.signUp({
+      // Sign up
+      const { data, error } = await sb.auth.signUp({
         email,
         password,
         options: { data: { full_name: name } }
@@ -102,31 +116,47 @@
       if (error) {
         msgEl.textContent = error.message;
         msgEl.style.color = '#ef4444';
+        msgEl.style.background = 'rgba(239,68,68,0.1)';
+        btn.disabled = false;
+        btn.textContent = 'Create Account';
         return;
       }
 
-      // Ensure profile is created (trigger may have done it, but we upsert to be safe)
+      // Manually insert profile as backup (trigger should also do it)
       if (data.user) {
-        await sbReg.from('profiles').upsert({
+        await sb.from('profiles').upsert({
           id: data.user.id,
           role: 'user',
           full_name: name,
           email: email
         });
-      }
 
-      // Auto sign in after signup (email confirmation is disabled in Supabase)
-      const { error: signInError } = await sbReg.auth.signInWithPassword({ email, password });
-      if (signInError) {
-        msgEl.textContent = 'Account created but could not log in automatically. Please login.';
-        msgEl.style.color = '#ef4444';
-        setTimeout(() => window.location.href = 'login.html', 2000);
-        return;
-      }
+        // Auto sign in after signup (email confirmation disabled)
+        const { error: signInError } = await sb.auth.signInWithPassword({ email, password });
+        if (signInError) {
+          msgEl.textContent = 'Account created but could not log in automatically. Please login.';
+          msgEl.style.color = '#ef4444';
+          msgEl.style.background = 'rgba(239,68,68,0.1)';
+          btn.disabled = false;
+          btn.textContent = 'Create Account';
+          setTimeout(() => window.location.href = 'login.html', 2000);
+          return;
+        }
 
-      window.location.href = 'index.html';
+        // Redirect to home page
+        window.location.href = 'index.html';
+      }
     });
+
+    // ========== LOGOUT (for navbar) ==========
+    window.logout = async function() {
+      await sb.auth.signOut();
+      window.location.href = 'landing.html';
+    };
   </script>
+
+  <!-- Load shared script for mobile nav & auth UI -->
+  <script src="supabase.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
