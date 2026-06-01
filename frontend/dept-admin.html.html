@@ -1,0 +1,14 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Department Admin - Ascenda Groups</title><link rel="stylesheet" href="style.css"><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"><style>.dept-wrap{max-width:1000px;margin:0 auto;padding:30px 20px;}.dept-header{background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:30px;text-align:center;margin-bottom:30px;}.dept-header h1{font-size:1.8rem;}.card{background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:20px;}.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:12px;}input,select,textarea{width:100%;padding:10px;background:var(--bg-primary);border:1px solid var(--border);color:white;border-radius:8px;font-family:inherit;}textarea{resize:vertical;min-height:70px;}table{width:100%;border-collapse:collapse;}th{background:rgba(0,0,0,0.3);padding:10px;font-size:0.75rem;text-transform:uppercase;color:var(--text-muted);}td{padding:10px;border-bottom:1px solid var(--border);}.btn-sm{padding:6px 12px;font-size:0.8rem;}</style></head><body>
+<nav class="navbar"><div class="nav-container"><a href="index.html" class="logo"><img src="https://rfogomnbicceentrhymy.supabase.co/storage/v1/object/public/Ascenda%20pics/logo.png" alt="Ascenda"></a><div class="nav-links"><a href="index.html">Home</a><a href="dashboard.html">Dashboard</a><a href="#" class="btn btn-outline" onclick="logout()">Logout</a></div></div></nav>
+
+<div class="dept-wrap"><div class="dept-header"><h1>🏢 <span id="dept-name" style="color:var(--purple);">Department</span> Admin</h1></div>
+
+<div class="card"><h3>🔧 Add Service</h3><div class="form-grid"><input id="dept-svc-title" placeholder="Service Title*"><input id="dept-svc-price" placeholder="Price"></div><textarea id="dept-svc-desc" placeholder="Description" style="margin-bottom:12px;"></textarea><button class="btn btn-primary" onclick="addDeptService()">Add Service</button></div>
+
+<div class="card"><h3>📋 Department Services</h3><table><thead><tr><th>Title</th><th>Price</th><th>Actions</th></tr></thead><tbody id="dept-svc-tbody"></tbody></table></div>
+
+<div class="card"><h3>💼 Department Jobs</h3><table><thead><tr><th>Title</th><th>Location</th><th>Actions</th></tr></thead><tbody id="dept-job-tbody"></tbody></table></div>
+</div>
+
+<script src="supabase.js"></script><script src="script.js"></script>
+</body></html>

@@ -1,46 +1,19 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard - Ascenda Groups</title>
-  <link rel="stylesheet" href="style.css">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-</head>
-<body>
-<nav class="navbar"><div class="nav-container">
-  <a href="index.html" class="logo"><img src="https://rfogomnbicceentrhymy.supabase.co/storage/v1/object/public/Ascenda%20pics/logo.png" alt="Ascenda"></a>
-  <div class="nav-links">
-    <a href="index.html">Home</a><a href="profile.html">Profile</a>
-    <span class="auth-user-name" style="color:var(--blue);font-weight:600;"></span>
-    <a href="#" class="btn btn-outline" onclick="logout()">Logout</a>
-  </div>
-  <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
-</div></nav>
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Dashboard - Ascenda Groups</title><link rel="stylesheet" href="style.css"><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"></head><body>
+<nav class="navbar"><div class="nav-container"><a href="index.html" class="logo"><img src="https://rfogomnbicceentrhymy.supabase.co/storage/v1/object/public/Ascenda%20pics/logo.png" alt="Ascenda"></a><div class="nav-links"><a href="index.html">Home</a><a href="profile.html">Profile</a><span class="auth-user-name" style="color:var(--blue);font-weight:600;"></span><a href="#" class="btn btn-outline auth-logout-btn" style="display:none;">Logout</a><a href="login.html" class="btn btn-outline auth-login-btn">Login</a></div><button class="hamburger" id="hamburger"><span></span><span></span><span></span></button></div></nav>
 <div class="mobile-nav" id="mobileNav"><a href="index.html">Home</a><a href="profile.html">Profile</a></div>
 
-<section class="section">
-  <div class="container" style="max-width:800px;">
-    <h1>Welcome, <span id="dash-name">User</span>!</h1>
-    <p>Role: <strong id="dash-role">USER</strong></p>
+<section class="section"><div class="container" style="max-width:800px;">
+<div class="section-header"><h2>Welcome, <span id="dash-name">User</span>!</h2><p>Role: <strong id="dash-role">USER</strong></p></div>
 
-    <div class="card" style="margin:20px 0;">
-      <h3>👤 Quick Actions</h3>
-      <a href="profile.html" class="btn btn-outline">Edit Profile</a>
-      <button class="btn btn-primary mt-4" onclick="applyAsAgent()">Apply as Agent 🤝</button>
-      <button class="btn btn-outline mt-4" onclick="window.location.href='jobs.html'">Browse Jobs</button>
-    </div>
+<div class="card" style="margin-bottom:20px;"><h3>👤 Quick Actions</h3><div style="display:flex;flex-wrap:wrap;gap:12px;"><a href="profile.html" class="btn btn-outline">Edit Profile</a><button class="btn btn-primary" onclick="applyAsAgent()">Apply as Agent 🤝</button><a href="jobs.html" class="btn btn-outline">Browse Jobs</a><a href="marketplace.html" class="btn btn-outline">Marketplace</a></div></div>
 
-    <div id="admin-quick-links" style="display:none;">
-      <div class="card" style="border-color:var(--gold);">
-        <h3 style="color:var(--gold);">⚡ Admin Quick Links</h3>
-        <a href="admin.html" class="btn btn-gold">Admin Panel</a>
-      </div>
-    </div>
-  </div>
-</section>
+<div id="admin-quick-links" style="display:none;"><div class="card" style="border-color:var(--gold);margin-bottom:20px;"><h3 style="color:var(--gold);">⚡ Admin Access</h3><a href="admin.html" class="btn btn-gold btn-block">Full Admin Panel</a></div></div>
 
-<footer class="footer"><div class="footer-content"><p>© 2026 Ascenda Groups</p></div></footer>
+<div id="dept-admin-link" style="display:none;"><div class="card" style="border-color:var(--purple);margin-bottom:20px;"><h3 style="color:var(--purple);">🏢 Department Management</h3><p style="color:var(--text-muted);margin-bottom:12px;">Manage your department's jobs, services, and items.</p><a href="dept-admin.html" class="btn btn-primary btn-block">Manage Department</a></div></div>
+
+<div id="agent-panel" style="display:none;"><div class="card" style="border-color:var(--green);"><h3 style="color:var(--green);">🤝 Agent Dashboard</h3><p>Status: <strong id="agent-status">-</strong></p><p>Commission: <strong id="agent-rate">-</strong>%</p><p>Earnings: <strong style="color:var(--green);">$<span id="agent-earnings">0</span></strong></p></div></div>
+</div></section>
+
+<footer class="footer"><div class="footer-content"><p>© 2026 Ascenda Groups. CEO: Eyakem Takele Kebede</p></div></footer>
 <script src="supabase.js"></script><script src="script.js"></script>
-</body>
-</html>
+</body></html>
