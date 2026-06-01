@@ -8,33 +8,86 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-  <!-- NAVBAR (exactly as provided before, with mobile classes) -->
-  <nav class="navbar">...</nav>
-  <div class="mobile-nav" id="mobileNav">...</div>
+  <nav class="navbar"><div class="nav-container">
+    <a href="index.html" class="logo"><img src="https://rfogomnbicceentrhymy.supabase.co/storage/v1/object/public/Ascenda%20pics/logo.png" style="height:36px;"></a>
+    <div class="nav-links"><a href="index.html">Home</a><a href="#" onclick="logout()">Logout</a></div>
+  </div></nav>
 
-  <div style="max-width:600px; margin:40px auto; padding:0 20px;">
+  <div style="max-width:500px;margin:40px auto;text-align:center;padding:20px;">
     <img id="avatar" src="https://via.placeholder.com/120" style="width:120px;height:120px;border-radius:50%;object-fit:cover;cursor:pointer;" onclick="document.getElementById('avatarInput').click()">
-    <input type="file" id="avatarInput" accept="image/*" onchange="uploadAvatar(this)" style="display:none;">
-    <h2 id="name"></h2>
-    <p id="bio"></p>
-    <div id="social"></div>
-    <button onclick="openEdit()">Edit Profile</button>
-
-    <div id="editModal" style="display:none; background:var(--card); padding:20px; border-radius:16px; margin-top:20px;">
-      <input id="editName" placeholder="Name">
-      <textarea id="editBio" placeholder="Bio"></textarea>
-      <input id="editInstagram" placeholder="Instagram URL">
-      <input id="editTiktok" placeholder="TikTok URL">
-      <input id="editTelegram" placeholder="Telegram URL">
-      <button onclick="saveProfile()">Save</button>
+    <input type="file" id="avatarInput" accept="image/*" onchange="uploadAvatar()" style="display:none;">
+    <h2 id="name">Loading...</h2>
+    <p id="bio" style="color:var(--text-muted);"></p>
+    <p id="email" style="color:var(--text-muted);"></p>
+    <p id="role"></p>
+    <button class="btn btn-primary" onclick="document.getElementById('editForm').style.display='block'" style="margin-top:12px;">Edit Profile</button>
+    
+    <div id="editForm" style="display:none;text-align:left;margin-top:20px;">
+      <input id="editName" placeholder="Full Name" style="margin-bottom:8px;">
+      <textarea id="editBio" placeholder="Bio" rows="3" style="margin-bottom:8px;"></textarea>
+      <input id="editPhone" placeholder="Phone" style="margin-bottom:8px;">
+      <input id="editInstagram" placeholder="Instagram URL" style="margin-bottom:8px;">
+      <input id="editTiktok" placeholder="TikTok URL" style="margin-bottom:8px;">
+      <input id="editTelegram" placeholder="Telegram URL" style="margin-bottom:8px;">
+      <button class="btn btn-primary" onclick="saveProfile()">Save</button>
+      <button class="btn btn-outline" onclick="document.getElementById('editForm').style.display='none'" style="margin-left:8px;">Cancel</button>
+      <p id="saveMsg" style="margin-top:8px;"></p>
     </div>
   </div>
 
   <script src="supabase.js"></script>
   <script>
-    // Profile logic (upload avatar, save profile)
-    // Full working code as in previous profile page, but with mobile nav fix
+    const sb = window.supabaseClient || supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY, {auth:{persistSession:true}});
+    let user = null;
+
+    async function init() {
+      const {data:{user:u}} = await sb.auth.getUser();
+      if (!u) { location.href='login.html'; return; }
+      user = u;
+      const {data:p} = await sb.from('profiles').select('*').eq('id',user.id).single();
+      const profile = p || {};
+      document.getElementById('name').textContent = profile.full_name || user.email?.split('@')[0];
+      document.getElementById('bio').textContent = profile.bio || '';
+      document.getElementById('email').textContent = user.email;
+      document.getElementById('role').textContent = (profile.role||'user').toUpperCase();
+      if (profile.avatar_url) document.getElementById('avatar').src = profile.avatar_url;
+      document.getElementById('editName').value = profile.full_name || '';
+      document.getElementById('editBio').value = profile.bio || '';
+      document.getElementById('editPhone').value = profile.phone || '';
+      document.getElementById('editInstagram').value = profile.instagram || '';
+      document.getElementById('editTiktok').value = profile.tiktok || '';
+      document.getElementById('editTelegram').value = profile.telegram || '';
+    }
+
+    async function uploadAvatar() {
+      const file = document.getElementById('avatarInput').files[0];
+      if (!file) return;
+      const path = `avatars/${user.id}.jpg`;
+      const {error} = await sb.storage.from('Ascenda pics').upload(path, file, {upsert:true,contentType:file.type});
+      if (error) { alert('Upload failed'); return; }
+      const url = `https://rfogomnbicceentrhymy.supabase.co/storage/v1/object/public/Ascenda%20pics/${path}`;
+      await sb.from('profiles').update({avatar_url:url}).eq('id',user.id);
+      document.getElementById('avatar').src = url;
+    }
+
+    async function saveProfile() {
+      const updates = {
+        full_name: document.getElementById('editName').value,
+        bio: document.getElementById('editBio').value,
+        phone: document.getElementById('editPhone').value,
+        instagram: document.getElementById('editInstagram').value,
+        tiktok: document.getElementById('editTiktok').value,
+        telegram: document.getElementById('editTelegram').value
+      };
+      const {error} = await sb.from('profiles').update(updates).eq('id',user.id);
+      const msg = document.getElementById('saveMsg');
+      if (error) { msg.textContent = 'Error: '+error.message; msg.style.color = 'red'; }
+      else { msg.textContent = 'Saved!'; msg.style.color = 'green'; init(); }
+    }
+
+    async function logout() { await sb.auth.signOut(); location.href='landing.html'; }
+
+    init();
   </script>
-  <script src="script.js"></script>
 </body>
 </html>
