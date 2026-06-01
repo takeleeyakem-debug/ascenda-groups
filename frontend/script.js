@@ -72,7 +72,7 @@ async function restoreSession() {
     updateUI();
     const path = window.location.pathname;
     if (path.includes('login.html') || path.includes('register.html') || path.includes('landing.html')) {
-      window.location.href = isAdmin ? 'admin.html' : 'index.html';
+     window.location.href = 'index.html';
     }
   } else { updateUI(); }
 
