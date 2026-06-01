@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome – Ascenda Groups</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    .landing-hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 40px 20px;
+      background: linear-gradient(160deg, #030712 0%, #0f1729 40%, #1e3a5f 100%);
+    }
+    .landing-hero h1 { font-size: clamp(2.5rem, 6vw, 4rem); font-weight: 800; margin-bottom: 16px; }
+    .landing-hero .subtitle { color: var(--text-muted); font-size: 1.2rem; max-width: 600px; margin-bottom: 32px; }
+    .landing-buttons { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; }
+    .landing-section { padding: 80px 20px; text-align: center; max-width: 800px; margin: 0 auto; }
+    .landing-section h2 { font-size: 2rem; margin-bottom: 16px; }
+    .landing-section p { color: var(--text-muted); font-size: 1.05rem; line-height: 1.8; }
+    .landing-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 24px; margin-top: 40px; }
+    .landing-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 30px; text-align: center; }
+    .landing-card .icon { font-size: 2.5rem; margin-bottom: 12px; }
+    .landing-card h3 { margin-bottom: 8px; }
+    .landing-footer { text-align: center; padding: 30px; border-top: 1px solid var(--border); color: var(--text-muted); }
+    .navbar-landing { display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; background: transparent; position: absolute; top: 0; left: 0; right: 0; z-index: 10; }
+    .navbar-landing img { height: 36px; }
+    .navbar-landing a { color: white; text-decoration: none; margin-left: 16px; font-weight: 500; }
+  </style>
+</head>
+<body>
+
+  <!-- Simple top bar for landing -->
+  <div class="navbar-landing">
+    <a href="landing.html"><img src="https://rfogomnbicceentrhymy.supabase.co/storage/v1/object/public/Ascenda%20pics/logo.png" alt="Ascenda"></a>
+    <div>
+      <a href="login.html" class="btn btn-outline btn-sm">Login</a>
+      <a href="register.html" class="btn btn-primary btn-sm">Sign Up</a>
+    </div>
+  </div>
+
+  <!-- HERO -->
+  <section class="landing-hero">
+    <img src="https://rfogomnbicceentrhymy.supabase.co/storage/v1/object/public/Ascenda%20pics/banner.png" style="max-width:450px; border-radius:16px; margin-bottom:24px;">
+    <h1>Ascenda Groups</h1>
+    <p class="subtitle">Your all-in-one platform for forex trading education, website development, marketplace, agent partnerships, and youth job opportunities.</p>
+    <div class="landing-buttons">
+      <a href="register.html" class="btn btn-primary btn-xl">Get Started Free</a>
+      <a href="index.html" class="btn btn-outline btn-xl">Continue as Guest</a>
+    </div>
+  </section>
+
+  <!-- VISION -->
+  <section class="landing-section">
+    <h2>Our Vision</h2>
+    <p>To become the leading multi-service digital platform connecting traders, businesses, agents, and job seekers worldwide. We empower communities through innovation, integrity, and opportunity.</p>
+  </section>
+
+  <!-- ABOUT -->
+  <section class="landing-section" style="background: var(--bg-secondary);">
+    <h2>About Ascenda Groups</h2>
+    <p>Founded by <strong>Eyakem Takele Kebede</strong>, Ascenda Groups bridges the gap between talent and opportunity. From forex trading education to custom website development, our marketplace and agent program create real economic impact for youth and businesses alike.</p>
+  </section>
+
+  <!-- SERVICES PREVIEW -->
+  <section class="landing-section">
+    <h2>What We Offer</h2>
+    <div class="landing-cards">
+      <div class="landing-card"><div class="icon">💻</div><h3>Website Development</h3><p>Custom full-stack websites for small businesses.</p></div>
+      <div class="landing-card"><div class="icon">📈</div><h3>Forex Trading</h3><p>Education, signals, books & courses.</p></div>
+      <div class="landing-card"><div class="icon">🤝</div><h3>Agent Program</h3><p>Earn commissions by promoting our services.</p></div>
+      <div class="landing-card"><div class="icon">🏪</div><h3>Marketplace</h3><p>Buy & sell houses, cars, digital products.</p></div>
+      <div class="landing-card"><div class="icon">💼</div><h3>Job Board</h3><p>Find jobs and business opportunities.</p></div>
+      <div class="landing-card"><div class="icon">📢</div><h3>Advertisement Center</h3><p>Promote your business on our platform.</p></div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="landing-section" style="background: var(--bg-secondary);">
+    <h2>Ready to Join?</h2>
+    <p>Create your free account and unlock all features.</p>
+    <div style="margin-top:24px;">
+      <a href="register.html" class="btn btn-primary btn-xl">Create Account</a>
+      <a href="index.html" class="btn btn-outline btn-xl" style="margin-left:12px;">Explore as Guest</a>
+    </div>
+  </section>
+
+  <div class="landing-footer">
+    <p>© 2026 Ascenda Groups. CEO: Eyakem Takele Kebede</p>
+    <p><a href="https://t.me/ascendagroups" target="_blank">Telegram</a></p>
+  </div>
+
+  <script src="supabase.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

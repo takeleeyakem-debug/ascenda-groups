@@ -1,4 +1,4 @@
-// Ascenda Groups – Complete Script
+// Ascenda Groups - Final Script v6
 const sb = window.supabaseClient || window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY, {
   auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, storage: window.localStorage }
 });
@@ -7,14 +7,13 @@ let currentUser = null;
 let currentProfile = null;
 let isAdmin = false;
 
-// ---------- DOM READY ----------
 document.addEventListener('DOMContentLoaded', async () => {
   initMobileNav();
   await restoreSession();
   initPageLogic();
 });
 
-// ---------- MOBILE NAV (right slide, half screen) ----------
+// ========== MOBILE NAV ==========
 function initMobileNav() {
   const hamburger = document.getElementById('hamburger');
   const mobileNav = document.getElementById('mobileNav');
@@ -56,15 +55,20 @@ function initMobileNav() {
   });
 }
 
-// ---------- AUTH & SESSION ----------
+// ========== AUTH ==========
 async function restoreSession() {
   const { data: { session } } = await sb.auth.getSession();
   if (session?.user) {
     currentUser = session.user;
     const { data: profile } = await sb.from('profiles').select('*').eq('id', currentUser.id).single();
     currentProfile = profile || { id: currentUser.id, role: 'user', full_name: currentUser.user_metadata?.full_name || currentUser.email };
-    isAdmin = currentProfile.role === 'admin' || currentProfile.role === 'ceo' || currentProfile.email === window.CEO_EMAIL;
+    isAdmin = currentProfile.role === 'admin' || currentProfile.role === 'ceo' || currentProfile.email === 'takeleeyakem@gmail.com';
     updateUIForRole();
+    // If on login/register/landing page while logged in, redirect
+    const path = window.location.pathname;
+    if (path.includes('login.html') || path.includes('register.html') || path.includes('landing.html')) {
+      window.location.href = isAdmin ? 'admin.html' : 'index.html';
+    }
   } else {
     updateUIForRole();
   }
@@ -74,7 +78,7 @@ async function restoreSession() {
       currentUser = session.user;
       const { data: profile } = await sb.from('profiles').select('*').eq('id', currentUser.id).single();
       currentProfile = profile || { id: currentUser.id, role: 'user' };
-      isAdmin = currentProfile.role === 'admin' || currentProfile.role === 'ceo' || currentProfile.email === window.CEO_EMAIL;
+      isAdmin = currentProfile.role === 'admin' || currentProfile.role === 'ceo' || currentProfile.email === 'takeleeyakem@gmail.com';
       updateUIForRole();
     }
     if (event === 'SIGNED_OUT') {
@@ -87,6 +91,7 @@ function updateUIForRole() {
   const loggedIn = !!currentUser;
   document.querySelectorAll('.nav-login').forEach(e => e.style.display = loggedIn ? 'none' : 'inline-flex');
   document.querySelectorAll('.nav-register').forEach(e => e.style.display = loggedIn ? 'none' : 'inline-flex');
+  document.querySelectorAll('.nav-guest').forEach(e => e.style.display = loggedIn ? 'none' : 'inline-flex');
   document.querySelectorAll('.nav-profile').forEach(e => e.style.display = loggedIn ? 'inline-flex' : 'none');
   document.querySelectorAll('.nav-logout').forEach(e => e.style.display = loggedIn ? 'inline-flex' : 'none');
   document.querySelectorAll('.nav-admin').forEach(e => e.style.display = (loggedIn && isAdmin) ? 'inline-flex' : 'none');
@@ -96,12 +101,13 @@ function updateUIForRole() {
 
   document.querySelectorAll('.mob-login').forEach(e => e.style.display = loggedIn ? 'none' : 'block');
   document.querySelectorAll('.mob-register').forEach(e => e.style.display = loggedIn ? 'none' : 'block');
+  document.querySelectorAll('.mob-guest').forEach(e => e.style.display = loggedIn ? 'none' : 'block');
   document.querySelectorAll('.mob-profile').forEach(e => e.style.display = loggedIn ? 'block' : 'none');
   document.querySelectorAll('.mob-logout').forEach(e => e.style.display = loggedIn ? 'block' : 'none');
   document.querySelectorAll('.mob-admin').forEach(e => e.style.display = (loggedIn && isAdmin) ? 'block' : 'none');
 }
 
-async function logout() { await sb.auth.signOut(); window.location.href = 'index.html'; }
+async function logout() { await sb.auth.signOut(); window.location.href = 'landing.html'; }
 
 function showToast(msg, isError = false) {
   const t = document.createElement('div');
@@ -111,21 +117,23 @@ function showToast(msg, isError = false) {
   setTimeout(() => t.remove(), 3000);
 }
 
-// ---------- PAGE ROUTER ----------
+// ========== PAGE ROUTER ==========
 function initPageLogic() {
   const path = window.location.pathname;
-  if (path.includes('index.html') || path === '/' || path.endsWith('/frontend/')) loadHome();
+  if (path.includes('index.html') || path === '/' || path.endsWith('/frontend/')) {
+    if (!currentUser) { window.location.href = 'landing.html'; return; }
+    loadHome();
+  }
   else if (path.includes('about.html')) loadAbout();
   else if (path.includes('services.html')) loadServices();
   else if (path.includes('marketplace.html')) loadMarketplace();
   else if (path.includes('jobs.html')) loadJobs();
   else if (path.includes('news.html')) loadNews();
   else if (path.includes('dashboard.html')) loadDashboard();
-  // admin and dept-admin are self-contained, but we still call their init if needed
   else if (path.includes('profile.html')) { if (!currentUser) window.location.href = 'login.html'; }
 }
 
-// ---- dynamic page loaders (called by router) ----
+// ========== HOME (index.html) ==========
 async function loadHome() {
   const [jobs, services] = await Promise.all([
     sb.from('jobs').select('*').eq('is_active', true).limit(4),
@@ -142,49 +150,40 @@ async function loadAbout() {
     sb.from('profiles').select('*').or('role.eq.worker,role.eq.dept_admin'),
     sb.from('authority').select('*, profiles(full_name), departments(name)').order('level')
   ]);
-  const wc = document.getElementById('workers-grid');
-  if (wc) wc.innerHTML = (workers.data || []).map(w => `<div class="card text-center"><img src="${w.avatar_url || 'https://via.placeholder.com/100'}" style="width:80px;height:80px;border-radius:50%;margin:0 auto 12px;"><h3>${w.full_name}</h3><p>${w.position || 'Worker'}</p></div>`).join('') || '<p>No workers</p>';
-  const ac = document.getElementById('authority-ladder');
-  if (ac) ac.innerHTML = authority.data?.map(a => `<div class="card"><h3>${a.title} (Level ${a.level})</h3><p>${a.profiles?.full_name || 'Unassigned'} – ${a.departments?.name || 'N/A'}</p></div>`).join('') || '<p>No authority set</p>';
+  const wc = document.getElementById('workers-grid'); if (wc) wc.innerHTML = (workers.data || []).map(w => `<div class="card text-center"><img src="${w.avatar_url || 'https://via.placeholder.com/100'}" style="width:80px;height:80px;border-radius:50%;margin:0 auto 12px;"><h3>${w.full_name}</h3><p>${w.position || 'Worker'}</p></div>`).join('') || '<p>No workers</p>';
+  const ac = document.getElementById('authority-ladder'); if (ac) ac.innerHTML = authority.data?.map(a => `<div class="card"><h3>${a.title} (Level ${a.level})</h3><p>${a.profiles?.full_name || 'Unassigned'} – ${a.departments?.name || 'N/A'}</p></div>`).join('') || '<p>No authority set</p>';
 }
 
 async function loadServices() {
   const { data } = await sb.from('services').select('*, departments(name)').eq('is_active', true);
-  const c = document.getElementById('services-list');
-  if (c) c.innerHTML = (data || []).map(s => `<div class="card"><span class="badge badge-purple">Service</span><h3>${s.title}</h3><p>${(s.description || '').substring(0, 80)}...</p>${s.price ? `<p style="color:var(--green);">${s.price}</p>` : ''}${s.departments?.name ? `<span style="font-size:0.75rem;color:var(--purple);">${s.departments.name}</span>` : ''}</div>`).join('') || '<p>No services</p>';
+  const c = document.getElementById('services-list'); if (c) c.innerHTML = (data || []).map(s => `<div class="card"><span class="badge badge-purple">Service</span><h3>${s.title}</h3><p>${(s.description || '').substring(0, 80)}...</p>${s.price ? `<p style="color:var(--green);">${s.price}</p>` : ''}</div>`).join('') || '<p>No services</p>';
 }
 
 async function loadMarketplace() {
   const { data } = await sb.from('marketplace_items').select('*').eq('is_active', true);
-  const c = document.getElementById('marketplace-list');
-  if (c) c.innerHTML = data?.map(i => `<div class="card"><span class="badge badge-green">${i.category}</span><h3>${i.title}</h3><p style="color:var(--green);">$${i.price}</p><p>${i.description || ''}</p><small>📞 ${i.seller_contact || 'N/A'}</small></div>`).join('') || '<p>No items</p>';
+  const c = document.getElementById('marketplace-list'); if (c) c.innerHTML = data?.map(i => `<div class="card"><span class="badge badge-green">${i.category}</span><h3>${i.title}</h3><p style="color:var(--green);">$${i.price}</p><p>${i.description || ''}</p><small>📞 ${i.seller_contact || 'N/A'}</small></div>`).join('') || '<p>No items</p>';
 }
 
 async function loadJobs() {
   const { data } = await sb.from('jobs').select('*').eq('is_active', true);
-  const c = document.getElementById('jobs-list');
-  if (c) c.innerHTML = data?.map(j => `<div class="card"><span class="badge badge-blue">Job</span><h3>${j.title}</h3><p>📍 ${j.location || 'Remote'}</p><p>${j.description || ''}</p><button class="btn btn-primary" onclick="applyForJob('${j.id}')">Apply</button></div>`).join('') || '<p>No jobs</p>';
+  const c = document.getElementById('jobs-list'); if (c) c.innerHTML = data?.map(j => `<div class="card"><span class="badge badge-blue">Job</span><h3>${j.title}</h3><p>📍 ${j.location || 'Remote'}</p><p>${j.description || ''}</p><button class="btn btn-primary" onclick="applyForJob('${j.id}')">Apply</button></div>`).join('') || '<p>No jobs</p>';
 }
 
 async function applyForJob(jobId) {
   if (!currentUser) { showToast('Login first', true); window.location.href = 'login.html'; return; }
   const { error } = await sb.from('job_applications').insert({ job_id: jobId, applicant_id: currentUser.id });
-  error ? showToast('Failed: ' + error.message, true) : showToast('Applied!');
+  error ? showToast('Failed', true) : showToast('Applied!');
 }
 
 async function loadNews() {
   const { data } = await sb.from('news_posts').select('*').eq('is_published', true).order('created_at', { ascending: false });
-  const c = document.getElementById('news-list');
-  if (c) c.innerHTML = data?.map(n => `<div class="card">${n.media_url ? (n.type === 'video' ? `<video src="${n.media_url}" controls style="width:100%;border-radius:8px;"></video>` : `<img src="${n.media_url}" style="width:100%;border-radius:8px;">`) : ''}<span class="badge badge-gold">${n.type}</span><h3>${n.title}</h3><p>${n.content || ''}</p></div>`).join('') || '<p>No news</p>';
+  const c = document.getElementById('news-list'); if (c) c.innerHTML = data?.map(n => `<div class="card">${n.media_url ? (n.type === 'video' ? `<video src="${n.media_url}" controls style="width:100%;border-radius:8px;"></video>` : `<img src="${n.media_url}" style="width:100%;border-radius:8px;">`) : ''}<span class="badge badge-gold">${n.type}</span><h3>${n.title}</h3><p>${n.content || ''}</p></div>`).join('') || '<p>No news</p>';
 }
 
 async function loadDashboard() {
   if (!currentUser) { window.location.href = 'login.html'; return; }
   document.getElementById('dash-name').textContent = currentProfile?.full_name || 'User';
   document.getElementById('dash-role').textContent = (currentProfile?.role || 'user').toUpperCase();
-  if (isAdmin) {
-    document.getElementById('admin-link').style.display = 'block';
-    document.getElementById('dept-link').style.display = 'block';
-  }
+  if (isAdmin) { document.getElementById('admin-link').style.display = 'block'; document.getElementById('dept-link').style.display = 'block'; }
   if (currentProfile?.role === 'dept_admin') document.getElementById('dept-link').style.display = 'block';
 }
