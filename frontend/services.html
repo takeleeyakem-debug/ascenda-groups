@@ -8,13 +8,44 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-  <!-- Universal Navbar (copy from above) -->
-  <nav class="navbar">...</nav>
-  <div class="mobile-nav" id="mobileNav">...</div>
+  <!-- ========== NAVBAR ========== -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="logo"><img src="https://rfogomnbicceentrhymy.supabase.co/storage/v1/object/public/Ascenda%20pics/logo.png" alt="Ascenda" style="height:36px;"></a>
+      <div class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="services.html" class="active">Services</a>
+        <a href="marketplace.html">Marketplace</a>
+        <a href="jobs.html">Jobs</a>
+        <a href="news.html">News</a>
+        <a href="contact.html">Contact</a>
+        <a href="login.html" class="btn btn-outline nav-login">Login</a>
+        <a href="register.html" class="btn btn-primary nav-register">Sign Up</a>
+        <a href="profile.html" class="btn btn-outline nav-profile" style="display:none;">👤 <span class="nav-username"></span></a>
+        <a href="admin.html" class="btn btn-outline nav-admin" style="display:none;color:#f59e0b;border-color:#f59e0b;">⚡ Admin</a>
+        <a href="#" class="btn btn-outline nav-logout" style="display:none;" onclick="logout()">Logout</a>
+      </div>
+      <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+    </div>
+  </nav>
+  <!-- Mobile Nav -->
+  <div class="mobile-nav" id="mobileNav">
+    <a href="index.html">🏠 Home</a><a href="about.html">📖 About</a><a href="services.html">🔧 Services</a>
+    <a href="marketplace.html">🏪 Marketplace</a><a href="jobs.html">💼 Jobs</a><a href="news.html">📰 News</a>
+    <a href="contact.html">✉️ Contact</a>
+    <a href="login.html" class="mob-login">🔑 Login</a><a href="register.html" class="mob-register">🚀 Sign Up</a>
+    <a href="profile.html" class="mob-profile" style="display:none;">👤 Profile</a>
+    <a href="admin.html" class="mob-admin" style="display:none;color:#f59e0b;">⚡ Admin</a>
+    <a href="#" class="mob-logout" style="display:none;" onclick="logout()">🚪 Logout</a>
+  </div>
 
+  <!-- ========== SERVICES CONTENT ========== -->
   <section class="container" style="padding:40px 20px;">
     <h2 style="text-align:center;margin-bottom:24px;">Our Services</h2>
-    <div id="services-list" class="cards-grid"></div>
+    <div id="services-list" class="cards-grid">
+      <p style="text-align:center;color:var(--text-muted);">Loading services...</p>
+    </div>
   </section>
 
   <footer class="footer">
@@ -22,7 +53,45 @@
     <p><a href="https://t.me/ascendagroups" target="_blank">Telegram</a></p>
   </footer>
 
+  <!-- ========== SCRIPTS ========== -->
   <script src="supabase.js"></script>
   <script src="script.js"></script>
+  <script>
+    // Fallback: if script.js failed, load services directly
+    window.addEventListener('load', function() {
+      setTimeout(function() {
+        const list = document.getElementById('services-list');
+        // Only run if still showing "Loading..."
+        if (list && list.children.length === 1 && list.children[0].textContent.includes('Loading')) {
+          console.log('Fallback loading services...');
+          const sb = window.supabaseClient || supabase.createClient(
+            'https://rfogomnbicceentrhymy.supabase.co',
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmb2dvbW5iaWNjZWVudHJoeW15Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyNDQwOTEsImV4cCI6MjA5NTgyMDA5MX0.wke5a7GEdU2oepfKfSD-rthLTEmpk3GqVfFRM_MjZ9c',
+            { auth: { persistSession: true } }
+          );
+          sb.from('services').select('*, departments(name)').eq('is_active', true).order('created_at', { ascending: false })
+            .then(({ data, error }) => {
+              if (error) {
+                list.innerHTML = `<p style="color:red;">Error: ${error.message}</p>`;
+                return;
+              }
+              if (!data || data.length === 0) {
+                list.innerHTML = '<p style="text-align:center;color:var(--text-muted);">No services available yet. Add from admin panel.</p>';
+                return;
+              }
+              list.innerHTML = data.map(s => `
+                <div class="card">
+                  <span class="badge badge-purple">Service</span>
+                  <h3>${s.title}</h3>
+                  <p>${(s.description||'').substring(0,100)}</p>
+                  ${s.price ? `<p style="color:var(--green);font-weight:700;">${s.price}</p>` : ''}
+                  ${s.departments?.name ? `<span style="font-size:0.75rem;color:var(--purple);">${s.departments.name}</span>` : ''}
+                </div>
+              `).join('');
+            });
+        }
+      }, 1500);
+    });
+  </script>
 </body>
 </html>
